@@ -1,0 +1,155 @@
+<?php defined('ALTUMCODE') || die() ?>
+
+<form name="update_biolink_" method="post" role="form">
+    <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" required="required" />
+    <input type="hidden" name="request_type" value="update" />
+    <input type="hidden" name="type" value="biolink" />
+    <input type="hidden" name="subtype" value="eshop" />
+    <input type="hidden" name="link_id" value="<?= $row->link_id ?>" />
+
+    <div class="notification-container"></div>
+	
+	<div class="form-product-container">
+					
+		<div class="d-flex justify-content-between mb-3">
+			<div class="flex-grow-1">
+				<i class="fas fa-list-alt"></i> <b class="ml-1">Categories</b>
+			</div>
+			<div>
+				<div data-eshop="aci" class="btn btn-primary"><i class="fa fa-plus"></i> Add</div>
+			</div>
+		</div>
+		
+		<div class="form-product-main">
+			<?php foreach($row->settings as $ky => $sg) {?>				
+			<div class="form-product-item">
+			
+				<div class="form-product-ctg">
+					<div data-eshop-btn="true" class="form-ctg-view">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="form-ctg-text flex--1"><div class="form-ctg-name"><?= $sg->category ?></div></div>
+							<div class="d-flex">
+								<div data-eshop="api" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div>
+								<div class="dropdown">
+									<div data-toggle="dropdown" class="btn btn-light cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div>
+									<div class="dropdown-menu dropdown-menu-right">
+										<a data-eshop="sci" class="dropdown-item none" href="javascript:;"><i class="fas fa-exchange-alt mr-1"></i> <span class="fbv-switch">Hide</span></a>
+										<a data-eshop="eci" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a>
+										<a data-eshop="dci" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-ctg-edit">
+						<div class="form-group mt-1">
+							<input class="form-control" name="category[]" value="<?= $sg->category ?>" placeholder="Insert a category name" required />
+						</div>
+						<div class="d-flex justify-content-center mb-1">
+							<div data-eshop="csp" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="form-product-bag">
+					<?php foreach($sg->products as $sp) {?>
+					<div class="form-bag-item">
+						<div class="form-bag-view">
+							
+							<div class="form-group">
+								<div class="d-flex align-items-stretch">
+									<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2">
+										<div class="fbv-image form-image-preview wh-70" style="background-image:url('<?= $sp->image_url?>')"></div>
+									</div>
+									
+									<div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap">
+										<div class="flex--1">
+											<div class="fbv-title mb-2"><span><?= $sp->title?></span></div>
+											<div class="fbv-description mb-2"<?= !$sp->description ? ' style="display:none"' : '' ?>><?= $sp->description ? $sp->description : '' ?></div>
+											<div class="fbv-mprice">
+												<div class="text-nowrap">Rp<span class="fbv-price"><?= $sp->price ?></span></div>
+												<div class="fbv-pstrike text-nowrap"<?= !$sp->price_strike ? ' style="display:none"' : '' ?>>Rp<span class="fbv-price-strike"><?= $sp->price_strike ? $sp->price_strike : '' ?></span></div>
+											</div>
+										</div>
+									</div>
+									
+									<div class="dropdown">
+										<div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div>
+										<div class="dropdown-menu dropdown-menu-right">
+											<a data-eshop="epi" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a>
+											<a data-eshop="dpi" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a>
+										</div>
+									</div>
+									
+								</div>
+							</div>
+							
+						</div>
+						<div class="form-bag-edit">
+						
+							<div class="form-group">
+								<div class="d-flex align-items-stretch">
+									<div class="flex-grow-1">
+										<label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label>
+										<div class="custom-file">
+											<input type="file" class="custom-file-input" data-image="upload" name="image[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label" for="customFile">Choose file</label>
+										</div>
+									</div>
+									<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2">
+										<div role="image" class="form-image-preview wh-70" style="background-image:url(<?= $sp->image_url?>)"></div>
+									</div>
+								</div>
+								<small class="text-danger" data-field="image"></small>
+							</div>
+							
+							<div class="form-group">
+								<label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label>
+								<input type="text" role="title" class="form-control" name="title[<?= $ky?>][]" value="<?= $sp->title?>" placeholder="Insert product title" required/>
+							</div>
+							
+							<div class="form-group">
+								<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label>
+								<textarea class="form-control" role="description" name="description[<?= $ky?>][]" rows="2" placeholder="Insert description product"><?= $sp->description?></textarea>
+							</div>
+							
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label>
+										<input type="number" min="100" role="price" class="form-control" name="price[<?= $ky?>][]" value="<?= $sp->price?>" placeholder="Insert price product" required/>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price Strike <small>(Opsional)</small></label>
+										<input type="number" role="price_strike" class="form-control" name="price_strike[<?= $ky?>][]" value="<?= $sp->price_strike?>" placeholder="Insert price strike product" />
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label>
+								<input type="number" min="100" role="price" class="form-control" name="weight[<?= $ky?>][]" value="<?= $sp->weight?>" placeholder="Ex: 100" required/>
+							</div>
+							
+							<div class="d-flex justify-content-center mb-2">
+								<div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div>
+							</div>
+						
+						</div>
+					</div>
+					<?php }?>
+					
+				</div>
+				
+			</div>
+			<?php }?>
+		
+		</div>
+	</div>
+
+    <div class="mt-4">
+        <button type="submit" name="submit" class="btn btn-lg btn-block btn-primary"><?= $this->language->global->update ?></button>
+    </div>
+</form>

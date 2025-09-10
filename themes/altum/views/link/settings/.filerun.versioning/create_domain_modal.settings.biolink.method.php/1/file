@@ -1,0 +1,96 @@
+<?php defined('ALTUMCODE') || die() ?>
+
+<div class="modal fade" id="create_biolink_domain" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"><?= $this->language->create_biolink_domain_modal->header ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <p class="text-muted modal-subheader"><?= $this->language->create_biolink_domain_modal->subheader ?></p>
+
+            <div class="modal-body">
+                <form name="create_biolink_domain" method="post" role="form">
+                    <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" required="required" />
+                    <input type="hidden" name="request_type" value="create" />
+                    <input type="hidden" name="link_id" value="<?= $data->link->link_id ?>" />
+                    <input type="hidden" name="type" value="biolink" />
+                    <input type="hidden" name="subtype" value="domain" />
+
+                    <div class="notification-container"></div>
+
+                    <div class="form-group">
+                        <label><i class="fa fa-fw fa-signature fa-sm mr-1"></i> <?= $this->language->create_biolink_domain_modal->input->location_url ?></label>
+                        <input type="text" class="form-control" name="location_url" required="required" placeholder="<?= $this->language->create_biolink_domain_modal->input->location_url_placeholder ?>" />
+                        <small class="text-muted"><?= $this->language->create_biolink_domain_modal->input->domain_help ?><a href="<?= trim_url(url()) ?>"><?= trim_url(url()) ?></a></small>
+                    </div>
+                    <div class="form-group">
+						<label><svg class="svg-inline--fa fa-align-center fa-w-14 fa-fw fa-sm mr-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="align-center" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M432 160H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0 256H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM108.1 96h231.81A12.09 12.09 0 0 0 352 83.9V44.09A12.09 12.09 0 0 0 339.91 32H108.1A12.09 12.09 0 0 0 96 44.09V83.9A12.1 12.1 0 0 0 108.1 96zm231.81 256A12.09 12.09 0 0 0 352 339.9v-39.81A12.09 12.09 0 0 0 339.91 288H108.1A12.09 12.09 0 0 0 96 300.09v39.81a12.1 12.1 0 0 0 12.1 12.1z"></path></svg><!-- <i class="fas fa-fw fa-align-center fa-sm mr-1"></i> --> Height Type</label>
+						<select id="typeheight" class="form-control" name="type_height">
+						<option value="0">Responsive</option>
+						<option value="1">Manual</option>
+						</select>
+					</div>
+                    <div id="ptypeheight" class="form-group" style="display:none">
+                        <label><svg class="svg-inline--fa fa-heading fa-w-16 fa-fw fa-sm mr-1" aria-hidden="true" focusable="false" data-prefix="fa" data-icon="heading" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M448 96v320h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H320a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V288H160v128h32a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H32a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16h32V96H32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-32v128h192V96h-32a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h160a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16z"></path></svg><!-- <i class="fa fa-fw fa-heading fa-sm mr-1"></i> --> Height</label>
+                        <div class="input-group">
+							<input type="text" class="form-control" name="height" value="300">
+							<div class="input-group-append">
+								<span class="input-group-text">PX</span>
+							</div>
+						</div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" name="submit" class="btn btn-primary"><?= $this->language->create_biolink_domain_modal->input->submit ?></button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<?php ob_start() ?>
+<script>
+    $('#typeheight').on('change',function() {
+		if($(this).val()=='1')
+			$('#ptypeheight').show();
+		else
+			$('#ptypeheight').hide();
+	});
+    $('form[name="create_biolink_domain"]').on('submit', event => {
+
+        $.ajax({
+            type: 'POST',
+            url: 'link-ajax',
+            data: $(event.currentTarget).serialize(),
+            success: (data) => {
+                if(data.status == 'error') {
+
+                    let notification_container = $(event.currentTarget).find('.notification-container');
+
+                    notification_container.html('');
+
+                    display_notifications(data.message, 'error', notification_container);
+
+                }
+
+                else if(data.status == 'success') {
+
+                    /* Fade out refresh */
+                    fade_out_redirect({ url: data.details.url, full: true });
+
+                }
+            },
+            dataType: 'json'
+        });
+
+        event.preventDefault();
+    })
+</script>
+<?php \Altum\Event::add_content(ob_get_clean(), 'javascript') ?>

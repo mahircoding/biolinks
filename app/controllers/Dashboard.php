@@ -1,0 +1,82 @@
+<?php
+
+namespace Altum\Controllers;
+
+use Altum\Database\Database;
+use Altum\Middlewares\Authentication;
+use Altum\Models\Package;
+use Altum\Routing\Router;
+
+class Dashboard extends Controller {
+
+    public function index() {
+
+        Authentication::guard();
+		
+		if(strtotime($this->user->package_expiration_date) < strtotime('NOW')) {
+			redirect('package/new');
+		}
+		
+		$message = $admin_sales_settings = null;
+		$is_admin = false;
+		$admin_email = $admin_phone = null;
+		$message = urlencode("Order ReNew Package \r\n\r\nName: ".$this->user->name." \r\n\r\nEmail: ".$this->user->email.($this->user->phone ? "\r\n\r\nPhone: ".$this->user->phone : ''));
+		if($this->user->ids_insert>0){
+			if($admin = Database::get(['name','email','phone','sales_page'], 'users', ['user_id' => $this->user->ids_insert])) {
+				if($admin->sales_page && is_null($admin_sales_settings)) $admin_sales_settings = json_decode($admin->sales_page);
+				$admin_email[] = array("name" => $admin->name, "email" => $admin->email);
+				if($admin->phone) $admin_phone[] = array("name" => $admin->name, "phone" => $admin->phone);
+			}
+		} else {
+			if($admin = Database::get(['name','email','phone','sales_page'], 'users', ['user_id' => 1])) {
+				$is_admin = true;
+				if($admin->sales_page && is_null($admin_sales_settings)) $admin_sales_settings = json_decode($admin->sales_page);
+				$admin_email[] = array("name" => $admin->name, "email" => $admin->email);
+				if($admin->phone) $admin_phone[] = array("name" => $admin->name, "phone" => $admin->phone);
+			}
+		}
+
+        /* Create Modal */
+        $view = new \Altum\Views\View('project/project_create_modal', (array) $this);
+        \Altum\Event::add_content($view->run(), 'modals');
+
+        /* Update Modal */
+        $view = new \Altum\Views\View('project/project_update_modal', (array) $this);
+        \Altum\Event::add_content($view->run(), 'modals');
+
+        /* Delete Modal */
+        $view = new \Altum\Views\View('project/project_delete_modal', (array) $this);
+        \Altum\Event::add_content($view->run(), 'modals');
+
+        /* Get the campaigns list for the user */
+        $projects_result = Database::$database->query("SELECT * FROM `projects` WHERE `user_id` = {$this->user->user_id}");
+
+        /* Some statistics for the widgets */
+        $links_total = Database::$database->query("SELECT COUNT(*) AS `total` FROM `links` WHERE `user_id` = {$this->user->user_id}")->fetch_object()->total;
+
+        /* Get statistics based on the total clicks */
+        $links_clicks_total = Database::$database->query("SELECT SUM(`clicks`) AS `total` FROM `links` WHERE `user_id` = {$this->user->user_id}")->fetch_object()->total;
+
+        /* Get license for the user */
+        $license = $this->user->ulicense;
+
+        /* Prepare the View */
+        $data = [
+			'sales_settings'		=> $admin_sales_settings,
+			'admin_email' 			=> $admin_email ? $admin_email[array_rand($admin_email)] : null,
+			'admin_phone' 			=> $admin_phone ? $admin_phone[array_rand($admin_phone)] : null,
+			'message'				=> $message,
+			'is_admin'				=> $is_admin,
+            'projects_result'       => $projects_result,
+            'links_total'           => $links_total,
+            'links_clicks_total'    => $links_clicks_total,
+            'license'               => $license
+        ];
+
+        $view = new \Altum\Views\View('dashboard/index', (array) $this);
+
+        $this->add_view_content('content', $view->run($data));
+
+    }
+
+}

@@ -1,0 +1,231 @@
+<?php
+
+namespace Altum\Controllers;
+
+use Altum\Captcha;
+use Altum\Database\Database;
+use Altum\Language;
+use Altum\Logger;
+use Altum\Middlewares\Authentication;
+
+class JoinTrial extends Controller {
+
+    public function index() {
+
+        /* Check if Registration is enabled first */
+        //if(!$this->settings->register_is_enabled) {
+        //    redirect();
+        //}
+
+        Authentication::guard('guest');
+
+        //$redirect = 'dashboard';
+		$redirect = 'dashboard';
+        if(isset($_GET['redirect']) && $redirect = $_GET['redirect']) {
+            $redirect = Database::clean_string($redirect);
+        }
+		
+		$user_id = isset($this->params[0]) ? (int)$this->params[0] : null;
+		if(is_null($user_id))
+			redirect();
+		
+		$main_server_name = null;
+		if(trim($_SERVER['SERVER_NAME'])!=BASE_DOMAIN)
+			$main_server_name = trim($_SERVER['SERVER_NAME']);
+		
+		$licenses_user = 0;
+		$whitelabel_id = 0;
+		
+		$rs_au = Database::$database->query("SELECT a.`name`, a.`email`, a.`phone`, a.`ulicense`, a.`ids_insert`, a.`whitelabel`, a.`whitelabel_id`, b.`url` FROM `users` a LEFT JOIN `whitelabel` b ON a.`whitelabel_id` = b.`id` WHERE a.`user_id` = '{$user_id}' AND a.`type` = 1");
+		$rw_aw = $rs_au&&$rs_au->num_rows ? $rs_au->fetch_object() : false;
+		if($rw_aw) {
+			if(trim($_SERVER['SERVER_NAME'])!=BASE_DOMAIN) {
+				$main_server_name = trim($_SERVER['SERVER_NAME']);
+				if($rw_aw->whitelabel != 'Y' && $rw_aw->url != $main_server_name)
+					redirect();
+			}
+			
+			$licenses_user = $rw_aw->ulicense;
+			$whitelabel_id = $rw_aw->whitelabel_id;
+			
+			/* Checking User Minimum Licenses to Create Another user */
+			if(is_null($licenses_user) || $licenses_user == -1) {
+			} else {
+				if($licenses_user==0)
+					redirect();
+			}
+		} else {
+			redirect();
+		}
+		
+        /* Default variables */
+        $values = [
+            'name' => '',
+            'email' => '',
+			'phone' => '',
+            'password' => ''
+        ];
+
+        /* Initiate captcha */
+        $captcha = new Captcha([
+            'recaptcha' => $this->settings->captcha->recaptcha_is_enabled,
+            'recaptcha_public_key' => $this->settings->captcha->recaptcha_public_key,
+            'recaptcha_private_key' => $this->settings->captcha->recaptcha_private_key
+        ]);
+
+        if(!empty($_POST)) {
+            /* Clean some posted variables */
+            $_POST['name']		= filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+			$_POST['phone']		= filter_var($_POST['phone'], FILTER_SANITIZE_NUMBER_INT);
+            $_POST['email']		= filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+			
+			$_POST['phone'] 	= phoneFixer($_POST['phone']);
+
+            /* Default variables */
+            $values['name'] = $_POST['name'];
+            $values['email'] = $_POST['email'];
+			$values['phone'] = $_POST['phone'];
+            $values['password'] = $_POST['password'];
+
+            /* Define some variables */
+            $fields = ['name', 'email', 'phone' ,'password'];
+			$messages = array('name' => 'Masukkan nama panggilan!.',
+							  'email' => 'Masukkan email!.',
+							  'phone' => 'Masukkan nomor whatsapp!.',
+							  'password' => 'Masukkan password!.');
+
+            /* Check for any errors */
+            foreach($_POST as $key => $value) {
+                if(empty($value) && in_array($key, $fields) == true) {
+                    $_SESSION['error'][$key] = $key . ':' . $messages[$key];
+                }
+            }
+			
+            if(!$captcha->is_valid()) {
+                $_SESSION['error']['captcha'] = 'captcha:Captcha tidak cocok';
+            }
+            if(strlen($_POST['name']) < 3 || strlen($_POST['name']) > 32) {
+                if(!isset($_SESSION['error']['name'])) $_SESSION['error']['name'] = 'name:Nama minimal 3 karakter';
+            }
+			
+			if (strlen($_POST['phone']) < 10 || strlen($_POST['phone']) > 14) {
+				if(!isset($_SESSION['error']['phone'])) $_SESSION['error']['phone'] = 'phone:Nomor WhatsApp digit antara 9 - 16 digit!.';
+			}
+			
+			if(Database::exists('user_id', 'users', ['phone' => $_POST['phone']])) {
+                if(!isset($_SESSION['error']['phone'])) $_SESSION['error']['phone'] = 'phone:Nomor WhatsApp sudah terdaftar!.';
+            }
+			
+            if(Database::exists('user_id', 'users', ['email' => $_POST['email']])) {
+                if(!isset($_SESSION['error']['email'])) $_SESSION['error']['email'] = 'email:Email sudah terdaftar!.';
+            }
+			
+            if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+                if(!isset($_SESSION['error']['email'])) $_SESSION['error']['email'] = 'email:Format Email salah!.';
+            }
+            if(strlen(trim($_POST['password'])) < 6) {
+                if(!isset($_SESSION['error']['password'])) $_SESSION['error']['password'] = 'password:Password terlalu pendek!.';
+            }
+
+            /* If there are no errors continue the registering process */
+            if(empty($_SESSION['error'])) {
+                /* Define some needed variables */
+                $password                   = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                $active 	                = (int) !$this->settings->email_confirmation;
+                $email_code                 = md5($_POST['email'] . microtime());
+                $last_user_agent            = Database::clean_string($_SERVER['HTTP_USER_AGENT']);
+                $total_logins               = $active == '1' ? 1 : 0;
+                $package_id                 = 'trial';
+                $package_expiration_date    = date("Y-m-d H:i:s", strtotime('+' . $this->settings->package_trial->days . ' days'));
+                $ip                         = get_ip();
+                $package_settings           = json_encode($this->settings->package_trial->settings);
+				
+				if($pkgs=Database::get('*', 'packages', ['uid' => $user_id, 'is_trial' => 1, 'is_default' => 1])) {
+					$package_expiration_date = date("Y-m-d H:i:s", strtotime('+' . $pkgs->trial_expired));
+					$package_settings = $pkgs->settings;
+					$package_id = $pkgs->package_id;
+				}
+				
+				/* Decrease License for the admin user */
+				if(is_null($licenses_user) || $licenses_user == -1) {
+				} else {
+					if($licenses_user<-1) $licenses_user = 1;
+					if(intval($licenses_user) > 0) {
+						$licenses_user -= 1;
+						$stmt = Database::$database->prepare("UPDATE `users` SET `ulicense` = ? WHERE `user_id` = ?");
+						$stmt->bind_param('ss', $licenses_user, $user_id);
+						$stmt->execute();
+						$stmt->close();
+					}
+				}
+				
+                /* Add the user to the database */
+                $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `ids_insert`, `whitelabel_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param('ssssssssssssssss', $password, $_POST['email'], $_POST['phone'], $email_code, $_POST['name'], $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $user_id, $whitelabel_id);
+                $stmt->execute();
+                $registered_user_id = $stmt->insert_id;
+                $stmt->close();
+                api_mailketing($_POST['name'], $_POST['email']);
+
+                /* Log the action */
+                Logger::users($registered_user_id, 'join.trial');
+
+                /* Send notification to admin if needed */
+                if($this->settings->email_notifications->new_user && !empty($this->settings->email_notifications->emails)) {
+
+                    send_mail(
+                        $this->settings,
+                        explode(',', $this->settings->email_notifications->emails),
+                        $this->language->global->emails->admin_new_user_notification->subject,
+                        sprintf($this->language->global->emails->admin_new_user_notification->body, $_POST['name'], $_POST['email'])
+                    );
+
+
+                }
+
+                /* If active = 1 then login the user, else send the user an activation email */
+                if($active == '1') {
+                    $_SESSION['user_id'] = $registered_user_id;
+                    $_SESSION['success'] = $this->language->register->success_message->login;
+
+                    Logger::users($registered_user_id, 'login.success');
+
+                    redirect($redirect);
+                } else {
+
+                    /* Prepare the email */
+                    $email_template = get_email_template(
+                        [
+                            '{{NAME}}' => $_POST['name'],
+                        ],
+                        $this->language->global->emails->user_activation->subject,
+                        [
+                            '{{ACTIVATION_LINK}}' => url('activate-user/' . md5($_POST['email']) . '/' . $email_code . '?redirect=' . $redirect),
+                            '{{NAME}}' => $_POST['name'],
+                        ],
+                        $this->language->global->emails->user_activation->body
+                    );
+
+                    send_mail($this->settings, $_POST['email'], $email_template->subject, $email_template->body);
+
+                    $_SESSION['success'][] = $this->language->register->success_message->registration;
+					
+					redirect($redirect);
+                }
+
+            }
+        }
+
+        /* Main View */
+        $data = [
+            'values' => $values,
+            'captcha' => $captcha
+        ];
+
+        $view = new \Altum\Views\View('join-trial/index', (array) $this);
+
+        $this->add_view_content('content', $view->run($data));
+
+    }
+
+}

@@ -1,0 +1,307 @@
+<?php
+
+namespace Altum\Controllers;
+
+use Altum\Database\Database;
+use Altum\Middlewares\Csrf;
+use Altum\Models\Package;
+use Altum\Models\User;
+use Altum\Middlewares\Authentication;
+use Altum\Response;
+use Altum\Routing\Router;
+
+class AdminUsers extends Controller {
+
+    public function index() {
+
+        Authentication::guard('admin');
+
+        /* Login Modal */
+        $view = new \Altum\Views\View('admin/users/user_login_modal', (array) $this);
+        \Altum\Event::add_content($view->run(), 'modals');
+
+        /* Main View */
+        $view = new \Altum\Views\View('admin/users/index', (array) $this);
+
+        $this->add_view_content('content', $view->run());
+
+    }
+
+
+    public function read() {
+        Authentication::guard('admin');
+		
+        $datatable = new \Altum\DataTable();
+        $datatable->set_accepted_columns(['user_id', 'name', 'email', 'phone', 'utype', 'license', 'date', 'date_created', 'type', 'active', 'total_user', 'total_login']);
+        $datatable->process($_POST);
+
+        $ids = $this->user->user_id; 
+		$limit = "LIMIT {$datatable->get_start()}, {$datatable->get_length()}";
+		if($datatable->get_length()<=-1) {
+			$limit = "";
+		}
+//		var_dump($limit,$datatable->get_length,$datatable->get_start);
+//		exit();
+    if($this->user->whitelabel == "Y" || $this->user->superagency == "Y" || $this->user->agency == "Y" || $this->user->subagency == "Y"){
+        $result = Database::$database->query("
+		SELECT a.*,
+				(SELECT COUNT(*) FROM `users` WHERE `ids_insert` = a.`user_id`) AS `total_user`,
+				(SELECT email FROM `users` WHERE `user_id` = a.`ids_insert` limit 1) AS `email_upline`,
+				(SELECT count(*) FROM (SELECT (CASE 
+				WHEN type > 0 && whitelabel = 'Y' THEN '1'
+				WHEN type > 0 && superagency = 'Y' THEN '2'
+				WHEN type > 0 && agency = 'Y' THEN '3'
+				WHEN type > 0 && subagency = 'Y' THEN '4'
+				WHEN type > 0 && ((superagency IS NULL || superagency = '') && (agency IS NULL || agency = '') && (subagency IS NULL || subagency = '') && (whitelabel IS NULL || whitelabel = '')) THEN '0'
+				WHEN type = 0 THEN '5'
+				ELSE '5'
+			END) as btype FROM `users` WHERE ids_insert = $ids AND `name` LIKE '%{$datatable->get_search()}%' AND `email` LIKE '%{$datatable->get_search()}%') b WHERE btype LIKE '%".$_POST['columns'][2]['search']['value']."%') as total_after_filter FROM (
+            SELECT
+                `user_id`, `name`, `email`, `phone`, `ids_insert`, 
+			(CASE 
+				WHEN type > 0 && whitelabel = 'Y' THEN '1'
+				WHEN type > 0 && superagency = 'Y' THEN '2'
+				WHEN type > 0 && agency = 'Y' THEN '3'
+				WHEN type > 0 && subagency = 'Y' THEN '4'
+				WHEN type > 0 && ((superagency IS NULL || superagency = '') && (agency IS NULL || agency = '') && (subagency IS NULL || subagency = '') && (whitelabel IS NULL || whitelabel = '')) THEN '0'
+				WHEN type = 0 THEN '5'
+				ELSE '5'
+			END) as utype, ulicense as license, `date`, `date` as `date_created`, `package_expiration_date`, `type`, `active`, `package_id`,
+				(SELECT DISTINCT `total_login` FROM `count_success_login_vw` WHERE `user_id` = `users`.`user_id` LIMIT 1) as `total_login`,
+                (SELECT COUNT(*) FROM `users` WHERE ids_insert = $ids AND (`name` LIKE '%{$datatable->get_search()}%' OR `email` LIKE '%{$datatable->get_search()}%')) AS `total_before_filter`
+            FROM
+                `users`
+            WHERE
+                ids_insert = $ids AND
+                (`name` LIKE '%{$datatable->get_search()}%'
+                OR `email` LIKE '%{$datatable->get_search()}%')
+            ORDER BY
+                `type` DESC,
+                " . $datatable->get_order() . "
+			) a WHERE utype LIKE '%".$_POST['columns'][2]['search']['value']."%'
+			ORDER BY
+				{$datatable->get_order()}
+			{$limit}
+        ");
+    }
+    else{
+//exit("ok2");
+        $q = "
+        SELECT a.*,
+				(SELECT COUNT(*) FROM `users` WHERE `ids_insert` = a.`user_id`) AS `total_user`,
+				(SELECT email FROM `users` WHERE `user_id` = a.`ids_insert` limit 1) AS `email_upline`,
+				(SELECT count(*) FROM (SELECT (CASE 
+				WHEN type > 0 && whitelabel = 'Y' THEN '1'
+				WHEN type > 0 && superagency = 'Y' THEN '2'
+				WHEN type > 0 && agency = 'Y' THEN '3'
+				WHEN type > 0 && subagency = 'Y' THEN '4'
+				WHEN type > 0 && ((superagency IS NULL || superagency = '') && (agency IS NULL || agency = '') && (subagency IS NULL || subagency = '') && (whitelabel IS NULL || whitelabel = '')) THEN '0'
+				WHEN type = 0 THEN '5'
+				ELSE '5'
+			END) as btype FROM `users` WHERE `name` LIKE '%{$datatable->get_search()}%' OR `email` LIKE '%{$datatable->get_search()}%') b WHERE btype LIKE '%".$_POST['columns'][2]['search']['value']."%') as total_after_filter FROM (
+			SELECT
+            `user_id`, `name`, `email`, `phone`, `ids_insert`, 
+			(CASE 
+				WHEN type > 0 && whitelabel = 'Y' THEN '1'
+				WHEN type > 0 && superagency = 'Y' THEN '2'
+				WHEN type > 0 && agency = 'Y' THEN '3'
+				WHEN type > 0 && subagency = 'Y' THEN '4'
+				WHEN type > 0 && ((superagency IS NULL || superagency = '') && (agency IS NULL || agency = '') && (subagency IS NULL || subagency = '') && (whitelabel IS NULL || whitelabel = '')) THEN '0'
+				WHEN type = 0 THEN '5'
+				ELSE '5'
+			END) as utype, ulicense as license, `date`, `date` as `date_created`, `package_expiration_date`, `type`, `active`, `package_id`, `agency`,
+            (SELECT DISTINCT `total_login` FROM `count_success_login_vw` WHERE `user_id` = `users`.`user_id` LIMIT 1) as `total_login`,
+			(SELECT COUNT(*) FROM `users`) AS `total_before_filter`
+        FROM
+            `users`
+        WHERE
+            `name` LIKE '%{$datatable->get_search()}%'
+            OR `email` LIKE '%{$datatable->get_search()}%'
+        ORDER BY
+            `type` DESC,
+            " . $datatable->get_order() . "
+		) a WHERE utype LIKE '%".$_POST['columns'][2]['search']['value']."%'
+		ORDER BY
+			{$datatable->get_order()}
+		{$limit}
+    ";
+//exit($q);
+	$result = Database::$database->query($q);
+    }
+
+        
+
+        $total_before_filter = 0;
+        $total_after_filter = 0;
+
+        $data = [];
+		
+		if($this->user->whitelabel == 'Y')
+			$urladmin = 'whitelabel';
+		elseif($this->user->superagency == 'Y')
+			$urladmin = 'superagency';
+		elseif($this->user->agency == 'Y')
+			$urladmin = 'agency';
+		elseif($this->user->subagency == 'Y')
+			$urladmin = 'subagency';
+		else
+			$urladmin = 'admin';
+//exit($urladmin);		
+        while($row = $result->fetch_object()):
+			//print_r($row);
+            $email_extra = $row->type > 0 ? ' <span class="text-success" data-toggle="tooltip" title="' . $this->language->admin_users->tooltip->admin .'"><i class="fa fa-fw fa-crown fa-sm"></i></span>' : '';
+            if($row->type > 0 && $row->utype == 1)
+			$email_extra = $row->type > 0 ? ' <span class="text-success" data-toggle="tooltip" title="Whitelabel"><i class="fa fa-fw fa-user-plus fa-sm"></i></span>' : '';
+			elseif($row->type > 0 && $row->utype == 2)
+			$email_extra = $row->type > 0 ? ' <span class="text-info" data-toggle="tooltip" title="' . $this->language->admin_users->tooltip->superagency .'"><i class="fa fa-fw fa-user-plus fa-sm"></i></span>' : '';	
+			elseif($row->type > 0 && $row->utype == 3)
+			$email_extra = $row->type > 0 ? ' <span class="text-primary" data-toggle="tooltip" title="' . $this->language->admin_users->tooltip->agency .'"><i class="fa fa-fw fa-user-plus fa-sm"></i></span>' : '';	
+			elseif($row->type > 0 && $row->utype == 4)
+			$email_extra = $row->type > 0 ? ' <span class="text-warning" data-toggle="tooltip" title="' . $this->language->admin_users->tooltip->subagency .'"><i class="fa fa-fw fa-user-plus fa-sm"></i></span>' : '';
+			
+			$row->email = trim($row->email);
+			$row->email_upline = $row->email_upline ? $row->email_upline : 'kreagrup@gmail.com';
+			
+			if($row->utype == 1 || $row->utype == 2 || $row->utype == 3 || $row->utype == 4) {
+				if(is_null($row->license) || intval($row->license)==-1)
+					$row->license = '<span class="badge badge-pill badge-info">Unlimited</span>';
+				else
+					$row->license = '<span class="badge badge-pill badge-primary fs-md">'.$row->license.'</span>';
+			} else
+				$row->license = '';
+			$row->name = trim($row->name) . $email_extra;
+			
+			$row->total_login = $row->total_login ? $row->total_login : 0;
+			
+            /* Active Status badge */
+            $row->active = $row->active ? '<div class="d-block text-center"><span class="badge badge-pill badge-success"><i class="fa fa-fw fa-check"></i> ' . $this->language->global->active . '</span>' : '<span class="badge badge-pill badge-warning"></div><i class="fa fa-fw fa-eye-slash"></i> ' . $this->language->global->disabled . '</span>';
+
+            /* Current Package */
+            $package = (new Package(['settings' => $this->settings]))->get_package_by_id($row->package_id);
+
+            $row->package_id =  $package ? '<div class="d-block text-center"><span class="badge badge-pill badge-light" data-toggle="tooltip" title="' . $this->language->admin_users->tooltip->package . '">' . $package->name . '</span></div>' : null;
+
+            $row->date = '<div class="d-block text-center"><span class="badge badge-pill badge-info" data-toggle="tooltip" title="' . \Altum\Date::get($row->date, 1) . '">' . \Altum\Date::get($row->date, 2) . '</span></div>'
+						 . '<div class="d-block text-center"><span class="badge badge-pill badge-danger" data-toggle="tooltip" title="' . \Altum\Date::get($row->package_expiration_date, 1) . '">' . \Altum\Date::get($row->package_expiration_date, 2) . '</span></div>';
+            $row->actions = get_admin_options_button('user', $row->user_id, $urladmin);
+			
+            $data[] = $row;
+            $total_before_filter = $row->total_before_filter;
+            $total_after_filter = $row->total_after_filter;
+
+        endwhile;
+//var_dump($total_before_filter,$data);
+//exit();
+        Response::simple_json([
+            'data' => $data,
+            'draw' => $datatable->get_draw(),
+            'recordsTotal' => $total_before_filter,
+            'recordsFiltered' =>  $total_after_filter
+        ]);
+
+    }
+
+    public function login() {
+
+        Authentication::guard();
+
+        $user_id = (isset($this->params[0])) ? $this->params[0] : false;
+
+        if(!Csrf::check('global_token')) {
+            $_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+            redirect('admin/users');
+        }
+
+        if($user_id == $this->user->user_id) {
+            redirect('admin/users');
+        }
+
+        /* Check if user exists */
+        if(!$user = Database::get('*', 'users', ['user_id' => $user_id])) {
+            redirect('admin/users');
+        }
+
+        if(empty($_SESSION['error'])) {
+
+            /* Logout of the admin */
+            Authentication::logout(false);
+
+            /* Login as the new user */
+            session_start();
+            $_SESSION['user_id'] = $user->user_id;
+
+            /* Success message */
+            $_SESSION['success'][] = sprintf($this->language->admin_user_login_modal->success_message, $user->name);
+
+            redirect('dashboard');
+
+        }
+
+        die();
+    }
+
+
+    public function delete() {
+
+        Authentication::guard();
+
+        $user_id = (isset($this->params[0])) ? $this->params[0] : false;
+		$user_licenses = 0;
+		$ownr_licenses = 0;
+		
+		$result = Database::get('*', 'users', ['user_id' => $user_id]);
+
+        if(!Csrf::check()) {
+            $_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+        }
+
+        if($user_id == $this->user->user_id) {
+            $_SESSION['error'][] = $this->language->admin_users->error_message->self_delete;
+        }
+		
+		if($this->user->type==1 && ($this->user->whitelabel=='Y' || $this->user->agency=='Y' || $this->user->subagency=='Y')) {
+			if($result&&$result->whitelabel=='Y') {
+				$_SESSION['error'][] = 'Can not delete Whitelabel User!';
+			}
+		}
+		
+		if(!$result)
+			redirect('admin/users');
+
+        if(empty($_SESSION['error'])) {
+			
+			if($result) {
+				$user_licenses = $result->ulicense;
+				if($insert = Database::get('*', 'users', ['user_id' => $result->ids_insert])) {
+					$ownr_licenses = $insert->ulicense;
+					/* Increase License for the user */
+					if(is_null($ownr_licenses) || $ownr_licenses == -1) {
+					} else {
+						if(intval($ownr_licenses)>=0) {
+							$ownr_licenses += ($user_licenses + 1);
+							$stmt = Database::$database->prepare("UPDATE `users` SET `ulicense` = ? WHERE `user_id` = ?");
+							$stmt->bind_param('ss', $ownr_licenses, $insert->user_id);
+							$stmt->execute();
+							$stmt->close();
+						}
+					}
+					
+					if($insert->type==1) {
+						$stmt = Database::$database->prepare("UPDATE `users` SET `ids_insert` = ?, `whitelabel_id` = ? WHERE `ids_insert` = {$user_id}");
+						$stmt->bind_param('ss', $insert->user_id, $insert->whitelabel_id);
+						$stmt->execute();
+						$stmt->close();
+					}
+				}
+			}
+
+            /* Delete the user */
+            (new User(['settings' => $this->settings]))->delete($user_id);
+            redirect('admin/users');
+
+        }
+
+        die();
+    }
+
+}

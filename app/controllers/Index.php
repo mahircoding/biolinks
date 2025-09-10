@@ -1,0 +1,114 @@
+<?php
+
+namespace Altum\Controllers;
+
+
+use Altum\Database\Database;
+use Altum\Models\Whitelabel;
+
+class Index extends Controller {
+
+    public function index() {
+
+        /* Custom index redirect if set */
+		/*
+        if(trim($_SERVER['SERVER_NAME'], '/') == custom_index_url('host') && !empty(custom_index_url('index_url'))) {
+            header('Location: http://'.custom_index_url('index_url'));
+            die();
+        }
+
+        if(trim($_SERVER['SERVER_NAME'], '/') == whitelabel('url') ) {
+            header('Location: /login');
+            die();
+        }
+        
+        if(!empty($this->settings->index_url) || trim($_SERVER['SERVER_NAME'], '/') == !whitelabel('url')) {
+            header('Location: ' . $this->settings->index_url);
+            die();
+        }
+		*/
+		
+		$is_custom_domain = false;
+		
+        /* Check if the current link accessed is actually the original url or not ( multi domain use ) */
+        $main_server_name = null;
+		if(trim($_SERVER['SERVER_NAME'])!=BASE_DOMAIN)
+			$main_server_name = trim($_SERVER['SERVER_NAME']);
+		
+		$original_url_host = str_replace('www.','',parse_url(url())['host']);
+        $request_url_host = str_replace('www.','',Database::clean_string($_SERVER['HTTP_HOST']));
+		
+        if($original_url_host != $request_url_host||trim($_SERVER['SERVER_NAME'])!=BASE_DOMAIN) {
+            $is_custom_domain = true;
+        }
+		
+		if($is_custom_domain) {
+			$result = Database::$database->query("SELECT a.`user_id`, a.`type`, a.`whitelabel_id`, a.`whitelabel`, a.`agency`, a.`subagency`, b.`index_url` FROM `users` a JOIN `whitelabel` b ON b.`id` = a.`whitelabel_id` WHERE a.`whitelabel` = 'y' AND b.`url` = '{$request_url_host}'");
+			$whitelabel = $result&&$result->num_rows ? $result->fetch_object() : null;
+			//$whitelabel = (new Whitelabel(['settings' => null]))->get($request_url_host);
+			
+			if($whitelabel) {
+				/* Custom index redirect if set */
+				if(!empty($whitelabel->index_url)) {
+					header('Location: ' . $whitelabel->index_url);
+					die();
+				} else {
+					header('Location: /login');
+					die();
+				}
+			} else {
+			    $rs_rdr = Database::$database->query("SELECT * FROM `domains` WHERE `host` = '".$main_server_name."' AND `index_url` <> ''");
+			    $row_rdr = $rs_rdr&&$rs_rdr->num_rows ? $rs_rdr->fetch_object() : null;
+			    if(!empty($row_rdr->index_url)) {
+    				header('Location: ' . $row_rdr->index_url);
+    				die();
+    			} else {
+    				header('Location: /login');
+    				die();
+    			}
+			}
+		} else {
+			/* Custom index redirect if set */
+			if(!empty($this->settings->index_url)) {
+				header('Location: ' . $this->settings->index_url);
+				die();
+			}
+		}
+
+        /* Packages View */
+        $data = [
+            'simple_package_settings' => [
+                'no_ads',
+                'removable_branding',
+                'custom_branding',
+                'custom_colored_links',
+                'statistics',
+                'google_analytics',
+                'facebook_pixel',
+                'custom_backgrounds',
+                'verified',
+                'scheduling',
+                'seo',
+                'utm',
+                'socials',
+                'fonts'
+            ]
+        ];
+
+        $view = new \Altum\Views\View('partials/packages', (array) $this);
+
+        $this->add_view_content('packages', $view->run($data));
+
+
+        /* Main View */
+        $data = [
+            'is_custom_domain' => $is_custom_domain ?? false
+        ];
+
+        $view = new \Altum\Views\View('index/index', (array) $this);
+
+        $this->add_view_content('content', $view->run($data));
+
+    }
+
+}

@@ -1,0 +1,259 @@
+<?php
+
+namespace Altum\Controllers;
+
+use Altum\Database\Database;
+use Altum\Date;
+use Altum\Models\User;
+use Altum\Title;
+use MaxMind\Db\Reader;
+use Sinergi\BrowserDetector\Browser;
+use Sinergi\BrowserDetector\Os;
+
+class Link extends Controller {
+    public $link;
+    public $user;
+
+    public function index() {
+
+        $link_url = isset($this->params[0]) ? Database::clean_string($this->params[0]) : false;
+        $link_id = isset($_GET['link_id']) ? (int) $_GET['link_id'] : false;
+        
+        /* Check if the current link accessed is actually the original url or not ( multi domain use ) */
+        $original_url_host = parse_url(url())['host'];
+        $request_url_host = Database::clean_string($_SERVER['HTTP_HOST']);
+        
+        $main_server_name = null;
+		if(trim($_SERVER['SERVER_NAME'])!=BASE_DOMAIN)
+			$main_server_name = trim($_SERVER['SERVER_NAME']);
+		
+        if($original_url_host == $request_url_host) {
+            /* If we have the link id, get it via the link id */
+            /* This is used for the preview iframe */
+            if($request_url_host==BASE_DOMAIN) {
+                if($link_id) {
+                    $this->link = Database::get('*', 'links', ['link_id' => $link_id]);
+                } else {
+                    if(parse_url(url())['host'] == global_whitelabel('url')){
+                        $this->link = Database::get('*', 'links', ['url' => $link_url, 'is_enabled' => 1, 'domain_id' => link_global_whitelabel('domain_id')]);
+                    }elseif(parse_url(url())['host'] == whitelabel('url')){
+                        $this->link = Database::get('*', 'links', ['url' => $link_url, 'is_enabled' => 1, 'domain_id' => link_whitelabel('domain_id')]);
+                    } else{ 
+                        $this->link = Database::get('*', 'links', ['url' => $link_url, 'is_enabled' => 1, 'domain_id' => 0]);
+                    }
+                }
+            } else {
+                $this->link = $this->database->query("
+                SELECT `links`.*, `domains`.`host`, `domains`.`scheme`
+                FROM `links`
+                LEFT JOIN `domains` ON `links`.`domain_id` = `domains`.`domain_id`
+				LEFT JOIN `whitelabel` ON `links`.`whitelabel_id` = `whitelabel`.`id`
+                WHERE
+                    `links`.`url` = '{$link_url}' AND 
+                    `links`.`is_enabled` = 1 AND 
+                    (`domains`.`host` = '{$request_url_host}' OR `whitelabel`.`url` = '{$request_url_host}')
+                LIMIT 1
+				")->fetch_object() ?? null;
+            }
+
+        } else {
+            
+            $this->link = $this->database->query("
+                SELECT `links`.*, `domains`.`host`, `domains`.`scheme`
+                FROM `links`
+                LEFT JOIN `domains` ON `links`.`domain_id` = `domains`.`domain_id`
+                WHERE
+                    `links`.`url` = '{$link_url}' AND 
+                    `links`.`is_enabled` = 1 AND 
+                    `domains`.`host` = '{$request_url_host}' AND 
+                    (`links`.`user_id` = `domains`.`user_id` OR `domains`.`type` = 1)
+            ")->fetch_object() ?? null;
+        }
+        
+        if(!$this->link) {
+			if($main_server_name)
+				redirect('http://'.$main_server_name,true);
+			else
+				redirect();
+        }
+
+        $this->user = (new User())->get($this->link->user_id);
+		
+		/* Parse the settings */
+        $this->link->settings = json_decode($this->link->settings);
+		
+		if($_POST) {
+			if($this->link->settings->password_protector)
+				if($_POST['password_unlock']==$this->link->settings->password_lock) {
+					$this->link->settings->password_protector = false;
+					$_SESSION['password_protector'] = time();
+					$this->process_redirect();
+				}
+		} else {
+			if(isset($_SESSION['password_protector'])&&!$this->link->settings->password_protector) unset($_SESSION['password_protector']);
+				
+			if(isset($_SESSION['password_protector'])) {
+				$time_lock = 5 * 60;
+				if(isset($this->link->settings->timeout_lock)) $time_lock = (int)$this->link->settings->timeout_lock * 60;
+				
+				if((time() - (int)$_SESSION['password_protector']) > $time_lock) {
+					unset($_SESSION['password_protector']);
+				} else {
+					$this->link->settings->password_protector = false;
+				}
+			}
+		}
+
+        /* Check if its a scheduled link and we should show it or not */
+        if(
+            $this->user->package_settings->scheduling &&
+
+            !empty($this->link->start_date) &&
+            !empty($this->link->end_date) &&
+            (
+                \Altum\Date::get('', null) < \Altum\Date::get($this->link->start_date, null, \Altum\Date::$default_timezone) ||
+                \Altum\Date::get('', null) > \Altum\Date::get($this->link->end_date, null, \Altum\Date::$default_timezone)
+            )
+        ) {
+            if($main_server_name)
+				redirect('http://'.$main_server_name,true);
+			else
+				redirect();
+        }
+
+        // To check if user expired trial, showing pop up expired 
+        if($this->user->package_id == "trial" && \Altum\Date::get_time_until($this->user->package_expiration_date) == "now") {
+            $get = Database::get(['email','phone'], 'users', ['user_id' => $this->user->ids_insert]);
+            if($get->phone == ''){
+                $get->phone = "6289521009988";
+            }
+            if($get->email == ''){
+                $get->email = "kreagrup@gmail.com";
+            }
+                echo '
+            <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+            <script>$(document).ready(function() {setTimeout(function() {$("#expired").modal({backdrop: "static"});},1500); 
+            });</script><div id="expired" class="modal fade justify-content-center"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><h4 class="modal-title">Masa Coba Gratis Anda telah Berakhir.</h4><br><h5><small><strong>Note:</strong>  Untuk Mengaktifkan Kembali Link Anda, Silahkan Perpanjang/Perbarui Paket, Bisa Hubungi Agency maupun Admin.</small></h5><br><strong>Klik Tombol dibawah ini untuk menghubungi Agency atau Admin</strong></div><div class="modal-footer"><a href="https://api.whatsapp.com/send/?phone=+'.$get->phone.'&text=Saya Ingin Membeli Paket Biolink https://'.$_SERVER['SERVER_NAME'].'/" class="btn btn-primary">Via WhatsApp</a><a href="mailto:'.$get->email.'" class="btn btn-primary">Via Email</a></div></div></div></div>';
+        }
+
+        /* Only parse and add statistics if its not coming from inside the preview iframe from the settings */
+        if(!isset($_GET['preview'])) {
+            /* Generate an id for the log */
+            $dynamic_id = md5(
+                $this->link->link_id . $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . (new \DateTime())->format('Y-m-d')
+            );
+
+            /* Detect the location */
+            $maxmind = (new Reader(APP_PATH . 'includes/GeoLite2-Country.mmdb'))->get(get_ip());
+            $country_code = $maxmind ? $maxmind['country']['iso_code'] : null;
+
+            /* Detect extra details about the user */
+            $os_name = (new Os($_SERVER['HTTP_USER_AGENT']))->getName();
+            $browser_name = (new Browser($_SERVER['HTTP_USER_AGENT']))->getName();
+            $browser_language = (new \Sinergi\BrowserDetector\Language($_SERVER['HTTP_ACCEPT_LANGUAGE']))->getLanguageLocale();
+            $referrer = isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+            $device_type = get_device_type($_SERVER['HTTP_USER_AGENT']);
+
+            /* Insert or update the log */
+            $is_insert = true;
+            $stmt = Database::$database->prepare("
+                INSERT INTO 
+                    `track_links` (`link_id`, `dynamic_id`, `ip`, `country_code`, `os_name`, `browser_name`, `referrer`, `device_type`, `browser_language`, `date`, `last_date`) 
+                VALUES 
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    `count` = `count` + 1,
+                    `last_date` = VALUES (last_date)  
+            ");
+            $stmt->bind_param(
+                'sssssssssss',
+                $this->link->link_id,
+                $dynamic_id,
+                $_SERVER['REMOTE_ADDR'],
+                $country_code,
+                $os_name,
+                $browser_name,
+                $referrer,
+                $device_type,
+                $browser_language,
+                Date::$date,
+                Date::$date
+            );
+            $stmt->execute();
+            if($stmt->affected_rows > 1) {
+                $is_insert = false;
+            }
+            $stmt->close();
+
+            /* Add the unique hit to the link table as well */
+            if ($is_insert) {
+                Database::$database->query("UPDATE `links` SET `clicks` = `clicks` + 1 WHERE `link_id` = {$this->link->link_id}");
+            }
+        }
+
+
+        /* Check what to do next */
+        if($this->link->type == 'biolink' && $this->link->subtype == 'base') {
+
+            $this->process_biolink();
+
+        } else {
+
+            $this->process_redirect();
+
+        }
+
+    }
+
+    public function process_biolink() {
+
+        /* Determine the actual full url */
+        $this->link->full_url = $this->link->domain_id && !isset($_GET['link_id']) ? $this->link->scheme . $this->link->host . '/' . $this->link->url : url($this->link->url);
+
+        /* Get all the links inside of the biolink */
+        $cache_instance = \Altum\Cache::$adapter->getItem('biolink_links_' . $this->link->link_id);
+
+        /* Set cache if not existing */
+        if(is_null($cache_instance->get())) {
+
+            $result = Database::$database->query("SELECT * FROM `links` WHERE `biolink_id` = {$this->link->link_id} AND `type` = 'biolink' AND `subtype` <> 'base' AND `is_enabled` = 1 ORDER BY `order` ASC LIMIT 0,100");
+            $links = [];
+
+            while($row = $result->fetch_object()) {
+                $links[] = $row;
+            }
+
+            \Altum\Cache::$adapter->save($cache_instance->set($links)->expiresAfter(86400)->addTag('biolinks_links_user_' . $this->link->user_id));
+
+        } else {
+
+            /* Get cache */
+            $links = $cache_instance->get();
+
+        }
+
+        /* Prepare the View */
+        $data = [
+            'link' => $this->link,
+            'links' => $links
+        ];
+
+        $view_content = \Altum\Link::get_biolink($this, $this->link, $this->user, $links);
+
+        $this->add_view_content('content', $view_content);
+
+        /* Set a custom title */
+        Title::set($this->link->settings->title, true);
+    }
+
+    public function process_redirect() {
+
+        /* Check if we should redirect the user or kill the script */
+        if(isset($_GET['no_redirect'])) {
+            die();
+        }
+
+        header('Location: ' . $this->link->location_url);
+
+    }
+}

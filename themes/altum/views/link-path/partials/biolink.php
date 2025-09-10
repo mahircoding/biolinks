@@ -1,0 +1,1075 @@
+<?php defined('ALTUMCODE') || die();
+$pvs=$kts=$kcs=null;
+?>
+
+<body class="pt-h100 link-body link-body-relative <?= $data->link->design->background_class ?>" style="<?= $data->link->design->background_style ?>;height:100%">
+		<?php if($this->blocked) {?>
+		<div class="link-blocked">
+			<div class="link-blocked-notes">
+				<h1 class="h1 text-center">Link Diblok</h1>
+				<p>Link ini telah di sembunyikan karena terdapat kata-kata yang dilarang, ini bertujuan untuk mencegah hal-hal yang tidak diingikan dan sesuai dengan syarat dan ketentuan yang berlaku.</p>
+				<p>Agar link anda tidak diblok, masuk ke akun anda dan ubah atau hapus block link yang mengandung kata-kata terlarang.</p>
+				<p>Jika ada pertanyaan silahkan menghubungi Admin yang bersangkutan</p>
+			</div>
+		</div>
+		<?php } else {?>
+		<?php if(isset($data->link->settings->password_protector)&&$data->link->settings->password_protector):?>
+		<?php else:?>
+		<?php if($data->links): ?>
+		<?php foreach($data->links as $row): ?>
+		<?php if(in_array($row->subtype,array('floatbutton','navbmenu'))) {?>
+		<?= \Altum\Link::get_biolink_link($row, $data->user) ?? null ?>
+		<?php }?>
+		<?php if($row->subtype=='domain'):
+			$settings_row = json_decode($row->settings);
+			if($settings_row->type_height==2):
+		?>
+			<div class="emb-rsp" data-link-id="<?= $row->link_id ?>">
+				<?= \Altum\Link::get_biolink_link($row, $data->user) ?? null ?>
+			</div>
+			<style>.emb-rsp .embed-responsive,.link-html{height:100% !important}.link-body{overflow:hidden !important}</style>
+			<?php endif ?>
+		<?php endif ?>
+		<?php endforeach?>
+		<?php endif?>
+		<?php endif?>
+	<script>window.isLoadPage=false,window.spc='',window.bkc='',window.are={pv:null,kt:null,kc:null,st:null};var eshop={},ow_phn='<?= $data->user->phone ?>',curr_symbol='<?= $data->user->currency ?>',eu_id='<?= string_encode($data->user->user_id,"12345678") ?>',el_id='<?= string_encode($data->link->link_id,"12345678") ?>'</script>
+    <div id="pt-main" data-animation="<?= $data->link->design->page_transition ?>" data-bg-class="<?= $data->link->design->background_class ?>" data-bg-style="<?= $data->link->design->background_style ?>" class="pt-perspective">
+		<div class="pt-page pt-page-1" style=""></div>
+		<div class="pt-page pt-page-2 pt-page-current pt-current-active" style="">
+			<div class="container">
+				<div class="row d-flex justify-content-center text-center">
+					<div class="col-md-8 link-content<?= isset($_GET['preview']) ? ' container-disabled-simple' : ''?>">
+
+						<?php require THEME_PATH . 'views/partials/ads_header_biolink.php' ?>
+
+						<header class="d-flex flex-column align-items-center" style="<?= $data->link->design->text_style ?>">
+							<img id="image" src="<?= SITE_URL . UPLOADS_URL_PATH . 'avatars/' . $data->link->settings->image ?>" alt="<?= \Altum\Language::get()->link->biolink->image_alt ?>" class="link-image" <?= !empty($data->link->settings->image) && file_exists(UPLOADS_PATH . 'avatars/' . $data->link->settings->image) ? null : 'style="display: none;"' ?> />
+
+							<div class="d-flex flex-row align-items-center mt-4">
+								<h1 id="title"><?= $data->link->settings->title ?></h1>
+
+								<?php if($data->user->package_settings->verified && $data->link->settings->display_verified): ?>
+								<span data-toggle="tooltip" title="<?= \Altum\Language::get()->global->verified ?>" class="link-verified ml-1"><i class="fa fa-fw fa-check-circle fa-1x"></i></span>
+								<?php endif ?>
+							</div>
+
+							<p id="description"><?= $data->link->settings->description ?></p>
+						</header>
+
+						<main id="links" class="mt-4">
+
+							<?php if(isset($data->link->settings->password_protector)&&$data->link->settings->password_protector):?>
+								<?php else: ?>
+								<?php if($data->links): ?>
+								<?php foreach($data->links as $row): ?>
+
+									<?php
+
+									/* Check if its a scheduled link and we should show it or not */
+									if(
+											!empty($row->start_date) &&
+											!empty($row->end_date) &&
+											(
+												\Altum\Date::get('', null) < \Altum\Date::get($row->start_date, null, \Altum\Date::$default_timezone) ||
+												\Altum\Date::get('', null) > \Altum\Date::get($row->end_date, null, \Altum\Date::$default_timezone)
+											)
+									) {
+										continue;
+									}
+
+									$row->utm = $data->link->settings->utm;
+
+									?>
+									<?php if($row->subtype=='domain'):
+										$setts_row = isset($row->settings->type_height) ? $row->settings : json_decode($row->settings);
+										if($setts_row->type_height!=2):
+									?>
+									<div data-link-id="<?= $row->link_id ?>">
+										<?php if(!in_array($row->subtype,array('floatbutton','navbmenu'))) {?>
+										<?= \Altum\Link::get_biolink_link($row, $data->user) ?? null ?>
+										<?php }?>
+									</div>
+										<?php endif?>
+									<?php else:?>
+									<div data-link-id="<?= $row->link_id ?>">
+										<?php if(!in_array($row->subtype,array('floatbutton','navbmenu'))) {?>
+										<?= \Altum\Link::get_biolink_link($row, $data->user) ?? null ?>
+										<?php }?>
+									</div>
+									<?php endif?>
+
+								<?php endforeach ?>
+							<?php endif ?>
+							
+							<?php if($data->user->package_settings->socials): ?>
+							<div id="socials" class="d-flex flex-wrap justify-content-center mt-5">
+
+							<?php $biolink_socials = require APP_PATH . 'includes/biolink_socials.php'; ?>
+							<?php foreach($data->link->settings->socials as $key => $value): ?>
+								<?php if($value): 
+								$value = str_replace('https://instagram.com/','',$value);
+								?>
+
+								<div class="mx-3 mb-3">
+									<a href="<?= sprintf($biolink_socials[$key]['format'], $value) ?>" target="_blank" data-toggle="tooltip" title="<?= \Altum\Language::get()->link->settings->socials->{$key}->name ?>">
+										<i class="<?= \Altum\Language::get()->link->settings->socials->{$key}->icon ?> fa-fw fa-2x" style="<?= $data->link->design->socials_style ?>"></i>
+									</a>
+								</div>
+
+								<?php endif ?>
+							<?php endforeach ?>
+
+							</div>
+							<?php endif ?>
+							<?php endif ?>
+						</main>
+
+						<?php require THEME_PATH . 'views/partials/ads_footer_biolink.php' ?>
+						
+						<footer class="link-footer">
+							<?php if($data->link->settings->display_branding): ?>
+								<?php if(isset($data->link->settings->branding, $data->link->settings->branding->name, $data->link->settings->branding->url) && !empty($data->link->settings->branding->name)): ?>
+									<a id="branding" href="<?= !empty($data->link->settings->branding->url) ? $data->link->settings->branding->url : '#' ?>" style="<?= $data->link->design->text_style ?>"><?= $data->link->settings->branding->name ?></a>
+								<?php else: ?>
+									<a id="branding" href="<?= url() ?>" style="<?= $data->link->design->text_style ?>"><?= \Altum\Language::get()->link->branding ?></a>
+								<?php endif ?>
+							<?php endif ?>
+						</footer>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<a class="bio-addtocart hide" href="javascript:;" data-toggle="modal" data-target="#addtocart">
+		<span>0</span> <i class="fas fa-shopping-cart ml-1 mr-1"></i> Cart
+	</a>
+	<style>
+	.bio-addtocart{
+		position:fixed;
+		top:10px;
+		right:10px;
+		padding:8px 16px;
+		font-size:20px;
+		border-radius:50px;
+		background-color:#f9f9f9;
+		box-shadow: 0 5px 5px 0 rgba(0,0,0,.1);
+		cursor:pointer;
+	}
+	.bio-addtocart.hide{display:none}
+	.bio-addtocart span {
+		position:relative;
+		top:-3px;
+		width:25px;
+		height:25px;
+		padding:3px 8px;
+		background-color:red;
+		border-radius:50px;
+		color:#fff;
+		line-height:12px;
+		font-size:14px;
+	}
+	.bio-addtocart:hover{text-decoration:none}
+	.btn-section,.btn-section-back{width:100%;max-width:120px;cursor:pointer}
+	.btn-section-back{background-color:#a8a8a8}
+	.modal-product{max-width:600px !important}
+	.modal-product .modal-header{padding:0 !important}
+	.es-product-container{margin-top:25px}
+	.product-item {position:relative;display:flex;padding:.75rem 0}
+	.product-close{
+		position: absolute;
+		top: -4px;
+		right: 0;
+		width: 24px;
+		height: 24px;
+		background-color: #f76a6a;
+		border-radius: 50%;
+		padding: .6rem .4rem;
+		line-height: 4px;
+		color:#fff;
+		font-weight:bold;
+		cursor:pointer;
+	}
+	.product-image{
+		width:75px;
+		height:75px;
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-color:#f2f2f2;
+		overflow:hidden;
+	}
+	.product-info{
+		width:100%;
+		padding-left:1rem;
+	}
+	.product-info label{font-size:13px !important;margin:0 !important}
+	.product-info .form-group{max-width:120px !important}
+	.product-title {
+		font-size:15px;
+		font-weight:700;
+		padding-right:25px;
+		line-height:16px;
+		margin-bottom:.5rem;
+	}
+	.product-variant{display:flex}
+	.product-variant span{display:block;font-size:13px;border-radius:50px;background-color:#e8e8e8;padding:.1rem 1rem;}
+	.product-desc{font-size:13px;color:#999}
+	.product-price{font-size:18px;color:#ea9222;margin:4px 0 8px 0}
+	.product-price span{font-size:14px;color:#aaa;text-decoration:line-through}
+	.product-empty{display:flex;justify-content:center;align-items:center;min-height:180px}
+	.product-empty .empty-center{display:flex;align-items:center}
+	</style>
+	<div class="modal fade" id="addtocart" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-product" role="document">
+			<div class="modal-content">
+			
+				<div class="modal-body">
+					<form id="addtocart_form" method="post" role="form">
+						<div class="modal-section" data-tab-section="one">
+							<div class="modal-header">
+								<h5 class="modal-title"><i class="fa fa-fw fa-shopping-cart"></i> Shopping Cart</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+							<div class="es-product-container"></div>
+							<div class="d-flex justify-content-between text-center mt-5">
+								<div></div>
+								<div data-section="two" class="btn btn-primary btn-section">Next</div>
+							</div>
+						</div>
+						<div class="modal-section" data-tab-section="two" style="display:none">
+							<div class="modal-header">
+								<h5 class="modal-title"><i class="fas fa-fw fa-info-circle"></i> Your Info</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+							<div class="mt-4"></div>
+							<?php if($data->user->country=='ID'||empty($data->user->country)): ?>
+							<div class="form-group" name="provinsi">
+								<label>Provinsi</label>
+								<select class="form-control vw_location" data-type="pv" name="province">
+								<?php while($pv = $data->areas['pv']->fetch_object()) { $pvs[$pv->pv_id]=$pv->pv_name;?>
+								<option value="<?= $pv->pv_id ?>"<?= $pv->pv_id==6 ? ' selected' : '' ?>><?= $pv->pv_name ?></option>
+								<?php }?>
+								</select>
+							</div>
+							<div class="form-group" name="kabkota">
+								<label>Kota / Kabupaten</label>
+								<select class="form-control vw_location" data-type="ct" name="city">
+								<?php $kts=array();while($kt = $data->areas['kt']->fetch_object()) { $kts[$kt->kt_id]=($kt->kt_type==0 ? 'Kab. ' : '').$kt->kt_name;?>
+								<option value="<?= $kt->kt_id ?>"><?= ($kt->kt_type==0 ? 'Kab. ' : '').$kt->kt_name ?></option>
+								<?php }?>
+								</select>
+							</div>
+							<div class="form-group" name="kecamatan">
+								<label>Kecamatan</label>
+								<select class="form-control vw_location" data-type="sd" name="subdistrict">
+								<?php while($kc = $data->areas['kc']->fetch_object()) { $kcs[$kc->kc_id]=$kc->kc_name;?>
+								<option value="<?= $kc->kc_id ?>"><?= $kc->kc_name ?></option>
+								<?php }?>
+								</select>
+							</div>
+							<?php elseif($data->user->country=='MY'): ?>
+							<div class="form-group" name="state">
+								<label>State</label>
+								<select class="form-control">
+								<?php while($st = $data->areas['st']->fetch_object()) {?>
+								<option value="<?= $st->myc_id ?>"><?= $st->myc_name ?></option>
+								<?php }?>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="postcode">Postcode</label>
+								<input type="text" name="postcode" class="form-control" value="" placeholder="Postcode..." />
+							</div>
+							<?php endif?>
+							<div class="form-group">
+								<label>Name</label>
+								<input class="form-control" name="name" value="" placeholder="Enter yourname..." required />
+							</div>
+							<div class="form-group">
+								<label>Full Address</label>
+								<textarea class="form-control" name="address" value="" placeholder="Enter the full address..." required></textarea>
+							</div>
+							<div class="d-flex justify-content-between text-center mt-5">
+								<div data-section="one" class="btn btn-primary btn-section-back">Back</div>
+								<?php if(json_decode($data->user->shipping,true)['enabled']){?>
+								<div data-section="three" class="btn btn-primary btn-section" data-shipping-cost="true">Next</div>
+								<?php }else{?>
+								<div data-section="three" class="btn btn-primary btn-section" data-bank-account="true">Next</div>
+								<?php }?>
+							</div>
+						</div>
+						<?php if(json_decode($data->user->shipping,true)['enabled']){?>
+						<div class="modal-section" data-tab-section="three" style="display:none">
+							<div class="modal-header">
+								<h5 class="modal-title"><i class="fas fa-fw fa-shipping-fast"></i> Courier Shipping</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+							
+							<div class="mt-4"></div>
+							<div class="form-courir">
+								<div class="courir-item"></div>
+							</div>
+							<div class="d-flex justify-content-between text-center mt-5">
+								<div data-section="two" class="btn btn-primary btn-section-back">Back</div>
+								<div data-section="four" class="btn btn-primary btn-section" data-bank-account="true">Next</div>
+							</div>
+						</div>
+						<?php }?>
+						<?php $data->user->bank_account = $data->user->bank_account ? json_decode($data->user->bank_account,true) : null?>
+						<div class="modal-section" data-tab-section="<?= json_decode($data->user->shipping,true)['enabled'] ? 'four' : 'three' ?>" style="display:none">
+							<div class="modal-header">
+								<h5 class="modal-title"><i class="fas fa-fw fa-money-check-alt"></i> Payment</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+							<div class="mt-4"></div>
+							<div class="form-bank-account">
+								<?php if($data->user->bank_account){
+								foreach($data->user->bank_account as $ky => $ba){ ?>
+								<div class="bank-account-item">
+									<label>
+										<input type="radio" name="pym" value="<?= $ky ?>" />
+										<span class="d-flex flex-column">
+											<span class="d-flex justify-content-between">
+												<span class="fs-sm"><b><?= $ba['account_name'] ?></b></span>
+												<span class="days text-right"><?= $ba['swift_code'] ?></span>
+											</span>
+											<span class="d-flex justify-content-between">
+												<span class=""><b><?= $ba['account_number'] ?></b></span>
+												<span class="text-right"><?= $ba['bank_name'] ?></span>
+											</span>
+										</span>
+									</label>
+								</div>
+								<?php }} ?>
+							</div>
+							<div class="d-flex justify-content-between text-center mt-5">
+								<div data-section="three" class="btn btn-primary btn-section-back">Back</div>
+								<div data-checkout="true" class="btn btn-primary btn-section">Checkout</div>
+							</div>
+						</div>
+						<style>.form-bank-account,.form-courir{border:1px solid #ccc;overflow:hidden;overflow-y:auto;max-height:345px}.bank-account-item,.courir-item{padding:.25rem .8rem;border-bottom:1px solid #ccc}.bank-account-item label,.courir-item label{display:flex;margin-bottom:0!important}.bank-account-item label input,.courir-item label input{margin:.35rem .5rem .5rem .5rem}.bank-account-item label span,.courir-item label span{width:100%}.bank-account-item label .fs-sm,.courir-item label .fs-sm{font-size:13px}.bank-account-item label .days,.courir-item label .days{color:#999;font-size:13px}</style>
+					</form>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<?php if(isset($data->link->settings->password_protector)&&$data->link->settings->password_protector):?>
+	<div class="modal fade" id="locked_content" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				
+				<div class="modal-header">
+					<h5 class="modal-title w-100 text-center"><?= $data->link->language_password->content_locked?></h5>
+				</div>
+
+				<div class="modal-body">
+					<form id="locked_content_form" method="post" role="form">
+						<div class="text-center"><?= $data->link->language_password->content_locked_help?></div>
+						
+						<div class="form-group mt-3 text-center">
+							<input type="text" class="form-control text-center" name="password_unlock" placeholder="<?= $data->link->language_password->password_unlock_placeholder?>" required="required" />
+						</div>
+						
+						<div class="text-center mt-4">
+							<button class="btn btn-lg btn-block btn-primary submit"><?= $data->link->language_password->button_unlock?></button>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<?php endif ?>
+	<div class="modal fade" id="product_variant" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				
+				<div class="modal-header">
+					<h5 class="modal-title"><i class="fa fa-fw fa-shopping-cart"></i> Shopping Cart</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<form id="product_variant_form" role="form"></form>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<style>
+	.modal{padding-right: 0px !important}
+	.product-preview{display:flex;flex-direction:row;}
+	.product-preview .prd-img{min-width:70px;width:70px;height:70px}
+	.product-preview .prd-variant{flex-grow:1;margin-left:.5rem}
+	.product-preview .prd-title{font-family:'Lato',serif;font-size: 1rem;margin-bottom:.25rem !important}
+	.product-preview .prd-desc{font-size:13px;}
+	.product-preview .prd-price{font-family:'Lato',serif;font-size: 1.25rem;color:#d99a05}
+	.product-variants{margin-left:-5px;margin-right:-5px;}
+	.product-variants .variant-item{margin-bottom:.75rem;padding-bottom:1.25rem;border-bottom:1px solid #f1f1f1}
+	.product-variants .variant-item:last-child{padding:0;margin:0;border:0}
+	.product-variants .prd-title{font-family:'Lato',serif;font-size: 1rem;padding-left:5px;padding-right:5px}
+	.product-variants .vrn-itm{list-style:none;padding:0;margin:0}
+	.product-variants .vrn-itm li{display:inline-block;padding-left:5px;padding-right:5px}
+	.product-variants .vrn-itm li a.vrn-btn{position:relative;overflow:hidden;display:block;padding:.25rem 1.5rem;background-color:#f1f1f1;border:1px solid #f1f1f1}
+	.product-variants .vrn-itm li a.vrn-btn.selected{border:1px solid #f07e01;background-color:#fff;color:#f07e01}
+	.product-variants .vrn-itm li a.vrn-btn.selected:before{
+		content:"";
+		position: absolute;
+		top: -10px;
+		left: -10px;
+		height: 20px;
+		width: 20px;
+		background: #f07e01;
+		transform: rotate(45deg);
+	}
+	.product-qty{display:flex;justify-content:space-between}
+	.product-qty .prd-title{display:flex;align-items:center;font-weight:bold}
+	.counter{display:flex;}
+	.counter .min,.counter .val,.counter .max{
+		padding:.25rem .5rem;
+		border:1px solid #ccc;
+		text-align:center;
+	}
+	.counter .min,.counter .max{cursor:pointer}
+	.counter .min{border-radius:5px 0 0 5px;border-right:0}
+	.counter .val{max-width:60px;font-size:14px}
+	.counter .max{border-radius:0 5px 5px 0 ;border-left:0}
+	.product-btn{display:flex;justify-content:center;margin-top:3rem}
+	.product-btn .btn-prd{border-radius:5px;padding:.5rem 1rem;background-color:#f07e01;color:#fff;text-transform:uppercase;cursor:pointer}
+	</style>
+    <?= \Altum\Event::get_content('modals') ?>
+    <?php }?>
+</body>
+
+<?php ob_start() ?>
+<script>
+var wa_uri = 'https://api.whatsapp.com/send';
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+  wa_uri = 'whatsapp://send/';
+}
+window.are.pv=<?= $pvs ? json_encode($pvs) : 'null' ?>;
+window.are.kt=<?= $kts ? json_encode($kts) : 'null' ?>;
+window.are.kc=<?= $kcs ? json_encode($kcs) : 'null' ?>;
+if($('#locked_content').length>0)
+	$('#locked_content').modal('show').off()
+	
+if($('[data-countdown]').length>0) {
+	var x = setInterval(function() {
+		$('[data-countdown]').each(function(e) {
+			var countDownDate = new Date($(this).data('countdown')).getTime();
+			var $this = $(this)
+			var now = new Date().getTime();
+			
+			var distance = countDownDate - now;
+
+			// Time calculations for days, hours, minutes and seconds
+			var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+			var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+			var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+			var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+			
+			if(distance>0) {
+				$this.find('.clock-seconds').find('.val').text(seconds.toString().padStart(2,'0'));
+				$this.find('.clock-minutes').find('.val').text(minutes.toString().padStart(2,'0'));
+				$this.find('.clock-hours').find('.val').text(hours.toString().padStart(2,'0'));
+				$this.find('.clock-days').find('.val').text(days.toString().padStart(2,'0'));
+			} else {
+				$this.parent().remove();
+			}
+		})
+	},1000);
+}
+</script>
+<script>
+    /* Internal tracking for biolink links */
+    $('[data-location-url]').on('click', event => {
+
+        let base_url = $('[name="url"]').val();
+        let url = $(event.currentTarget).data('location-url');
+
+        $.ajax(`${base_url}${url}?no_redirect`);
+    });
+$('.selectpicker').on('change', function(e) {
+	if($(this).val()=='all') {
+		$(this).parents('.category-product').find('[data-filter-product]').removeAttr('style');
+	} else {
+		$(this).parents('.category-product').find('[data-filter-product]').hide();
+		$(this).parents('.category-product').find('[data-filter-product="'+$(this).val()+'"]').removeAttr('style')
+	}
+})
+$('.floating-btn').off('click').on('click',function(e){
+	var ths = $(this).parent()
+	ths.toggleClass('active')
+	if(ths.hasClass('active')) {
+		setTimeout(function(){
+			ths.find('[data-toggle="tooltip"]').tooltip({trigger: 'manual'}).tooltip('show')
+			ths.find('[data-toggle="tooltip"]').unbind()
+		},350)
+	} else {
+		ths.find('[data-toggle="tooltip"]').tooltip({trigger: 'manual'}).tooltip('hide')
+	}
+})
+
+is_not_empty_cart();
+variants();
+counter()
+
+$('[data-cart]').off('click').on('click',function(e){
+	if($(this).data('cart')=='add') {
+		var getCarts = Cookies.get('carts');
+		if(typeof(getCarts)=='undefined') getCarts='';
+		
+		if(getCarts)
+			var arrCarts = getCarts.split(',');
+		else
+			var arrCarts = new Array();
+		
+		var ths = $(this)
+		var io = $(this).data('link-id').split(':');
+		if(typeof(eshop[io[0]][io[1]].products[io[2]].variants)=='undefined'||eshop[io[0]][io[1]].products[io[2]].variants==null) {
+			if(getCarts.indexOf($(this).data('link-id'))<=-1) {
+				arrCarts.push($(this).data('link-id'));
+				getCarts = arrCarts.join(',')
+				$('.modal-section').hide().eq(0).show();
+				toast_txt('Product has been added in the cart')
+			} else {
+				toast_txt('Product already added in the cart','#a43939')
+			}
+		} else {
+			//var itm_prd = '<div class="cartform"><img class="'+eshop[io[0]][io[1]].products[io[2]].image_url+'" src="" /><h1 class="title">'+eshop[io[0]][io[1]].products[io[2]].title+'</h1><div class="price">'+eshop[io[0]][io[1]].products[io[2]].price+'</div><div class="description">'+eshop[io[0]][io[1]].products[io[2]].description+'</div></div>';
+			var itm_prd = '<div class="product-preview"><img class="prd-img" src="'+eshop[io[0]][io[1]].products[io[2]].image_url+'" /><div class="prd-variant"><h3 class="prd-title">'+eshop[io[0]][io[1]].products[io[2]].title+'</h3><div class="prd-desc">'+eshop[io[0]][io[1]].products[io[2]].description+'</div><div class="prd-price">Rp<span>'+number_format(eshop[io[0]][io[1]].products[io[2]].price)+'</span></div></div></div><hr class="mb-2"><div class="product-variants">';
+			$.each(eshop[io[0]][io[1]].products[io[2]].variants,function(a,b){
+				itm_prd += '<div class="variant-item"'+(b.select==1 ? ' data-select="true"' : '')+'><h3 class="prd-title">'+b.title+'</h3><ul class="vrn-itm">';
+				$.each(b.variant,function(c,d){
+					itm_prd += '<li><a class="vrn-btn none" data-variant="'+ths.data('link-id')+':'+a+':'+c+'" data-item="'+a+'-'+c+'" href="javascript:;">'+d.name+'</a></li>';
+				})
+				itm_prd += '</ul></div>';
+			})
+			itm_prd += '</div><div class="product-btn"><div class="btn-prd" data-link-id="" data-item="">Add To Cart</div></div>';
+			$('#product_variant_form').html(itm_prd);
+			variants();
+			$('#product_variant').modal('show')
+		}
+		
+		Cookies.set('carts', getCarts, { expires: 3 })
+		is_not_empty_cart();
+	}
+})
+$("#addtocart").on("show.bs.modal", function () { 
+    var gtCarts = Cookies.get('carts');
+	var html = '';
+	if(gtCarts) {
+		var getCarts = gtCarts.split(',')
+		if(getCarts.length>0) {
+			$.each(getCarts,function(i,j){
+				var itm = j;
+				var io = j.split(':');
+				if(typeof(eshop[io[0]])!='undefined') {
+					var ip = $('#item_'+j.replace(new RegExp(':', 'g'),'_'));
+					var vrn_name='',variants='';
+					var vprice = curr_symbol+number_format(eshop[io[0]][io[1]].products[io[2]].price)
+					var vimage = eshop[io[0]][io[1]].products[io[2]].image_url
+					if(io.length==6) {
+						var i1 = io[5].split('_')
+						$.each(i1,function(a,b){
+							var i2 = b.split('-')
+							vrn_name += eshop[io[0]][io[1]].products[io[2]].variants[i2[0]].variant[i2[1]].name + ' '
+						})
+						vprice = curr_symbol+number_format(eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].price)
+						if(eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].image_url)
+							vimage = eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].image_url
+						variants = '<div class="product-variant"><span>'+vrn_name+'</span></div>';
+					}
+					if(ip.length==0) {
+						$('.es-product-container').find('.product-empty').remove()
+						$('.es-product-container').append('<div id="item_'+j.replace(new RegExp(':', 'g'),'_')+'" class="product-item"><div class="product-close" data-link-id="'+itm+'">×</div><div class="product-image" style="background-image:url('+vimage+')"></div><div class="product-info"><div class="product-title">'+eshop[io[0]][io[1]].products[io[2]].title+'</div>'+variants+'<div class="row"><div class="col-md-8"><div class="product-price">'+vprice+' '+(eshop[io[0]][io[1]].products[io[2]].price_strike ? '<span>'+curr_symbol+eshop[io[0]][io[1]].products[io[2]].price_strike+'</span>' : '')+'</div></div><div class="col-md-4"><div class="form-group d-flex"><div class="counter"><div class="min"><i class="fas fa-minus"></i></div><input class="val" type="text" name="qty[]" value="1" min="1" oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\..*?)\..*/g, \'$1\');" /><div class="max"><i class="fas fa-plus"></i></div></div></div></div></div></div></div>');
+					} else {
+						ip.find('.product-price').html(vprice+' '+(eshop[io[0]][io[1]].products[io[2]].price_strike ? '<span>'+curr_symbol+eshop[io[0]][io[1]].products[io[2]].price_strike+'</span>' : ''))
+					}
+				}
+			})
+			close_p_prd()
+		}
+	} else {
+		$('.es-product-container').html('<div class="product-empty"><div class="empty-center">Cart Empty</div></div>');
+	}
+	counter();
+});
+
+$('.vw_location').on('change',function(e){
+	if($(this).data('type')!=='sd') {
+		if(!window.isLoadPage){
+			window.isLoadPage=true
+			if($(this).data('type')=='pv') {
+				$('[data-type="ct"]').prop('disabled',true)
+				$('[data-type="sd"]').prop('disabled',true)
+			} else if($(this).data('type')=='ct') {
+				$('[data-type="sd"]').prop('disabled',true)
+			}
+			$.ajax({
+				type: 'POST',
+				url: window.location.origin + '/link/locationajax',
+				data: {tp:$(this).data('type'),vl:$(this).val()},
+				dataType: 'json',
+				success: (d) => {
+					window.isLoadPage=false
+					if(typeof(d.ct)!='undefined') {
+						var html = '';
+						window.are.kt={}
+						$.each(d.ct,function(i,j) {
+							html += '<option value="'+j.id+'">'+j.name+'</option>';
+							window.are.kt[j.id] = j.name
+						})
+						$('[data-type="ct"]').html(html)
+					}
+					var html = '';
+					window.are.kc={}
+					$.each(d.sd,function(i,j) {
+						html += '<option value="'+j.id+'">'+j.name+'</option>';
+						window.are.kc[j.id]=j.name
+					})
+					$('[data-type="sd"]').html(html)
+					if($(this).data('type')=='pv') {
+						$('[data-type="ct"]').prop('disabled',false)
+						$('[data-type="sd"]').prop('disabled',false)
+					} else if($(this).data('type')=='ct') {
+						$('[data-type="sd"]').prop('disabled',false)
+					}
+				}
+			});
+		}
+	}
+})
+function close_p_prd(){
+	$('.product-close').off('click').on('click',function(e){
+		var ths = $(this)
+		var nArr= new Array();
+		var getCarts = Cookies.get('carts').split(',');
+		$.each(getCarts,function(i,j){
+			if(ths.data('link-id')!=j){
+				nArr.push(j)
+			}
+		})
+		var prt = ths.parents('.es-product-container').find('.product-item');
+		ths.parents('.product-item').remove();
+		if(prt.length==1) {
+			Cookies.set('carts', '', { expires: 3 })
+			$('.es-product-container').html('<div class="product-empty"><div class="empty-center">Cart Empty</div></div>');
+		} else {
+			Cookies.set('carts', nArr.join(','), { expires: 3 })
+		}
+		getCarts = Cookies.get('carts').split(',');
+		is_not_empty_cart();
+	})
+	$('input[name="qty[]"]').off('blur').on('blur',function(e){
+		if($(this).val().trim()=='')$(this).val(1)
+		$(this).val(parseInt($(this).val()))
+		if(parseInt($(this).val())<1)$(this).val(1)
+	})
+}
+function is_not_empty_cart(){
+	var gtCarts = Cookies.get('carts');
+	if(gtCarts) {
+		var getCarts = gtCarts.split(',')
+		var nm_itm = 0;
+		$.each(getCarts,function(i,j){
+			var itm = j;
+			var io = j.split(':');
+			if(typeof(eshop[io[0]])!='undefined') {
+				nm_itm++;
+			}
+		})
+		if(nm_itm>0) {
+			$('.bio-addtocart').removeClass('hide').find('span').text(nm_itm)
+			btn_section()
+		} else {
+			$('.bio-addtocart').removeClass('hide').addClass('hide').find('span').text(nm_itm)
+			$('[data-section]').off('click')
+		}
+	} else {
+		$('[data-section]').off('click')
+		$('.bio-addtocart').addClass('hide').find('span').text(0)
+	}
+}
+function counter() {
+	$('.counter').find('.min,.max').off('click').on('click',function(e) {
+		var vl = $(this).parent().find('.val').val()
+		if($(this).hasClass('min')) {
+			vl--;
+			if(vl<=0) vl = 1;
+		}
+		if($(this).hasClass('max')) {
+			vl++;
+			if(vl<=0) vl = 1;
+		}
+		$(this).parent().find('.val').val(vl)
+	})
+}
+
+function variants() {
+	$('.vrn-btn').off('click').on('click',function(e){
+		var items = new Array();
+		var ths = $(this)
+		$(this).parents('.vrn-itm').find('.vrn-btn.selected').removeClass('selected')
+		$(this).removeClass('selected').addClass('selected')
+		var data = $(this).data('variant').split(':')
+		var itm = $(this).parents('#product_variant_form').find('.product-btn .btn-prd').attr('data-item')
+		if(typeof(ths.parents('.variant-item').data('select'))!='undefined') {
+			$(this).parents('#product_variant_form').find('.product-btn .btn-prd').attr('data-link-id',ths.data('variant'))
+			var io = $(this).data('variant').split(':')
+			$(this).parents('#product_variant_form').find('.product-preview .prd-variant .prd-price span').text(number_format(eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].price))
+			if(eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].image_url)
+				$(this).parents('#product_variant_form').find('.product-preview .prd-img').attr('src',eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].image_url)
+		}
+		$.each($(this).parents('#product_variant_form').find('.vrn-itm'),function(a,b){
+			items.push($(b).find('.vrn-btn.selected').attr('data-item'))
+		})
+		$(this).parents('#product_variant_form').find('.product-btn .btn-prd').attr('data-item',items.join('_'))
+	})
+	$('.vrn-itm').find('li:eq(0) .vrn-btn').click();
+	$('#product_variant_form').find('.product-btn .btn-prd').off('click').on('click',function(e){
+		var getCarts = Cookies.get('carts');
+		if(typeof(getCarts)=='undefined') getCarts='';
+		
+		if(getCarts)
+			var arrCarts = getCarts.split(',');
+		else
+			var arrCarts = new Array();
+		
+		$('#product_variant').modal('hide')
+		if(getCarts.indexOf($(this).data('link-id')+':'+$(this).data('item'))<=-1) {
+			arrCarts.push($(this).data('link-id')+':'+$(this).data('item'));
+			getCarts = arrCarts.join(',')
+			$('.modal-section').hide().eq(0).show();
+			toast_txt('Product has been added in the cart')
+			
+			Cookies.set('carts', getCarts, { expires: 3 })
+			is_not_empty_cart();
+		} else {
+			toast_txt('Product already added in the cart','#a43939')
+		}
+	})
+}
+function btn_section() {
+	$('[data-section]').off('click').on('click',function(e){
+		var ths = $(this)
+		if(!window.isLoadPage){
+			
+			if(typeof($(this).data('shipping-cost'))!='undefined') {
+				if($('[name="name"]').get(0).reportValidity()&&$('[name="address"]').get(0).reportValidity()) {
+					window.isLoadPage=true;	
+					var data = $(this).parents('.modal-section').find('input,select,textarea').serialize();
+					ths.removeClass('btn-section').addClass('btn-section-back').text('Please wait...')
+					var gtCarts = Cookies.get('carts');
+					var qtys = ths.parents('[role="form"]').find('input[name="qty[]"]')
+					var wgt = 0;
+					var qtyInd = 0;
+					if(gtCarts.length>0) {
+						var getCarts = gtCarts.split(',')
+						if(getCarts.length>0) {
+							$.each(getCarts,function(i,j){
+								var io = j.split(':');
+								if(typeof(eshop[io[0]])!='undefined') {
+									if(io.length==6) {
+										wgt += (parseInt($(qtys[qtyInd]).val())*parseInt(eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].weight))
+									} else {
+										wgt += (parseInt($(qtys[qtyInd]).val())*parseInt(eshop[io[0]][io[1]].products[io[2]].weight))
+									}
+								}
+								qtyInd++
+							})
+						}
+					}
+					$.ajax({
+						type: 'POST',
+						url: window.location.origin + '/link/spcajax',
+						data: data + '&eu_id=' + eu_id + '&el_id=' + el_id + '&weight=' + wgt,
+						success: (data) => {
+							window.isLoadPage=false;
+							ths.removeClass('btn-section-back').addClass('btn-section').text('Next')
+							var next = true;
+							if(data.shp=='ro') {
+								if(data.data) {
+									var html = ''
+									$.each(data.data,function(i,j){
+										if(j.ct!=null) {
+											if(j.ct.length>0) {
+												$.each(j.ct,function(k,l){
+													html += '<div class="courir-item"><label><input type="radio" name="shp" value="'+i+':'+k+'" /><span class="d-flex flex-column"><span class="d-flex justify-content-between"><span class="fs-sm"><b>'+j.cd.toUpperCase()+'</b></span><span class="days text-right">'+(l.etd ? l.etd : '?')+' Days</span></span><span class="d-flex justify-content-between"><span class="">'+l.name+'</span><span class="text-right"><b>'+curr_symbol+l.costtext+'</b></span></span></span></label></div>'
+												})
+											}
+										}
+									})
+									if(next) {
+										$('.form-courir').html(html)
+										$('input[name="shp"]').eq(0).prop('checked',true)
+										$('[name="pym"]').eq(0).prop('checked',true)
+										window.spc = data.data
+										$('.modal-section').hide();
+										$('[data-tab-section="'+ths.data('section')+'"]').show();
+									}
+								} else {
+									$('.form-courir').html('<div class="alert alertbox bg-warning mb-0">'+data.message+'</div>')
+									$('[data-section="four"]').hide();
+									$('.modal-section').hide();
+									$('[data-tab-section="'+ths.data('section')+'"]').show();
+								}
+							} else if(data.shp=='pa') {
+								
+							}
+						},
+						dataType: 'json'
+					});
+				}
+			} else if(typeof($(this).data('bank-account'))!='undefined') {
+				if($('[name="name"]').get(0).reportValidity()&&$('[name="address"]').get(0).reportValidity()) {
+					window.isLoadPage=true;	
+					ths.removeClass('btn-section').addClass('btn-section-back').text('Please wait...')
+					$.ajax({
+						type: 'POST',
+						url: window.location.origin + '/link/bkcajax',
+						data: 'eu_id=' + eu_id,
+						success: (data) => {
+							window.isLoadPage=false;
+							ths.removeClass('btn-section-back').addClass('btn-section').text('Next')
+							var html = ''
+							if(data.data) {
+								$.each(data.data,function(i,j){
+									html += '<div class="bank-account-item"><label><input type="radio" name="pym" value="'+i+'" /><span class="d-flex flex-column"><span class="d-flex justify-content-between"><span class="fs-sm"><b>'+j.account_name+'</b></span><span class="days text-right">'+j.swift_code+'</span></span><span class="d-flex justify-content-between"><span class=""><b>'+j.account_number+'</b></span><span class="text-right"><b>'+j.bank_name+'</b></span></span></span></label></div>';
+								})
+								$('.form-bank-account').html(html)
+								$('[name="pym"]').eq(0).prop('checked',true)
+								window.bkc = data.data
+								$('.modal-section').hide();
+								$('[data-tab-section="'+ths.data('section')+'"]').show();
+							} else {
+								$('[data-section="four"]').hide();
+								$('.form-bank-account').html('<div class="alert alertbox bg-warning mb-0">'+data.message+'</div>')
+								$('.modal-section').hide();
+								$('[data-tab-section="'+ths.data('section')+'"]').show();
+							}
+						},
+						dataType: 'json'
+					});
+				}
+			} else {
+				$('.modal-section').hide();
+				$('[data-section]').removeAttr('style')
+				$('[data-tab-section="'+ths.data('section')+'"]').show();
+
+			}
+		}
+	})
+}
+$('[data-checkout]').off('click').on('click',function(e){
+	
+	var send_wa = wa_uri + '?phone=' + ow_phn + '&text=' + window.encodeURIComponent(template_wa());
+	Cookies.set('carts', '', { expires: 3 })
+	$('.es-product-container').html('<div class="product-empty"><div class="empty-center">Cart Empty</div></div>');
+	is_not_empty_cart()
+	$('#addtocart').modal('hide')
+	var win = window.open(send_wa, '_blank');
+	win.focus();
+})
+function template_wa() {
+	var gtCarts = Cookies.get('carts');
+	var html = '';
+	if(gtCarts) {
+		var getCarts = gtCarts.split(',')
+		var txt = '';
+		if(getCarts.length>0) {
+			var qtys = $('#addtocart').find('input[name="qty[]"]')
+			txt += "*Name:*\r\n" 
+			txt += $('input[name="name"]').val().toLowerCase().replace(/\b[a-z]/g, function(letter) {
+						return letter.toUpperCase();
+					});
+			txt += "\r\n\r\n" + "*Address:*\r\n" 
+			txt += $('textarea[name="address"]').val().replace("\r\n"," ")
+			if(curr_symbol=='Rp')
+				txt += "\r\n" + window.are.kc[$('[name="subdistrict"]').val()] + ' ' + window.are.kt[$('[name="city"]').val()] + ', ' + window.are.pv[$('[name="province"]').val()]
+				
+			txt += "\r\n\r\n" + '*Products:*' + "\r\n";
+			var tta = 0,tti = 0,idx = 0;
+			$.each(getCarts,function(i,j){
+				var itm = j;
+				var io = j.split(':');
+				
+				if(typeof(eshop[io[0]])!='undefined') {
+					var variants = '';
+					var vrn_name = '';
+					var vprice = eshop[io[0]][io[1]].products[io[2]].price
+					if(io.length==6) {
+						var i1 = io[5].split('_')
+						$.each(i1,function(a,b){
+							var i2 = b.split('-')
+							vrn_name += eshop[io[0]][io[1]].products[io[2]].variants[i2[0]].variant[i2[1]].name + ' '
+						})
+						vprice = eshop[io[0]][io[1]].products[io[2]].variants[io[3]].variant[io[4]].price
+						variants = "\r\n" + vrn_name;
+					}
+					var tti = (parseInt(qtys.eq(idx).val()) * parseInt(vprice));
+					tta += tti;
+					txt += eshop[io[0]][io[1]].products[io[2]].title + variants + "\r\n" + curr_symbol + number_format(vprice) + ' x' + qtys.eq(idx).val() + ' = ' + curr_symbol + number_format(tti) + "\r\n" + '--------------------------' + "\r\n";
+				
+	                idx++;
+				}
+			})
+			var vshp = $('input[name="shp"]:checked')
+			if(vshp.length>0) {
+				vshp = vshp.val().split(':')
+				var shp_1 = window.spc[vshp[0]].ct[vshp[1]]
+				tta += shp_1.cost
+				txt += "\r\n" + '*Shipping:*' + "\r\n" + shp_1.name_long + ' ' + curr_symbol + shp_1.costtext;
+			}
+			var vpym = $('input[name="pym"]:checked').val()
+			txt += "\r\n\r\n" + '*Payment Method:*' + "\r\n" + window.bkc[vpym].bank_name + ' _' + window.bkc[vpym].swift_code + '_' + "\r\n" + window.bkc[vpym].account_number + "\r\n" + window.bkc[vpym].account_name;
+		
+			txt += "\r\n\r\n" + '*Total Payment:*' + "\r\n" +  curr_symbol + number_format(tta);
+		}
+	}
+	return txt
+}
+function toast_txt(txt,color) {
+	if(typeof(color)=='undefined') color='#3986A4'
+	$.toast({ 
+	  text: txt,
+	  showHideTransition:'fade',
+	  loader: false, 
+	  stack: false,
+	  hideAfter: 2000,
+	  bgColor:color,
+	  position: 'top-center' 
+	})
+}
+$(document).ready(function(e){
+    var ch = parseInt($('.pt-page-2.pt-current-active.pt-page-current').eq(0).children(0).get(0).clientHeight)
+    var hh = parseInt($('html').get(0).clientHeight)
+    if(ch<=hh) {
+		$('<style>.link-body.link-body-relative{position:fixed !important;width:100%;height:100% !important}.pt-page-2.pt-page-current{position:absolute !important;width:100%;height:100%}</style>').appendTo("head");
+	}
+	$('.embed-responsive.link-iframe-round').on('click',function(e){
+		if($(this).find('.youtube').length>0) {
+			let ytID = $(this).data('gr-id')
+			var iframe = document.createElement("iframe");
+			iframe.setAttribute("src", "//www.youtube.com/embed/" + ytID + "?autoplay=1&autohide=2&border=0&wmode=opaque&enablejsapi=1&controls=1&showinfo=1");
+			iframe.setAttribute("frameborder", "0");
+			$(this).get(0).appendChild(iframe)
+		}
+	})
+})
+</script>
+<?php \Altum\Event::add_content(ob_get_clean(), 'javascript') ?>
+
+<?php ob_start() ?>
+<script>
+    /* Go over all mail buttons to make sure the user can still submit mail */
+    $('form[id^="mail_"]').each((index, element) => {
+        let link_id = $(element).find('input[name="link_id"]').val();
+        let is_converted = localStorage.getItem(`mail_${link_id}`);
+
+        if(is_converted) {
+            /* Set the submit button to disabled */
+            $(element).find('button[type="submit"]').attr('disabled', 'disabled');
+        }
+    });
+        /* Form handling for mail submissions if any */
+    $('form[id^="mail_"]').on('submit', event => {
+        let base_url = $('[name="url"]').val();
+        let link_id = $(event.currentTarget).find('input[name="link_id"]').val();
+        let is_converted = localStorage.getItem(`mail_${link_id}`);
+
+        if(!is_converted) {
+
+            $.ajax({
+                type: 'POST',
+                url: `${base_url}link-ajax`,
+                data: $(event.currentTarget).serialize(),
+                success: (data) => {
+                    let notification_container = $(event.currentTarget).find('.notification-container');
+
+                    if (data.status == 'error') {
+                        notification_container.html('');
+
+                        display_notifications(data.message, 'error', notification_container);
+                    } else if (data.status == 'success') {
+
+                        display_notifications(data.message, 'success', notification_container);
+
+                        setTimeout(() => {
+
+                            /* Hide modal */
+                            $(event.currentTarget).closest('.modal').modal('hide');
+
+                            /* Remove the notification */
+                            notification_container.html('');
+
+                            /* Set the localstorage to mention that the user was converted */
+                            localStorage.setItem(`mail_${link_id}`, true);
+
+                            /* Set the submit button to disabled */
+                            $(event.currentTarget).find('button[type="submit"]').attr('disabled', 'disabled');
+
+                        }, 1000);
+
+                    }
+                },
+                dataType: 'json'
+            });
+
+        }
+
+        event.preventDefault();
+    })
+</script>
+<?= $this->expired_script ? $this->expired_script : null ?>
+<?php \Altum\Event::add_content(ob_get_clean(), 'javascript') ?>
+<?php if($data->user->package_settings->google_analytics && !empty($data->link->settings->google_analytics)): ?>
+    <?php ob_start() ?>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= $data->link->settings->google_analytics ?>"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '<?= $data->link->settings->google_analytics ?>');
+    </script>
+
+    <?php \Altum\Event::add_content(ob_get_clean(), 'head') ?>
+<?php endif ?>
+
+<?php if($data->user->package_settings->facebook_pixel && !empty($data->link->settings->facebook_pixel)): ?>
+    <?php ob_start() ?>
+
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '<?= $data->link->settings->facebook_pixel ?>');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=<?= $data->link->settings->facebook_pixel ?>&ev=PageView&noscript=1"/></noscript>
+    <!-- End Facebook Pixel Code -->
+
+    <?php \Altum\Event::add_content(ob_get_clean(), 'head') ?>
+<?php endif ?>
+

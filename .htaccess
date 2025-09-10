@@ -1,0 +1,69 @@
+Options All -Indexes
+
+RewriteEngine On
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteRule ^.*-(\d+)-.*/$ openbayl/index\.php?id=$1&%{QUERY_STRING} [L]
+RewriteRule ^catalog-(.*)/$ openbayl/index\.php?cat=$1&%{QUERY_STRING} [L]
+RewriteRule ^.*(write[a-z]+map\.xml)$  mapper/$1 [L]
+RewriteRule ^.*(writemap\.xml)$  mapper/$1 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+
+RewriteRule ^(.+)$ index.php?altum=$1 [QSA,L]
+

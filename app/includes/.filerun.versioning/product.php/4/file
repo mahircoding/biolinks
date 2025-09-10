@@ -1,0 +1,8 @@
+<?php
+define('PRODUCT_NAME', 'BioSmart');
+define('PRODUCT_KEY', 'biosmart');
+define('PRODUCT_URL', 'https://' . BASE_DOMAIN);
+define('PRODUCT_DOCUMENTATION_URL', 'https:/' . BASE_DOMAIN . '/biolinks-docs');
+define('PRODUCT_VERSION', '4.7.3 ⚡️');
+define('PRODUCT_CODE', '473');
+define('PRODUCT_ENS_KEY', 'de7f38b0ca');

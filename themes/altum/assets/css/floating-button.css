@@ -1,0 +1,182 @@
+.circular-menu {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  z-index:999;
+}
+
+.circular-menu .floating-btn {
+  display: block;
+  width: 3.5em;
+  height: 3.5em;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px 0 hsla(0, 0%, 0%, .26); 
+  text-align: center;
+  line-height: 3.7;
+  cursor: pointer;
+  outline: 0;
+}
+
+.circular-menu .floating-btn:active {
+  box-shadow: 0 4px 8px 0 hsla(0, 0%, 0%, .4);
+}
+
+.circular-menu .floating-btn svg {
+  font-size: 1.3em;
+  -webkit-transition: -webkit-transform .2s;
+  transition: -webkit-transform .2s;
+  transition: transform .2s;
+  transition: transform .2s, -webkit-transform .2s;  
+}
+
+.circular-menu.active .floating-btn svg {
+  -webkit-transform: rotate(-135deg);
+          transform: rotate(-135deg);
+}
+
+
+.circular-menu .items-wrapper {
+  padding: 0;
+  margin: 0;
+}
+
+.circular-menu .menu-item {
+  position: absolute;
+  top: .2em;
+  right: .2em;
+  z-index: -1;
+  display: block;
+  text-decoration: none;
+  font-size: 1em;
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 3;
+  background-color: hsl(4, 98%, 60%);
+  box-shadow: 0 2px 5px 0 hsla(0, 0%, 0%, .26);  
+  color: hsl(0, 0%, 100%);
+  -webkit-transition: background .2s ease, -webkit-transform .3s ease;
+  transition: background .2s ease, -webkit-transform .3s ease;
+  transition: transform .3s ease, background .2s ease;
+  transition: transform .3s ease, background .2s ease, -webkit-transform .3s ease;
+}
+
+.circular-menu .menu-item:hover {
+  background-color: hsla(0,0%,0%,.3);
+}
+
+.circular-menu.active .menu-item {
+  -webkit-transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.circular-menu.active .menu-item:nth-child(1) {
+  -webkit-transform: translate3d(0,-6em,0);
+          transform: translate3d(0,-6em,0);
+}
+
+.circular-menu.active .menu-item:nth-child(2) {
+  -webkit-transform: translate3d(-6em,-6em,0);
+          transform: translate3d(-6em,-6em,0);
+}
+
+.circular-menu.active .menu-item:nth-child(3) {
+  -webkit-transform: translate3d(-6em,0em,0);
+          transform: translate3d(-6em,0em,0);
+}
+
+.circular-menu.active .menu-item:nth-child(4) {
+  -webkit-transform: translate3d(0,-12em,0);
+          transform: translate3d(0,-12em,0);
+}
+
+.circular-menu.active .menu-item:nth-child(5) {
+  -webkit-transform: translate3d(-12em,0,0);
+          transform: translate3d(-12em,0,0);
+}
+
+/**
+ * The other theme for this menu
+ */
+
+.circular-menu.circular-menu-left {
+  right: auto; 
+  left: 1em;
+}
+
+.circular-menu.circular-menu-left.active .floating-btn svg {
+  -webkit-transform: rotate(135deg);
+          transform: rotate(135deg);
+}
+
+.circular-menu.circular-menu-left.active .menu-item:nth-child(1) {
+  -webkit-transform: translate3d(0,-6em,0);
+          transform: translate3d(0,-6em,0);
+}
+
+.circular-menu.circular-menu-left.active .menu-item:nth-child(2) {
+  -webkit-transform: translate3d(6em,-6em,0);
+          transform: translate3d(6em,-6em,0);
+}
+
+.circular-menu.circular-menu-left.active .menu-item:nth-child(3) {
+  -webkit-transform: translate3d(6em,0,0);
+          transform: translate3d(6em,0,0);
+}
+
+.circular-menu.circular-menu-left.active .menu-item:nth-child(4) {
+  -webkit-transform: translate3d(0,-12em,0);
+          transform: translate3d(0,-12em,0);
+}
+
+.circular-menu.circular-menu-left.active .menu-item:nth-child(5) {
+  -webkit-transform: translate3d(12em,0,0);
+          transform: translate3d(12em,0,0);
+}
+
+.circular-menu.circular-menu-center {
+  bottom: 1em; 
+  display:flex;
+  width:100%;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  left:0;
+}
+
+.circular-menu.circular-menu-center .menu-item {
+	bottom:1em;
+	right:auto;
+	margin-left:-24px;
+}
+
+.circular-menu.circular-menu-center.active .floating-btn svg {
+  -webkit-transform: rotate(135deg);
+          transform: rotate(135deg);
+}
+
+.circular-menu.circular-menu-center.active .menu-item:nth-child(1) {
+  -webkit-transform: translate3d(-5em,-3em,0);
+          transform: translate3d(-5em,-3em,0);
+}
+
+.circular-menu.circular-menu-center.active .menu-item:nth-child(2) {
+  -webkit-transform: translate3d(0,-6em,0);
+          transform: translate3d(0,-6em,0);
+}
+
+.circular-menu.circular-menu-center.active .menu-item:nth-child(3) {
+  -webkit-transform: translate3d(5em,-3em,0);
+          transform: translate3d(5em,-3em,0);
+}
+
+.circular-menu.circular-menu-center.active .menu-item:nth-child(4) {
+  -webkit-transform: translate3d(-10em,-3em,0);
+          transform: translate3d(-10em,-3em,0);
+}
+
+.circular-menu.circular-menu-center.active .menu-item:nth-child(5) {
+  -webkit-transform: translate3d(10em,-3em,0);
+          transform: translate3d(10em,-3em,0);
+}

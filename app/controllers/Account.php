@@ -1,0 +1,584 @@
+<?php
+
+namespace Altum\Controllers;
+
+use Altum\Database\Database;
+use Altum\Middlewares\Authentication;
+use Altum\Middlewares\Csrf;
+use Altum\Models\User;
+use Altum\Response;
+
+class Account extends Controller {
+
+    public function index() {
+
+        Authentication::guard();
+		
+        /* Prepare the TwoFA codes just in case we need them */
+        $twofa = new \RobThree\Auth\TwoFactorAuth($this->settings->title, 8, 30);
+        $twofa_secret = $twofa->createSecret();
+        $twofa_image = $twofa->getQRCodeImageAsDataUri($this->user->name, $twofa_secret);
+		$sales_settings = $this->user->sales_page ? json_decode($this->user->sales_page) : null;
+		$country = Database::$database->query("SELECT * FROM `country` ORDER BY cty_id ASC");
+		
+		$ro_configs = Database::get(['shipping','ro_pro_package','ro_pro_courier','ro_pro_biolink','ro_pro_expired','esc_package','esc_expired'], 'users', ['user_id' => $this->user->user_id]);
+		$ro_configs->shipping = $ro_configs->shipping ? json_decode($ro_configs->shipping) : null;
+		$ro_configs->ro_pro_courier = $ro_configs->ro_pro_courier ? json_decode($ro_configs->ro_pro_courier) : null;
+		$ro_configs->ro_pro_biolink = $ro_configs->ro_pro_biolink ? json_decode($ro_configs->ro_pro_biolink) : null;
+		$ro_configs->ro_pro_expired = $ro_configs->ro_pro_expired ? json_decode($ro_configs->ro_pro_expired) : null;
+		
+		$couriers = null;
+		
+		if($ro_configs->shipping) {
+			
+			if($this->user->country=='MY') {
+				
+				$province = Database::$database->query("SELECT * FROM `provinsi`");
+				$city = Database::$database->query("SELECT * FROM `kota_kabupaten` WHERE kt_pv_id = 6");
+				$subdistrict = Database::$database->query("SELECT * FROM `kecamatan` WHERE kc_kt_id = ".$city->fetch_object()->kt_id);
+				$my_city = Database::$database->query("SELECT * FROM `my_city`");
+				$configs = array('pv' => $ro_configs->shipping->pv,
+								 'kt' => $ro_configs->shipping->kt,
+								 'kc' => $ro_configs->shipping->kc,
+								 'mc' => $ro_configs->shipping->mc,
+								 'pc' => $ro_configs->shipping->pc,
+								 'pv_text' => $ro_configs->shipping->pv_text,
+								 'kt_text' => $ro_configs->shipping->kt_text,
+								 'kc_text' => $ro_configs->shipping->kc_text,
+								 'mc_text' => $ro_configs->shipping->mc_text,
+								 'shp_type' => $ro_configs->shipping->shp_type,
+								 'enabled' => $ro_configs->shipping->enabled,
+								 'apikey' => $ro_configs->shipping->apikey,
+								 'secret' => $ro_configs->shipping->secret,
+								 'package' => $ro_configs->shipping->package,
+								 'couriers' => $couriers
+								);
+				
+			} else {
+				
+				$province = Database::$database->query("SELECT * FROM `provinsi`");
+				$city = Database::$database->query("SELECT * FROM `kota_kabupaten` WHERE kt_pv_id = " . $ro_configs->shipping->pv);
+				$subdistrict = Database::$database->query("SELECT * FROM `kecamatan` WHERE kc_kt_id = ".$ro_configs->shipping->kt);
+				$my_city = Database::$database->query("SELECT * FROM `my_city`");
+				
+				$couriers = isset($ro_configs->shipping->couriers) ? explode(':',$ro_configs->shipping->couriers) : null;
+				if(is_null($couriers)) {
+					if(isset($ro_configs->shipping->package)) {
+						if((int)$ro_configs->shipping->package==0) {
+							$couriers = array('pos');
+						} elseif((int)$ro_configs->shipping->package==2) {
+							$couriers = array('jne','jnt','sicepat','pos','tiki');
+						} else {
+							$couriers = array('pos');
+						}
+					}
+				}
+				
+				$configs = array('pv' => $ro_configs->shipping->pv,
+								 'kt' => $ro_configs->shipping->kt,
+								 'kc' => $ro_configs->shipping->kc,
+								 'mc' => $ro_configs->shipping->mc,
+								 'pc' => $ro_configs->shipping->pc,
+								 'pv_text' => $ro_configs->shipping->pv_text,
+								 'kt_text' => $ro_configs->shipping->kt_text,
+								 'kc_text' => $ro_configs->shipping->kc_text,
+								 'mc_text' => $ro_configs->shipping->mc_text,
+								 'shp_type' => $ro_configs->shipping->shp_type,
+								 'enabled' => $ro_configs->shipping->enabled,
+								 'apikey' => $ro_configs->shipping->apikey,
+								 'secret' => $ro_configs->shipping->secret,
+								 'package' => (int)$ro_configs->shipping->package,
+								 'couriers' => $couriers
+								);
+				
+			}
+			
+		} else {
+			
+			if($this->user->country=='MY') {
+				
+				$province = Database::$database->query("SELECT * FROM `provinsi`");
+				$city = Database::$database->query("SELECT * FROM `kota_kabupaten` WHERE kt_pv_id = 6");
+				$subdistrict = Database::$database->query("SELECT * FROM `kecamatan` WHERE kc_kt_id = ".$city->fetch_object()->kt_id);
+				$my_city = Database::$database->query("SELECT * FROM `my_city`");
+				$configs = array('pv' => 6,
+								 'kt' => 151,
+								 'kc' => 0,
+								 'mc' => '',
+								 'pc' => '',
+								 'pv_text' => '',
+								 'kt_text' => '',
+								 'kc_text' => '',
+								 'mc_text' => '',
+								 'shp_type' => '',
+								 'enabled' => 0,
+								 'apikey' => '',
+								 'secret' => '',
+								 'package' => '',
+								 'couriers' => $couriers
+								);
+			
+			} else {
+				
+				$province = Database::$database->query("SELECT * FROM `provinsi`");
+				$city = Database::$database->query("SELECT * FROM `kota_kabupaten` WHERE kt_pv_id = 6");
+				$subdistrict = Database::$database->query("SELECT * FROM `kecamatan` WHERE kc_kt_id = ".$city->fetch_object()->kt_id);
+				$my_city = Database::$database->query("SELECT * FROM `my_city`");
+				
+				if(is_null($couriers)) {
+					if((int)$ro_configs->shipping->package==0) {
+						$couriers = array('pos');
+					} elseif((int)$ro_configs->shipping->package==2) {
+						$couriers = array('jne','jnt','sicepat','pos','tiki');
+					} else {
+						$couriers = array('pos');
+					}
+				}
+				
+				$configs = array('pv' => 6,
+								 'kt' => 151,
+								 'kc' => 0,
+								 'mc' => '',
+								 'pc' => '',
+								 'pv_text' => '',
+								 'kt_text' => '',
+								 'kc_text' => '',
+								 'mc_text' => '',
+								 'shp_type' => '',
+								 'enabled' => 0,
+								 'apikey' => '',
+								 'secret' => '',
+								 'package' => '',
+								 'couriers' => $couriers
+								);
+				
+			}
+		
+		}
+		
+        if(!empty($_POST)) {
+
+            /* Clean some posted variables */
+            $_POST['email']		        = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+			$_POST['phone']		    	= filter_var($_POST['phone'], FILTER_SANITIZE_NUMBER_INT);
+            $_POST['name']		        = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+            $_POST['country']		    = filter_var($_POST['country'], FILTER_SANITIZE_STRING);
+			$_POST['my_city']		    = filter_var($_POST['my_city'], FILTER_SANITIZE_STRING);
+			$_POST['timezone']          = in_array($_POST['timezone'], \DateTimeZone::listIdentifiers()) ? Database::clean_string($_POST['timezone']) : $this->settings->default_timezone;
+            $_POST['twofa_is_enabled']  = (bool) $_POST['twofa_is_enabled'];
+            $_POST['twofa_token']       = trim(filter_var($_POST['twofa_token'], FILTER_SANITIZE_STRING));
+            $twofa_secret               = $_POST['twofa_is_enabled'] ? $this->user->twofa_secret : null;
+			
+			$_POST['phone'] 			= phoneFixer($_POST['phone']);
+			
+			if($city_code = Database::get('*', 'country', ['cty_id' => trim($_POST['country'])])) {
+				$_POST['phone'] 			= phoneFixer($_POST['phone'], $city_code->cty_phone_code);
+			} else {
+				$_SESSION['error'][] = 'Invalid Country';
+			}
+			
+			if($this->user->type==1) {
+				$_POST['title']		        = filter_var($_POST['title'], FILTER_SANITIZE_STRING);
+				$_POST['description']		= filter_var($_POST['description'], FILTER_SANITIZE_STRING);
+				$_POST['text_button']		= filter_var($_POST['text_button'], FILTER_SANITIZE_STRING);
+				$_POST['sales_link_0']		= filter_var($_POST['sales_link_0'], FILTER_SANITIZE_STRING);
+				$_POST['sales_link_1']		= filter_var($_POST['sales_link_1'], FILTER_SANITIZE_STRING);
+				
+				if((int)$_POST['sales_type']==0) {
+					if($_POST['sales_link_0']) {
+						if (filter_var($_POST['sales_link_0'], FILTER_VALIDATE_URL) === FALSE) {
+							$_SESSION['error'][] = $this->language->global->error_message->invalid_link_url;
+						}
+					}
+				}
+			}
+			
+			if($_POST['country']=='MY') {
+				
+				if(isset($_POST['parcelasia_enabled'])) {
+					
+					if(!$_POST['parcelasia_apikey']) {
+						//$_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+						$_SESSION['error'][] = 'Insert ParcelAsia Api Key';
+					}
+					
+					if(!$_POST['my_city']) {
+						//$_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+						$_SESSION['error'][] = 'Insert state';
+					}
+					
+					if(!$_POST['parcelasia_apikey']) {
+						//$_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+						$_SESSION['error'][] = 'Insert ParcelAsia Api Key';
+					}
+					
+				}
+				
+			} else {
+				
+				//if(isset($_POST['rajaongkir_enabled'])) {
+					
+				//	if(!$_POST['rajaongkir_apikey']) {
+						//$_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+				//		$_SESSION['error'][] = 'Insert RajaOngkir Api Key';
+				//	}
+					
+				//}
+				
+			}
+			
+            /* Check for any errors */
+            if(!Csrf::check()) {
+                $_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+            }
+            if(filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
+                $_SESSION['error'][] = $this->language->register->error_message->invalid_email;
+            }
+			
+			if (strlen($_POST['phone']) < 10 || strlen($_POST['phone']) > 14) {
+				$_SESSION['error'][] = $this->language->register->error_message->phone_length;
+			}
+			
+            if(Database::exists('user_id', 'users', ['email' => $_POST['email']]) && $_POST['email'] !== $this->user->email) {
+                $_SESSION['error'][] = $this->language->register->error_message->email_exists;
+            }
+			
+			//if(Database::exists('user_id', 'users', ['phone' => $_POST['phone']]) && $_POST['phone'] !== $this->user->phone) {
+            //    $_SESSION['error'][] = $this->language->register->error_message->phone_exists;
+            //}
+
+            if(strlen($_POST['name']) < 3 || strlen($_POST['name'] > 32)) {
+                $_SESSION['error'][] = $this->language->register->error_message->name_length;
+            }
+
+            if(!empty($_POST['old_password']) && !empty($_POST['new_password'])) {
+                if(!password_verify($_POST['old_password'], $this->user->password)) {
+                    $_SESSION['error'][] = $this->language->account->error_message->invalid_current_password;
+                }
+                if(strlen(trim($_POST['new_password'])) < 6) {
+                    $_SESSION['error'][] = $this->language->account->error_message->short_password;
+                }
+                if($_POST['new_password'] !== $_POST['repeat_password']) {
+                    $_SESSION['error'][] = $this->language->account->error_message->passwords_not_matching;
+                }
+            }
+
+            if($_POST['twofa_is_enabled'] && $_POST['twofa_token']) {
+                $twofa_check = $twofa->verifyCode($_SESSION['twofa_potential_secret'], $_POST['twofa_token']);
+
+                if(!$twofa_check) {
+                    $_SESSION['error'][] = $this->language->account->error_message->twofa_check;
+
+                    /* Regenerate */
+                    $twofa_secret = $twofa->createSecret();
+                    $twofa_image = $twofa->getQRCodeImageAsDataUri($this->user->name, $twofa_secret);
+
+                } else {
+                    $twofa_secret = $_SESSION['twofa_potential_secret'];
+                }
+
+            }
+			
+			if($ro_configs->ro_pro_package) {
+				//if(count($ro_configs->ro_pro_biolink)!=count($_POST['ro_courier'])){
+				//	$_SESSION['error'][] = 'Something\'s wrong with Raja Ongkir Pro courier';
+				//}
+			}
+
+            if(empty($_SESSION['error'])) {
+				
+				if(isset($_POST['sales_link_'.(int)$_POST['sales_type']])&&$_POST['sales_link_'.(int)$_POST['sales_type']]) {
+					$sales_settings = json_encode([
+												  "title" => ucwords(trim($_POST['title'])),
+												  "description" => ucfirst(trim(preg_replace('/\s*\R\s*/', ' ',$_POST['description']))),
+												  "text_button" => ucwords(trim($_POST['text_button'])),
+												  "sales_type" => (int)$_POST['sales_type'],
+												  "sales_link" => $_POST['sales_link_'.(int)$_POST['sales_type']],
+												  ]);
+				} else
+					$sales_settings = null;
+				
+				if($_POST['country'] == 'MY') {
+					
+					$my_city = Database::$database->query("SELECT * FROM `my_city` WHERE myc_id = '" . Database::$database->escape_string(trim($_POST['my_city']))."'")->fetch_object();
+					
+					$shipping = array('pv' => 6,
+									  'kt' => 151,
+									  'kc' => 0,
+									  'mc' => $my_city->myc_id,
+									  'pc' => $_POST['my_postcode'],
+									  'pv_text' => '',
+									  'kt_text' => '',
+									  'kc_text' => '',
+									  'mc_text' => $my_city->myc_name,
+									  'shp_type' => 'parcelasia',
+									  'enabled' => isset($_POST['parcelasia_enabled']) ? 1 : 0,
+									  'apikey' => strpos($_POST['parcelasia_apikey'],'*') ? $ro_configs->shipping->apikey : $_POST['parcelasia_apikey'],
+									  'secret' => strpos($_POST['parcelasia_secret'],'*') ? $ro_configs->shipping->secret : $_POST['parcelasia_secret'],
+									  'package' => ''
+									 );
+								 
+				} else {
+					
+					$kc_list = Database::$database->query("SELECT * FROM `kecamatan` join `kota_kabupaten` on kc_kt_id = kt_id join `provinsi` on kc_pv_id = pv_id WHERE kc_id = " . $_POST['subdistrict'])->fetch_object();
+					
+					$couriers = 'pos';
+					
+					if((int)$ro_configs->shipping->package==0) {
+						$couriers = $_POST['courier_1'];
+					} elseif((int)$ro_configs->shipping->package==2) {
+						$couriers = implode(':',$_POST['courier_3']);
+					}
+					
+					$shipping = array('pv' => $kc_list->pv_id,
+									  'kt' => $kc_list->kt_id,
+									  'kc' => $kc_list->kc_id,
+									  'mc' => '',
+									  'pc' => '',
+									  'pv_text' => $kc_list->pv_name,
+									  'kt_text' => $kc_list->kt_name,
+									  'kc_text' => $kc_list->kc_name,
+									  'mc_text' => '',
+									  'shp_type' => 'rajaongkir',
+									  'enabled' => isset($_POST['rajaongkir_enabled']) ? 1 : 0,
+									  //'apikey' => strpos($_POST['rajaongkir_apikey'],'*') ? $ro_configs->shipping->apikey : $_POST['rajaongkir_apikey'],
+									  'apikey' => $ro_configs->shipping->apikey ? $ro_configs->shipping->apikey : '',
+									  'secret' => '',
+									  'package' => $ro_configs->shipping->package ? $ro_configs->shipping->package : 0,
+									  'couriers' => $couriers,
+									 );
+					
+				}
+				
+                /* Prepare the statement and execute query */
+                $stmt = Database::$database->prepare("UPDATE `users` SET `email` = ?, 
+																		 `phone` = ?, 
+																		 `name` = ?, 
+																		 `timezone` = ?,
+																		 `country` = ?,
+																		 `currency` = ?,
+																		 `twofa_secret` = ?,
+																		 `shipping` = ?,
+																		 `sales_page` = ? 
+																		 WHERE `user_id` = {$this->user->user_id}");
+                
+				$stmt->bind_param('sssssssss', $_POST['email'],
+											  $_POST['phone'], 
+											  $_POST['name'], 
+											  $_POST['timezone'], 
+											  $_POST['country'],
+											  $city_code->cty_symbol,
+											  $twofa_secret,
+											  json_encode($shipping),
+											  $sales_settings);
+                $stmt->execute();
+                $stmt->close();
+				
+				//if($ro_configs->ro_pro_package || $ro_configs->esc_package) {
+				$ro_pro_courier = [];
+				foreach($_POST['ro_courier'] as $rc) {
+					//$ro_pro_courier[] = implode(':',$rc);
+					$ro_pro_courier[] = $rc;
+				}
+				
+				$ro_pro_courier = json_encode($ro_pro_courier[0]);
+				
+				$stmt = Database::$database->prepare("UPDATE `users` SET `ro_pro_courier` = ?  WHERE `user_id` = {$this->user->user_id}");
+				$stmt->bind_param('s', $ro_pro_courier);
+				$stmt->execute();
+				$stmt->close();
+				//}
+
+                $_SESSION['success'][] = $this->language->account->success_message->account_updated;
+
+                if(!empty($_POST['old_password']) && !empty($_POST['new_password'])) {
+                    $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+
+                    Database::update('users', ['password' => $new_password], ['user_id' => $this->user->user_id]);
+
+                    /* Set a success message and log out the user */
+                    Authentication::logout();
+                }
+
+                redirect('account');
+            }
+
+        }
+
+        /* Store the potential secret */
+        $_SESSION['twofa_potential_secret'] = $twofa_secret;
+
+        /* Establish the account header view */
+        $menu = new \Altum\Views\View('partials/account_header', (array) $this);
+        $this->add_view_content('account_header', $menu->run());
+		
+		$url_biolink = null;
+		if($this->user->ro_pro_biolink) {
+			$tmp_ro_pro_biolink = '('.implode(',',json_decode($this->user->ro_pro_biolink)).')';
+			$dt_ro_pro_biolink = Database::$database->query("SELECT link_id,url FROM links WHERE user_id = '".$this->user->user_id."' AND link_id IN ".$tmp_ro_pro_biolink." AND type = 'biolink' AND subtype = 'base'");
+			if($dt_ro_pro_biolink->num_rows) {
+				$url_biolink = [];
+				while($ro_rows = $dt_ro_pro_biolink->fetch_object()) {
+					$url_biolink[$ro_rows->link_id] = $ro_rows->url;
+				}
+			}
+		}
+		
+		$pro_couriers = [];
+		$pro_couriers['jne'] = 'JNE';
+		$pro_couriers['jnt'] = 'J&T Express';
+		$pro_couriers['sicepat'] = 'SiCepat Express';
+		$pro_couriers['pos'] = 'POS Indonesia';
+		$pro_couriers['anteraja'] = 'AnterAja';
+		$pro_couriers['tiki'] = 'TIKI';
+		$pro_couriers['wahana'] = 'Wahana';
+		$pro_couriers['jet'] = 'JET Express';
+		$pro_couriers['pandu'] = 'Pandu Logistics';
+		$pro_couriers['first'] = 'First Logistics';
+		$pro_couriers['lion'] = 'Lion Parcel';
+		$pro_couriers['ninja'] = 'Ninja Xpress';
+		$pro_couriers['rex'] = 'Royal Express';
+		$pro_couriers['ide'] = 'ID Express';
+		$pro_couriers['ncs'] = 'NCS';
+		$pro_couriers['rpx'] = 'RPX Holding';
+		$pro_couriers['pcp'] = 'PCP Express';
+		$pro_couriers['esl'] = 'ESL Express';
+		$pro_couriers['pahala'] = 'Pahala Kencana';
+		$pro_couriers['dse'] = '21 Express';
+		$pro_couriers['slis'] = 'Solusi Ekspres';
+		$pro_couriers['star'] = 'Star Cargo';
+		$pro_couriers['idl'] = 'IDL Cargo';
+		//$pro_couriers['expedito'] = 'Expedito';
+		//$pro_couriers['sentral'] = 'Sentral Cargo';
+		
+        /* Prepare the View */
+        $data = [
+            'twofa_secret'  => $twofa_secret,
+            'twofa_image'   => $twofa_image,
+			'country'		=> $country,
+			'province' 		=> $province,
+			'city' 			=> $city,
+			'my_city'		=> $my_city,
+			'subdistrict' 	=> $subdistrict,
+			'configs' 		=> $configs,
+			'ro_package'	=> $ro_configs->ro_pro_package||$ro_configs->esc_package ? true : false,
+			'ro_courier'	=> $ro_configs->ro_pro_courier,
+			'ro_biolink'	=> $ro_configs->ro_pro_biolink,
+			'ro_expired'	=> $ro_configs->ro_pro_expired,
+			'url_biolink'	=> $url_biolink,
+			'pro_couriers' 	=> $pro_couriers,
+			'sales_settings' => $sales_settings
+        ];
+
+        $view = new \Altum\Views\View('account/index', (array) $this);
+
+        $this->add_view_content('content', $view->run($data));
+
+    }
+
+    public function delete() {
+
+        Authentication::guard();
+
+        if(!Csrf::check()) {
+            $_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+            redirect('account');
+        }
+
+        if(empty($_SESSION['error'])) {
+
+            /* Delete the user */
+            (new User(['settings' => $this->settings]))->delete($this->user->user_id);
+            Authentication::logout();
+
+        }
+
+    }
+
+    public function cancelsubscription() {
+
+        Authentication::guard();
+
+        if(!Csrf::check()) {
+            $_SESSION['error'][] = $this->language->global->error_message->invalid_csrf_token;
+            redirect('account');
+        }
+
+        if(empty($_SESSION['error'])) {
+
+            try {
+                (new User(['settings' => $this->settings, 'user' => $this->user]))->cancel_subscription();
+            } catch (\Exception $exception) {
+
+                /* Output errors properly */
+                if (DEBUG) {
+                    echo $exception->getCode() . '-' . $exception->getMessage();
+
+                    die();
+                } else {
+
+                    $_SESSION['error'][] = $exception->getMessage();
+                    redirect('account');
+
+                }
+            }
+
+            /* Set a message */
+            $_SESSION['success'][] = $this->language->account->success_message->subscription_canceled;
+
+            redirect('account');
+
+        }
+
+    }
+	
+	public function locationajax() {
+		Authentication::guard('user');
+		
+		if($_POST['tp']&&$_POST['vl']) {
+			$ct = $sd = array();
+			if($_POST['tp']=='pv') {
+				$num_kt = $num_ix = 0;
+				
+				$r_ct = Database::$database->query("SELECT * FROM `kota_kabupaten` WHERE kt_pv_id = ".(int)$_POST['vl']);
+				while($ct_row = $r_ct->fetch_object()) {
+					$ct[] = array('id' => $ct_row->kt_id, 'name' => ($ct_row->kt_type==1 ? '' : 'Kab. ').$ct_row->kt_name);
+					if($num_ix==0) $num_kt = $ct_row->kt_id;
+					$num_ix++;
+				}
+				
+				$r_sd = Database::$database->query("SELECT * FROM `kecamatan` WHERE kc_kt_id = ".$num_kt);
+				while($sd_row = $r_sd->fetch_object()) {
+					$sd[] = array('id' => $sd_row->kc_id, 'name' => $sd_row->kc_name);
+				}
+				
+				Response::simple_json([
+					'ct' => $ct,
+					'sd' => $sd,
+				]);
+				
+			} elseif($_POST['tp']=='ct') {
+				
+				$r_sd = Database::$database->query("SELECT * FROM `kecamatan` WHERE kc_kt_id = ".(int)$_POST['vl']);
+				while($sd_row = $r_sd->fetch_object()) {
+					$sd[] = array('id' => $sd_row->kc_id, 'name' => $sd_row->kc_name);
+				}
+				
+				Response::simple_json([
+					'sd' => $sd,
+				]);
+				
+			} else {
+				Response::simple_json([
+					'status' => 'error'
+				]);
+			}
+			
+		} else {
+			Response::simple_json([
+				'status' => 'error'
+			]);
+		}
+	}
+
+}

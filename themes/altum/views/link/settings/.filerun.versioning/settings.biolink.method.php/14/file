@@ -1,0 +1,1939 @@
+<?php defined('ALTUMCODE') || die() ?>
+<?php ?>
+<?php ob_start() ?>
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+		
+		<div class="recomended-browser">
+			<div class="mb-2">We recommend that you use a browser that works best for mobile:</div>
+			<div class="d-flex justify-content-between flex-wrap mb-2">
+				<div class="d-flex align-items-center mt-2" ><img src="<?= SITE_URL . ASSETS_URL_PATH . 'images/chrome-icon-min.png'?>" /> <span class="ml-2">Chrome Mobile</span></div>
+				<div class="d-flex align-items-center mt-2"><img src="<?= SITE_URL . ASSETS_URL_PATH . 'images/firefox-icon-min.png'?>" /> <span class="ml-2">Firefox Mobile</span></div>
+			</div>
+		</div>
+        <div class="d-flex justify-content-between">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link <?= !isset($_GET['tab']) || (isset($_GET['tab']) && $_GET['tab'] == 'settings') ? 'active' : null ?>" id="settings-tab" data-toggle="pill" href="#settings" role="tab" aria-controls="settings" aria-selected="true"><?= $this->language->link->header->settings_tab ?></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= isset($_GET['tab']) && $_GET['tab'] == 'links'? 'active' : null ?>" id="links-tab" data-toggle="pill" href="#links" role="tab" aria-controls="links" aria-selected="false"><?= $this->language->link->header->links_tab ?></a>
+                </li>
+            </ul>
+			
+			<div class="dropdown">
+                <button type="button" data-toggle="dropdown" class="btn btn-primary rounded-pill dropdown-toggle dropdown-toggle-simple"><i class="fa fa-database"></i> Backup</button>
+
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a href="#" class="dropdown-item" data-toggle="modal" data-target="#create_biolink_exportb">
+                        <i class="fa fa-fw fa-file-export fa-sm mr-1" style="color: #005e0B"></i>
+
+                        Export Biolink
+                    </a>
+					<a href="#" class="dropdown-item" data-toggle="modal" data-target="#create_biolink_importb">
+                        <i class="fa fa-fw fa-file-import fa-sm mr-1" style="color: #9C0060"></i>
+
+                        Import Biolink
+                    </a>
+                </div>
+            </div>
+			
+			<div class="dropdown">
+                <button type="button" data-toggle="dropdown" class="btn btn-primary rounded-pill dropdown-toggle dropdown-toggle-simple"><i class="fa fa-plus-circle"></i> <?= $this->language->project->links->create ?></button>
+
+                <div class="dropdown-menu dropdown-menu-right dropdown-multicol">
+                    <?php $biolink_link_types = require APP_PATH . 'includes/biolink_link_types.php'; ?>
+					
+                    <?php foreach($biolink_link_types as $key): ?>
+                    <a href="#" class="dropdown-item" data-toggle="modal" data-target="#create_biolink_<?= $key ?>">
+                        <i class="fa fa-fw fa-circle fa-sm mr-1" style="color: <?= $this->language->link->biolink->{$key}->color ?>"></i>
+
+                        <?= $this->language->link->biolink->{$key}->name ?>
+                    </a>
+                    <?php endforeach ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade <?= !isset($_GET['tab']) || (isset($_GET['tab']) && $_GET['tab'] == 'settings') ? 'show active' : null ?>" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                <div class="card border-0">
+                    <div class="card-body">
+
+                        <form name="update_biolink" action="" method="post" role="form" enctype="multipart/form-data">
+                            <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" />
+                            <input type="hidden" name="request_type" value="update" />
+                            <input type="hidden" name="type" value="biolink" />
+                            <input type="hidden" name="link_id" value="<?= $data->link->link_id ?>" />
+
+                            <div class="notification-container"></div>
+
+                            <div class="form-group">
+                                <label><i class="fa fa-fw fa-link fa-sm mr-1"></i> <?= $this->language->link->settings->url ?></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <?php print_r($data->domains) ?>
+                                        <?php if(count($data->domains)): ?>
+                                            <select name="domain_id" class="appearance-none select-custom-altum form-control input-group-text">
+                                                <option value="" <?= $data->link->domain ? 'selected="selected"' : null ?>><?= str_replace('http://','https://',url()) ?></option>
+                                                <?php foreach($data->domains as $row): ?>
+                                                    <option value="<?= $row->domain_id ?>" <?= $data->link->domain && $row->domain_id == $data->link->domain->domain_id ? 'selected="selected"' : null ?>><?= $row->url ?></option>
+                                                <?php endforeach ?>
+                                            </select>
+                                        <?php else: ?>
+                                            <span class="input-group-text"><?= url() ?></span>
+                                        <?php endif ?>
+                                    </div>
+                                    <input type="text" class="form-control" name="url" placeholder="<?= $this->language->link->settings->url_placeholder ?>" value="<?= $data->link->url ?>" />
+                                </div>
+                                <small class="text-muted"><?= $this->language->link->settings->url_help ?></small>
+                            </div>
+
+                            <?php
+
+                            /* Check if we have avatar or we show the default */
+                            if(empty($data->link->settings->image) || !file_exists(UPLOADS_PATH . 'avatars/' . $data->link->settings->image)) {
+                                $data->link->settings->image_url = SITE_URL . ASSETS_URL_PATH . 'images/avatar_default.png';
+                            } else {
+                                $data->link->settings->image_url = SITE_URL . UPLOADS_URL_PATH . 'avatars/' . $data->link->settings->image;
+                            }
+
+                            ?>
+
+                            <div class="form-group">
+                                <div class="m-1 d-flex flex-column align-items-center justify-content-center">
+                                    <label aria-label="<?= $this->language->link->settings->image ?>" class="clickable">
+                                        <img id="image_file_preview" src="<?= $data->link->settings->image_url ?>" data-default-src="<?= $data->link->settings->image_url ?>" data-empty-src="<?= SITE_URL . ASSETS_URL_PATH . 'images/avatar_default.png' ?>" class="img-fluid link-image-preview" />
+                                        <input id="image_file_input" type="file" name="image" class="form-control" style="display:none;" />
+                                        <input type="hidden" name="image_delete" value="0" class="form-control" />
+                                    </label>
+
+                                    <div id="image_file_status" <?= empty($data->link->settings->image) ? 'style="display: none;"' : null ?>>
+                                        <button type="button" id="image_file_remove" class="btn btn-outline-secondary" data-toggle="tooltip" title="<?= $this->language->link->settings->image_remove ?>"><i class="fa fa-fw fa-trash-alt"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings_title"><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->link->settings->title ?></label>
+                                <input type="text" id="settings_title" name="title" class="form-control" value="<?= $data->link->settings->title ?>" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings_description"><i class="fa fa-fw fa-pen-fancy fa-sm mr-1"></i> <?= $this->language->link->settings->description ?></label>
+                                <input type="text" id="settings_description" name="description" class="form-control" value="<?= $data->link->settings->description ?>" />
+                            </div>
+							
+							<div class="custom-control custom-switch mr-3 mb-3 <?= !$this->user->package_settings->verified ? 'container-disabled': null ?>">
+                                <input
+                                        type="checkbox"
+                                        class="custom-control-input"
+                                        id="display_verified"
+                                        name="display_verified"
+                                    <?= !$this->user->package_settings->verified ? 'disabled="disabled"': null ?>
+                                    <?= $data->link->settings->display_verified ? 'checked="true"' : null ?>
+                                >
+                                <label class="custom-control-label clickable" for="display_verified"><?= $this->language->link->settings->display_verified ?></label>
+                            </div>
+							
+							<div class="custom-control custom-switch mr-3 mb-3">
+                                <input
+                                        type="checkbox"
+                                        class="custom-control-input"
+                                        id="password_protector"
+                                        name="password_protector"
+										<?= isset($data->link->settings->password_protector)&&$data->link->settings->password_protector ? 'checked="true"' : null ?>
+                                >
+                                <label class="custom-control-label clickable" for="password_protector"><?= $this->language->link->settings->password_protector ?></label>
+                            </div>
+							
+							<div id="cpassword_protector" class="form-group" style="<?= isset($data->link->settings->password_protector)&&$data->link->settings->password_protector ? 'display:block' : 'display:none' ?>">
+                                <label for="settings_password_protector"><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->link->settings->password_lock ?></label>
+                                <input type="text" id="settings_title" name="password_lock" class="form-control" maxlength="48" value="<?= isset($data->link->settings->password_lock) ? $data->link->settings->password_lock : null ?>" placeholder="<?= $this->language->link->settings->password_lock_placeholder ?>" />
+                            </div>
+							
+							<div id="dpassword_protector" class="form-group" style="<?= isset($data->link->settings->password_protector)&&$data->link->settings->password_protector ? 'display:block' : 'display:none' ?>">
+                                <label for="settings_password_protector"><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->link->settings->timeout_lock ?></label>
+                                <select class="form-control" name="timeout_lock">
+								<option value="5"<?= isset($data->link->settings->timeout_lock)&&$data->link->settings->timeout_lock==5 ? ' selected' : '' ?>>5 Minutes</option>
+								<option value="10"<?= isset($data->link->settings->timeout_lock)&&$data->link->settings->timeout_lock==10 ? ' selected' : '' ?>>10 Minutes</option>
+								<option value="20"<?= isset($data->link->settings->timeout_lock)&&$data->link->settings->timeout_lock==20 ? ' selected' : '' ?>>20 Minutes</option>
+								<option value="30"<?= isset($data->link->settings->timeout_lock)&&$data->link->settings->timeout_lock==30 ? ' selected' : '' ?>>30 Minutes</option>
+								<option value="60"<?= isset($data->link->settings->timeout_lock)&&$data->link->settings->timeout_lock==60 ? ' selected' : '' ?>>60 Minutes</option>
+								</select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings_text_color"><i class="fa fa-fw fa-paint-brush fa-sm mr-1"></i> <?= $this->language->link->settings->text_color ?></label>
+                                <input type="hidden" id="settings_text_color" name="text_color" class="form-control" value="<?= $data->link->settings->text_color ?>" required="required" />
+                                <div id="settings_text_color_pickr"></div>
+                            </div>
+							
+							<div class="form-group">
+                                <label for="settings_page_transition_type"><i class="fa fa-fw fa-fill fa-sm mr-1"></i> <?= $this->language->link->settings->page_transition ?></label>
+                                <select id="settings_page_transition_type" name="page_transition_type" class="form-control">
+                                    <option value="0"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==0 ? ' selected' : '') : '' ?>>None</option>
+									<option value="1"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==1 ? ' selected' : '') : '' ?>>Move (To Left / From Right)</option>
+									<option value="2"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==2 ? ' selected' : '') : '' ?>>Move (To right / From left)</option>
+									<option value="3"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==3 ? ' selected' : '') : '' ?>>Move (To Top / From Bottom)</option>
+									<option value="4"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==4 ? ' selected' : '') : '' ?>>Move (To Bottom / From Top)</option>
+									<option value="5"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==5 ? ' selected' : '') : '' ?>>Fade (From Right)</option>
+									<option value="6"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==6 ? ' selected' : '') : '' ?>>Fade (From Left)</option>
+									<option value="7"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==7 ? ' selected' : '') : '' ?>>Fade (From Bottom)</option>
+									<option value="8"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==8 ? ' selected' : '') : '' ?>>Fade (From Top)</option>
+									<option value="9"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==9 ? ' selected' : '') : '' ?>>Fade (Left / Right)</option>
+									<option value="10"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==10 ? ' selected' : '') : '' ?>>Fade (Right / Left)</option>
+									<option value="11"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==11 ? ' selected' : '') : '' ?>>Fade (Top / Bottom)</option>
+									<option value="12"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==12 ? ' selected' : '') : '' ?>>Fade (Bottom / Top)</option>
+									<option value="13"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==13 ? ' selected' : '') : '' ?>>Different Easing (From Right)</option>
+									<option value="14"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==14 ? ' selected' : '') : '' ?>>Different Easing (From Left)</option>
+									<option value="15"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==15 ? ' selected' : '') : '' ?>>Different Easing (From Bottom)</option>
+									<option value="16"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==16 ? ' selected' : '') : '' ?>>Different Easing (From Top)</option>
+									<option value="17"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==17 ? ' selected' : '') : '' ?>>Scale (Scale Down / From Right)</option>
+									<option value="18"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==18 ? ' selected' : '') : '' ?>>Scale (Scale Down / From Left)</option>
+									<option value="19"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==19 ? ' selected' : '') : '' ?>>Scale (Scale Down / From Bottom)</option>
+									<option value="20"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==20 ? ' selected' : '') : '' ?>>Scale (Scale Down / From Top)</option>
+									<option value="21"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==21 ? ' selected' : '') : '' ?>>Scale (Scale Down / Scale Down)</option>
+									<option value="22"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==22 ? ' selected' : '') : '' ?>>Scale (Scale Up / Scale Up)</option>
+									<option value="23"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==23 ? ' selected' : '') : '' ?>>Scale (Move To Left / Scale Up)</option>
+									<option value="24"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==24 ? ' selected' : '') : '' ?>>Scale (Move To Right / Scale Up)</option>
+									<option value="25"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==25 ? ' selected' : '') : '' ?>>Scale (Move To Top / Scale Up)</option>
+									<option value="26"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==26 ? ' selected' : '') : '' ?>>Scale (Move To Bottom / Scale Up)</option>
+									<option value="27"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==27 ? ' selected' : '') : '' ?>>Scale (Scale Down / Scale Up)</option>
+									<option value="28"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==28 ? ' selected' : '') : '' ?>>Rotate - Glue (Left / From Right)</option>
+									<option value="29"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==29 ? ' selected' : '') : '' ?>>Rotate - Glue (Right / From Left) </option>
+									<option value="30"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==30 ? ' selected' : '') : '' ?>>Rotate - Glue (Bottom / From Top)</option>
+									<option value="31"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==31 ? ' selected' : '') : '' ?>>Rotate - Glue (Top / From Bottom)</option>
+									<option value="32"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==32 ? ' selected' : '') : '' ?>>Rotate - Flip (Right)</option>
+									<option value="33"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==33 ? ' selected' : '') : '' ?>>Rotate - Flip (Left)</option>
+									<option value="34"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==34 ? ' selected' : '') : '' ?>>Rotate - Flip (Top)</option>
+									<option value="35"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==35 ? ' selected' : '') : '' ?>>Rotate - Flip (Bottom)</option>
+									<option value="36"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==36 ? ' selected' : '') : '' ?>>Rotate - Fall</option>
+									<option value="37"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==37 ? ' selected' : '') : '' ?>>Rotate - Newspaper</option>
+									<option value="38"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==38 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Left / From Right)</option>
+									<option value="39"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==39 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Right / From Left)</option>
+									<option value="40"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==40 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Top / From Bottom)</option>
+									<option value="41"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==41 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Bottom / From Top)</option>
+									<option value="42"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==42 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Left / Pull Right)</option>
+									<option value="43"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==43 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Right / Pull Left)</option>
+									<option value="44"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==44 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Top / Pull Bottom)</option>
+									<option value="45"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==45 ? ' selected' : '') : '' ?>>Rotate - Push / Pull (Push Bottom / Pull Top)</option>
+									<option value="46"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==46 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Fold Left / From Right)</option>
+									<option value="47"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==47 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Fold Right / From Left)</option>
+									<option value="48"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==48 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Fold Top / From Bottom)</option>
+									<option value="49"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==49 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Fold Bottom / From Top)</option>
+									<option value="50"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==50 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Move To Right / Unfold Left)</option>
+									<option value="51"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==51 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Move To Left / Unfold Right)</option>
+									<option value="52"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==52 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Move To Bottom / Unfold Top)</option>
+									<option value="53"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==53 ? ' selected' : '') : '' ?>>Rotate - Fold / Unfold (Move To Top / Unfold Bottom)</option>
+									<option value="54"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==54 ? ' selected' : '') : '' ?>>Rotate - Room (To Left)</option>
+									<option value="55"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==55 ? ' selected' : '') : '' ?>>Rotate - Room (To Right)</option>
+									<option value="56"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==56 ? ' selected' : '') : '' ?>>Rotate - Room (To Top)</option>
+									<option value="57"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==57 ? ' selected' : '') : '' ?>>Rotate - Room (To Bottom)</option>
+									<option value="58"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==58 ? ' selected' : '') : '' ?>>Rotate - Cube (To Left)</option>
+									<option value="59"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==59 ? ' selected' : '') : '' ?>>Rotate - Cube (To Right)</option>
+									<option value="60"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==60 ? ' selected' : '') : '' ?>>Rotate - Cube (To Top)</option>
+									<option value="61"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==61 ? ' selected' : '') : '' ?>>Rotate - Cube (To Bottom)</option>
+									<option value="62"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==62 ? ' selected' : '') : '' ?>>Rotate - Carousel (To Left)</option>
+									<option value="63"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==63 ? ' selected' : '') : '' ?>>Rotate - Carousel (To Right)</option>
+									<option value="64"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==64 ? ' selected' : '') : '' ?>>Rotate - Carousel (To Top)</option>
+									<option value="65"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==65 ? ' selected' : '') : '' ?>>Rotate - Carousel (To Bottom)</option>
+									<option value="66"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==66 ? ' selected' : '') : '' ?>>Rotate - Sides</option>
+									<option value="67"<?= isset($data->link->settings->page_transition_type) ? ($data->link->settings->page_transition_type==67 ? ' selected' : '') : '' ?>>Slide</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings_background_type"><i class="fa fa-fw fa-fill fa-sm mr-1"></i> <?= $this->language->link->settings->background_type ?></label>
+                                <select id="settings_background_type" name="background_type" class="form-control">
+                                    <?php foreach($biolink_backgrounds as $key => $value): ?>
+                                        <option value="<?= $key ?>" <?= $data->link->settings->background_type == $key ? 'selected="selected"' : null?>><?= $this->language->link->settings->{'background_type_' . $key} ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+							
+							<div id="background_type_preset" class="row">
+                                <?php foreach($biolink_backgrounds['preset'] as $key): ?>
+                                    <label for="settings_background_type_preset_<?= $key ?>" class="m-0 col-4 mb-4">
+                                        <input type="radio" name="background" value="<?= $key ?>" id="settings_background_type_preset_<?= $key ?>" class="d-none" <?= $data->link->settings->background == $key ? 'checked="checked"' : null ?>/>
+
+                                        <div class="link-background-type-preset link-body-background-<?= $key ?>"></div>
+                                    </label>
+                                <?php endforeach ?>
+                            </div>
+
+                            <div class="<?= !$this->user->package_settings->custom_backgrounds ? 'container-disabled': null ?>">
+                                <div id="background_type_anigradient">
+                                    <div class="form-group">
+                                        <label for="settings_background_type_anigradient_color_one"><?= $this->language->link->settings->background_type_anigradient_color_one ?></label>
+                                        <input type="hidden" id="settings_background_type_anigradient_color_one" name="background[]" class="form-control" value="<?= $data->link->settings->background->color_one ?? '#a529b9' ?>" />
+                                        <div id="settings_background_type_anigradient_color_one_pickr"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="settings_background_type_anigradient_color_two"><?= $this->language->link->settings->background_type_anigradient_color_two ?></label>
+                                        <input type="hidden" id="settings_background_type_anigradient_color_two" name="background[]" class="form-control" value="<?= $data->link->settings->background->color_two ?? '#50b1e1' ?>" />
+                                        <div id="settings_background_type_anigradient_color_two_pickr"></div>
+                                    </div>
+									
+									<div class="form-group">
+                                        <label for="settings_background_type_anigradient_color_three"><?= $this->language->link->settings->background_type_anigradient_color_three ?></label>
+                                        <input type="hidden" id="settings_background_type_anigradient_color_three" name="background[]" class="form-control" value="<?= $data->link->settings->background->color_three ?? '#79F1A4' ?>" />
+                                        <div id="settings_background_type_anigradient_color_three_pickr"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="settings_background_type_anigradient_color_four"><?= $this->language->link->settings->background_type_anigradient_color_four ?></label>
+                                        <input type="hidden" id="settings_background_type_anigradient_color_four" name="background[]" class="form-control" value="<?= $data->link->settings->background->color_four ?? '#0E5CAD' ?>" />
+                                        <div id="settings_background_type_anigradient_color_four_pickr"></div>
+                                    </div>
+                                </div>
+								
+								<div id="background_type_gradient">
+                                    <div class="form-group">
+                                        <label for="settings_background_type_gradient_color_one"><?= $this->language->link->settings->background_type_gradient_color_one ?></label>
+                                        <input type="hidden" id="settings_background_type_gradient_color_one" name="background[]" class="form-control" value="<?= $data->link->settings->background->color_one ?? '' ?>" />
+                                        <div id="settings_background_type_gradient_color_one_pickr"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="settings_background_type_gradient_color_two"><?= $this->language->link->settings->background_type_gradient_color_two ?></label>
+                                        <input type="hidden" id="settings_background_type_gradient_color_two" name="background[]" class="form-control" value="<?= $data->link->settings->background->color_two ?? '' ?>" />
+                                        <div id="settings_background_type_gradient_color_two_pickr"></div>
+                                    </div>
+                                </div>
+
+                                <div id="background_type_color">
+                                    <div class="form-group">
+                                        <label for="settings_background_type_color"><?= $this->language->link->settings->background_type_color ?></label>
+                                        <input type="hidden" id="settings_background_type_color" name="background" class="form-control" value="<?= is_string($data->link->settings->background) ? $data->link->settings->background : '#60A3CE' ?>" />
+                                        <div id="settings_background_type_color_pickr"></div>
+                                    </div>
+                                </div>
+
+                                <div id="background_type_image">
+                                    <div class="form-group">
+                                        <label><?= $this->language->link->settings->background_type_image ?></label>
+                                        <?php if(is_string($data->link->settings->background) && file_exists(UPLOADS_PATH . 'backgrounds/' . $data->link->settings->background)): ?>
+                                            <img id="background_type_image_preview" src="<?= SITE_URL . UPLOADS_URL_PATH . 'backgrounds/' . $data->link->settings->background ?>" data-default-src="<?= SITE_URL . UPLOADS_URL_PATH . 'backgrounds/' . $data->link->settings->background ?>" class="link-background-type-image img-fluid" />
+                                        <?php endif ?>
+                                        <input id="background_type_image_input" type="file" name="background" class="form-control" />
+                                        <p id="background_type_image_status" style="display: none;">
+                                            <span class="text-muted"><?= $this->language->link->settings->image_status ?></span>
+                                            <span id="background_type_image_remove" class="clickable" data-toggle="tooltip" title="<?= $this->language->link->settings->image_remove ?>"><i class="fa fa-fw fa-trash-alt"></i></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-block btn-gray-300 my-4" type="button" data-toggle="collapse" data-target="#branding_container" aria-expanded="false" aria-controls="branding_container">
+                                <?= $this->language->link->settings->branding_header ?>
+                            </button>
+
+                            <div class="collapse" id="branding_container">
+                                <div class="custom-control custom-switch mr-3 mb-3 <?= !$this->user->package_settings->removable_branding ? 'container-disabled': null ?>">
+                                    <input
+                                            type="checkbox"
+                                            class="custom-control-input"
+                                            id="display_branding"
+                                            name="display_branding"
+                                        <?= !$this->user->package_settings->removable_branding ? 'disabled="disabled"': null ?>
+                                        <?= $data->link->settings->display_branding ? 'checked="true"' : null ?>
+                                    >
+                                    <label class="custom-control-label clickable" for="display_branding"><?= $this->language->link->settings->display_branding ?></label>
+                                </div>
+
+                                <div class="<?= !$this->user->package_settings->custom_branding ? 'container-disabled': null ?>">
+                                    <div class="form-group">
+                                        <label><i class="fa fa-fw fa-random fa-sm mr-1"></i> <?= $this->language->link->settings->branding->name ?></label>
+                                        <input id="branding_name" type="text" class="form-control" name="branding_name" value="<?= $data->link->settings->branding->name ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->branding->name_help ?></small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label><i class="fa fa-fw fa-link fa-sm mr-1"></i> <?= $this->language->link->settings->branding->url ?></label>
+                                        <input id="branding_url" type="text" class="form-control" name="branding_url" value="<?= $data->link->settings->branding->url ?? '' ?>" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-block btn-gray-300 my-4" type="button" data-toggle="collapse" data-target="#analytics_container" aria-expanded="false" aria-controls="analytics_container">
+                                <?= $this->language->link->settings->analytics_header ?>
+                            </button>
+
+                            <div class="collapse" id="analytics_container">
+                                <div class="<?= !$this->user->package_settings->google_analytics ? 'container-disabled': null ?>">
+                                    <div class="form-group">
+                                        <label><i class="fab fa-fw fa-google fa-sm mr-1"></i> <?= $this->language->link->settings->google_analytics ?></label>
+                                        <input id="google_analytics" type="text" class="form-control" name="google_analytics" value="<?= $data->link->settings->google_analytics ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->google_analytics_help ?></small>
+                                    </div>
+                                </div>
+
+                                <div class="<?= !$this->user->package_settings->facebook_pixel ? 'container-disabled': null ?>">
+                                    <div class="form-group">
+                                        <label><i class="fab fa-fw fa-facebook fa-sm mr-1"></i> <?= $this->language->link->settings->facebook_pixel ?></label>
+                                        <input id="facebook_pixel" type="text" class="form-control" name="facebook_pixel" value="<?= $data->link->settings->facebook_pixel ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->facebook_pixel_help ?></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-block btn-gray-300 my-4" type="button" data-toggle="collapse" data-target="#seo_container" aria-expanded="false" aria-controls="seo_container">
+                                <?= $this->language->link->settings->seo_header ?>
+                            </button>
+
+                            <div class="collapse" id="seo_container">
+                                <div class="<?= !$this->user->package_settings->seo ? 'container-disabled': null ?>">
+                                    <div class="form-group">
+                                        <label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->link->settings->seo_title ?></label>
+                                        <input id="seo_title" type="text" class="form-control" name="seo_title" value="<?= $data->link->settings->seo->title ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->seo_title_help ?></small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> <?= $this->language->link->settings->seo_meta_description ?></label>
+                                        <input id="seo_meta_description" type="text" class="form-control" name="seo_meta_description" value="<?= $data->link->settings->seo->meta_description ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->seo_meta_description_help ?></small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> <?= $this->language->link->settings->seo_meta_image ?></label>
+                                        <input id="seo_meta_image" type="text" class="form-control" name="seo_meta_image" value="<?= $data->link->settings->seo->meta_image ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->seo_meta_image_help ?></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-block btn-gray-300 my-4" type="button" data-toggle="collapse" data-target="#utm_container" aria-expanded="false" aria-controls="utm_container">
+                                <?= $this->language->link->settings->utm_header ?>
+                            </button>
+
+                            <div class="collapse" id="utm_container">
+                                <div class="<?= !$this->user->package_settings->utm ? 'container-disabled': null ?>">
+                                    <div class="form-group">
+                                        <label><?= $this->language->link->settings->utm_medium ?></label>
+                                        <input id="utm_medium" type="text" class="form-control" name="utm_medium" value="<?= $data->link->settings->utm->medium ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->utm_medium_help ?></small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label><?= $this->language->link->settings->utm_source ?></label>
+                                        <input id="utm_source" type="text" class="form-control" name="utm_source" value="<?= $data->link->settings->utm->source ?? '' ?>" />
+                                        <small class="text-muted"><?= $this->language->link->settings->utm_source_help ?></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-block btn-gray-300 my-4" type="button" data-toggle="collapse" data-target="#socials_container" aria-expanded="false" aria-controls="socials_container">
+                                <?= $this->language->link->settings->socials_header ?>
+                            </button>
+
+                            <div class="collapse" id="socials_container">
+                                <div class="<?= !$this->user->package_settings->socials ? 'container-disabled': null ?>">
+                                    <div class="form-group">
+                                        <label for="settings_socials_color"><i class="fa fa-fw fa-paint-brush fa-sm mr-1"></i> <?= $this->language->link->settings->socials_color ?></label>
+                                        <input type="hidden" id="settings_socials_color" name="socials_color" class="form-control" value="<?= $data->link->settings->socials_color ?>" required="required" />
+                                        <div id="settings_socials_color_pickr"></div>
+                                    </div>
+
+                                    <?php $biolink_socials = require APP_PATH . 'includes/biolink_socials.php'; ?>
+
+                                    <?php foreach($biolink_socials as $key => $value): ?>
+                                    <div class="form-group">
+                                        <label><i class="<?= $this->language->link->settings->socials->{$key}->icon ?> fa-fw fa-sm mr-1"></i> <?= $this->language->link->settings->socials->{$key}->name ?></label>
+                                        <input type="text" class="form-control" name="socials[<?= $key ?>]" placeholder="<?= $this->language->link->settings->socials->{$key}->placeholder ?>" value="<?= $data->link->settings->socials->{$key} ?? '' ?>" />
+                                    </div>
+                                    <?php endforeach ?>
+
+                                </div>
+                            </div>
+
+                            <button class="btn btn-block btn-gray-300 my-4" type="button" data-toggle="collapse" data-target="#fonts_container" aria-expanded="false" aria-controls="fonts_container">
+                                <?= $this->language->link->settings->fonts_header ?>
+                            </button>
+
+                            <div class="collapse" id="fonts_container">
+                                <div class="<?= !$this->user->package_settings->fonts ? 'container-disabled': null ?>">
+                                    <?php $biolink_fonts = require APP_PATH . 'includes/biolink_fonts.php'; ?>
+
+                                    <div class="form-group">
+                                        <label for="settings_font"><i class="fa fa-fw fa-pen-nib fa-sm mr-1"></i> <?= $this->language->link->settings->font ?></label>
+                                        <select id="settings_font" name="font" class="form-control">
+                                            <?php foreach($biolink_fonts as $key => $value): ?>
+                                                <option value="<?= $key ?>" <?= $data->link->settings->font == $key ? 'selected="selected"' : null?>><?= $value['name'] ?></option>
+                                            <?php endforeach ?>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" name="submit" class="btn btn-lg btn-block btn-primary"><?= $this->language->global->update ?></button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade <?= isset($_GET['tab']) && $_GET['tab'] == 'links'? 'show active' : null ?>" id="links" role="tabpanel" aria-labelledby="links-tab">
+
+                <?php if($data->link_links_result->num_rows): ?>
+                    <?php while($row = $data->link_links_result->fetch_object()): ?>
+
+                    <?php $row->settings = json_decode($row->settings) ?>
+
+                        <div class="link card border-0 <?= $row->is_enabled ? null : 'custom-row-inactive' ?> my-4" data-link-id="<?= $row->link_id ?>">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                <div class="custom-row-side-controller">
+                                    <span data-toggle="tooltip" title="<?= $this->language->link->links->link_sort ?>">
+                                        <i class="fa fa-fw fa-bars text-muted custom-row-side-controller-grab drag"></i>
+                                    </span>
+                                </div>
+
+                                <div class="col-1 mr-2 p-0 d-none d-lg-block">
+
+                                    <span class="fa-stack fa-1x" data-toggle="tooltip" title="<?= $this->language->link->biolink->{$row->subtype}->name ?>">
+                                      <i class="fa fa-circle fa-stack-2x" style="color: <?= $this->language->link->biolink->{$row->subtype}->color ?>"></i>
+                                      <i class="fas <?= $this->language->link->biolink->{$row->subtype}->icon ?> fa-stack-1x fa-inverse"></i>
+                                    </span>
+
+                                </div>
+
+                                <div class="col-7 col-md-8">
+                                    <div class="d-flex flex-column">
+                                        <a href="#"
+                                           data-toggle="collapse"
+                                           data-target="#link_expanded_content<?= $row->link_id ?>"
+                                           aria-expanded="false"
+                                           aria-controls="link_expanded_content<?= $row->link_id ?>"
+                                        >
+                                            <strong><?= in_array($row->subtype, $this->blocks->block_title) ? $this->language->link->biolink->{$row->subtype}->name : $row->settings->name ?></strong>
+                                        </a>
+
+                                        <span class="d-flex align-items-center">
+                                            <?php if(!empty($row->location_url)): ?>
+                                            <img src="https://www.google.com/s2/favicons?domain=<?= $row->location_url ?>" class="img-fluid mr-1" />
+                                            <span class="d-inline-block text-truncate">
+                                                <a href="<?= $row->location_url ?>" class="text-muted" title="<?= $row->location_url ?>"><?= $row->location_url ?></a>
+                                            </span>
+                                            <?php elseif(!empty($row->url)): ?>
+                                            <img src="https://www.google.com/s2/favicons?domain=<?= url($row->url) ?>" class="img-fluid mr-1" />
+                                            <span class="d-inline-block text-truncate">
+                                                <a href="<?= url($row->url) ?>" class="text-muted" title="<?= url($row->url) ?>"><?= url($row->url) ?></a>
+                                            </span>
+											<?php elseif(isset($row->settings->picture_url)): ?>
+                                            <img src="https://www.google.com/s2/favicons?domain=<?= $row->settings->picture_url ?>" class="img-fluid mr-1" />
+                                            <span class="d-inline-block text-truncate">
+												<?php if(isset($row->settings->target_url)): ?>
+												<a href="<?= $row->settings->target_url ?>" class="text-muted" title="<?= $row->settings->target_url ?>" target="_blank"><?= $row->settings->target_url ?></a>
+												<?php else: ?>
+                                                <a href="<?= $row->settings->picture_url ?>" class="text-muted" title="<?= $row->settings->picture_url ?>" target="_blank"><?= $row->settings->picture_url ?></a>
+												<?php endif ?>
+										   </span>
+                                            <?php endif ?>
+                                        </span>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-3 col-md-2">
+                                    <?php if(!in_array($row->subtype, $this->blocks->block_statistic)): ?>
+                                    <a href="<?= url('link/' . $row->link_id . '/statistics') ?>">
+                                        <span data-toggle="tooltip" title="<?= $this->language->project->links->clicks ?>" class="badge badge-primary"><i class="fa fa-fw fa-chart-bar mr-1"></i> <?= nr($row->clicks) ?></span>
+                                    </a>
+                                    <?php endif ?>
+                                </div>
+
+                                <div class="col-1 d-flex justify-content-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-toggle="dropdown" class="text-secondary dropdown-toggle dropdown-toggle-simple">
+                                            <i class="fa fa-ellipsis-v"></i>
+
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <a href="#"
+                                                   class="dropdown-item"
+                                                   data-toggle="collapse"
+                                                   data-target="#link_expanded_content<?= $row->link_id ?>"
+                                                   aria-expanded="false"
+                                                   aria-controls="link_expanded_content<?= $row->link_id ?>"
+                                                >
+                                                    <i class="fa fa-fw fa-pencil-alt"></i> <?= $this->language->global->edit ?>
+                                                </a>
+
+                                                <?php if(!in_array($row->subtype, $this->blocks->block_statistic)): ?>
+                                                <a href="<?= url('link/' . $row->link_id . '/statistics') ?>" class="dropdown-item"><i class="fa fa-fw fa-chart-bar"></i> <?= $this->language->link->statistics->link ?></a>
+                                                <?php endif ?>
+
+                                                <a href="#" class="dropdown-item" id="biolink_link_is_enabled_<?= $data->link->link_id ?>" data-row-id="<?= $row->link_id ?>">
+                                                    <i class="fa fa-fw fa-bell"></i> <?= $this->language->link->links->switch_status ?>
+                                                </a>
+
+                                                <?php if($row->subtype == 'link' || $row->subtype == 'html'): ?>
+                                                <a href="#" class="dropdown-item" data-duplicate="true" data-row-id="<?= $row->link_id ?>"><i class="fa fa-fw fa-copy"></i> <?= $this->language->link->links->duplicate ?></a>
+                                                <?php endif ?>
+
+                                                <a href="#" class="dropdown-item" data-delete="<?= $this->language->global->info_message->confirm_delete ?>" data-row-id="<?= $row->link_id ?>"><i class="fa fa-fw fa-times"></i> <?= $this->language->global->delete ?></a>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                                <div class="collapse mt-3" id="link_expanded_content<?= $row->link_id ?>" data-link-subtype="<?= $row->subtype ?>">
+                                    <?php require THEME_PATH . 'views/link/settings/' . $row->subtype . '_form.settings.biolink.method.php' ?>
+                                </div>
+                            </div>
+                        </div>
+
+                    <?php endwhile ?>
+                <?php else: ?>
+
+                    <div class="alert alert-info" role="alert">
+                        <?= $this->language->link->links->no_links ?>
+                    </div>
+
+                <?php endif ?>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6 mt-5 mt-lg-0 d-flex justify-content-center">
+        <div class="biolink-preview-container">
+            <div class="biolink-preview">
+                <div class="biolink-preview-iframe-container">
+                    <iframe id="biolink_preview_iframe" class="biolink-preview-iframe" src="<?= url($data->link->url . '?preview&link_id=' . $data->link->link_id) ?>" data-url-prepend="<?= url() ?>" data-url-append="<?= '?preview&link_id=' . $data->link->link_id ?>"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.cursor-pointer{cursor:pointer !important}
+.form-bag-view{line-height:1 !important}
+.form-bag-view .fbv-title,.form-vbag-view .fvv-title{
+	width:100%;
+	font-weight:bold;
+}
+
+.form-bag-view .fbv-title > span,.form-vbag-view .fvv-title > span {
+	display:block;
+	overflow: hidden;
+	white-space:nowrap;
+	text-overflow: ellipsis;
+}
+.flex--1 {
+  flex: 1 1 auto;
+  overflow: hidden; /*or auto*/
+}
+.form-bag-view .fbv-description{
+	display: block;
+	display: -webkit-box;
+	width: 100%;
+	max-height: 30px;
+	font-size: 14px;
+	line-height: 1.1;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.form-image-preview.wh-60{min-width:60px !important;max-width:60px !important;height:60px !important}
+.form-image-preview.wh-70{min-width:70px !important;max-width:70px !important;height:70px !important}
+.mw-preview.wh-60{min-width:60px !important;max-width:60px !important;height:60px !important}
+.form-bag-view .fbv-mprice,.form-vbag-view .fvv-mprice{
+	display:flex;
+	align-items:center;
+	flex-wrap:wrap;
+	font-size:.85rem;
+	color:#333;
+}
+.form-bag-view .fbv-price,.form-vbag-view .fvv-price{font-size:1.1rem;font-weight:bold;color:#953051;margin-right:.65rem}
+.form-bag-view .fbv-price-strike,.form-vbag-view .fvv-price-strike{font-size:.85rem;color:#b3b3b3;text-decoration:line-through;margin-top:.15rem;}
+.form-bag-view .dropdown-menu{line-height:1.5 !important}
+.form-bag-view .form-group{margin-bottom:0 !important}
+.form-product-bag,.form-vrn-bag{position:relative;text-align:center;padding-top:1.25em;border-top:1px solid #ccc}
+.form-product-bag::after,.form-vrn-bag::after{
+	content:"Product";
+	position:absolute;
+	top:-13px;
+	text-align:center;
+	padding:.15em .75em;
+	border-radius:50px;
+	font-size:.85rem;
+	margin-left:-34px;
+	background-color:#6c757d;
+	color:#fff;
+}
+.form-vrn-bag{margin-top:1.25em;border-color:#eee}
+.form-vrn-bag::after{content:"Variant Product";margin-left:-57.5px;}
+.form-vrn-main{line-height:1.5 !important}
+.form-vrn-main{margin-top:.5rem}
+.product-vrn-item .form-group{margin-bottom:1rem !important;text-align:left !important}
+.form-bag-item{text-align:left !important;padding:.75rem 0;border-bottom:1px solid #ccc}
+.form-bag-item:last-child{border:0 !important}
+.form-product-item,.form-mvrn-item{padding:.25em .5em;border:1px solid #ccc;border-radius:5px;margin-bottom:1rem}
+.form-mvrn-item{margin-bottom:.5rem}
+.form-product-item:last-child,.form-mvrn-item:last-child{margin-bottom:0 !important}
+.form-product-item .form-product-bag,.form-product-item .form-product-bag .form-bag-edit,.form-product-item .form-product-ctg .form-ctg-edit,.form-mvrn-item .form-vrn-product .form-vrn-edit,form-mvrn-item .form-vrn-product .form-vrn-view,.form-mvrn-item .form-vrn-bag .form-vbag-edit,.form-mvrn-item .form-vrn-bag,.form-product-item .hide,.form-mvrn-item .hide{
+	display:none;
+}
+.form-product-item .show,.form-mvrn-item .show{display:block !important}
+.form-ctg-view .form-ctg-text,.form-mvrn-item .form-vrn-text{padding:.25rem .5rem .25rem 0}
+.form-ctg-view .form-ctg-name,.form-mvrn-item .form-vrn-view .form-vrn-name{
+	font-weight:bold;
+	padding:.375rem .5rem;
+	background-color:#f0f0f0;
+	border-radius:4px;
+	overflow: hidden;
+	white-space:nowrap;
+	text-overflow: ellipsis;
+	cursor:pointer;
+}
+.form-vrn-vrm .form-vrn-title{background-color:#fff !important;color:#38b2ac !important;cursor:default !important}
+.form-vrn-vrm .form-vrn-title{padding: .65rem .5rem;height:36px}
+.form-product-item.open .form-ctg-name,.form-mvrn-item.open .form-vrn-view .form-vrn-name {
+	background-color:#38b2ac;
+	color:#fff;
+}
+.form-product-item.open .form-product-bag,.form-mvrn-item.open .form-vrn-bag{
+	display:block;
+}
+.form-product-item.open .form-product-ctg{
+	margin-bottom:1.25em;
+}
+.form-vbag-item{text-align:left !important;margin-bottom:.75rem !important}
+.form-vrn-view label{margin-bottom:0 !important}
+.form-radio{position:relative}
+.form-radio input[type="radio"]{position:absolute;left:-99999px}
+.form-mvrn-text{font-weight:bold}
+</style>
+<?php $html = ob_get_clean() ?>
+
+
+<?php ob_start() ?>
+<script src="<?= SITE_URL . ASSETS_URL_PATH . 'js/libraries/sortable.js' ?>"></script>
+<script src="<?= SITE_URL . ASSETS_URL_PATH . 'js/libraries/pickr.min.js?v='.PRODUCT_CODE ?>"></script>
+<script src="<?= SITE_URL . ASSETS_URL_PATH . 'js/libraries/tinymce/tinymce.min.js?v='.PRODUCT_CODE ?>"></script>
+<script>
+tinymce.init({
+  selector: '.form-editor',
+  height: 500,
+  menubar: false,
+  toolbar_location: 'bottom',
+  force_p_newlines : false,
+  force_br_newlines : true,
+  convert_newlines_to_brs : false,
+  remove_linebreaks : true, 
+  forced_root_block: false ,
+  plugins: [
+    "advlist lists link image charmap print preview anchor",
+    "searchreplace visualblocks code fullscreen",
+    "insertdatetime media table paste "
+  ],
+  contextmenu:false,
+  default_link_target:"_blank",
+  valid_elements : '*[*]',
+  valid_children : "+body[style]",
+  skin: 'lightgray',
+  branding: false,
+  toolbar: 'code | insert | undo redo | bold italic backcolor forecolor | link | image media | styleselect | fontselect | fontsizeselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table | removeformat',
+  setup: function(ed) {
+	ed.on('init',function(){
+		
+	});
+	ed.on('change', function () {
+		tinymce.triggerSave();
+	});
+  },
+  font_formats:
+    "Lato=lato, sans-serif; Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Oswald=oswald; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats",
+  fontsize_formats:
+    "8pt 9pt 10pt 11pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 60pt 72pt 96pt",
+  content_style: "@import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap'); @import url('https://fonts.googleapis.com/css?family=Lato&display=swap'); .mce-content-body {font-size:12pt;font-family: 'Lato', sans-serif; padding:15px}",
+  content_css: [
+  '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+  '//www.tiny.cloud/css/codepen.min.css'] });
+
+$(document).on('focusin', function(e) {
+	if ($(e.target).closest(".tox-textarea,.tox-textfield").length)
+		e.stopImmediatePropagation();
+});
+$('#create_biolink_html').on('hidden.bs.modal', function (e) {
+	$('.tox-tbtn.tox-tbtn--enabled[title="More..."]').click();
+})
+$('#settings_page_transition_type').on('change',function(e) {
+	$('#biolink_preview_iframe')[0].contentWindow.PageTransitions.init(parseInt($(this).val()))
+})
+$('#create_biolink_floatbutton').on('shown.bs.modal', function (e) { $(document).off('focusin.modal'); });
+</script>
+<script>
+var ua = navigator.userAgent;
+if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)){
+	if(/Chrome\/[6-9][0-9.0-9]* Mobile/i.test(ua)) {
+	}else if(/Firefox/i.test(ua)){
+	}else if(/FxiOS/i.test(ua)){		
+	}else
+		$('.recomended-browser').show();
+}
+eventButtonUpload()
+eventClose()
+getDataEshop();
+function getDataEshop() {
+	var eshp_prd = '<div class="form-bag-item"><div class="form-bag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2"><div class="fbv-image form-image-preview wh-70"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fbv-title mb-1"><span></span></div><div class="fbv-description mb-1"></div><div class="fbv-mprice"><div class="text-nowrap">Rp<span class="fbv-price"></span></div><div class="fbv-pstrike text-nowrap">Rp<span class="fbv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="epi" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dpi" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div><div class="form-vrn-main"><div class="form-vrn-vrm mb-2"><div class="d-flex justify-content-between align-items-center"><div class="form-mvrn-text flex--1"><div class="form-vrn-name">Variants</div></div><div class="d-flex"><div data-eshop="vra" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div></div></div></div></div></div><div class="form-bag-edit show"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image[0][]" accept="image/x-png,image/gif,image/jpeg" required><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70"></div></div></div><small class="text-danger" data-field="image"></small></div><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label><input type="text" role="title" class="form-control" name="title[0][]" placeholder="Insert product title" required="required" /></div><div class="form-group"><label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label><textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price[0][]" placeholder="Price..." required/></div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price Strike <small>(Opsional)</small></label><input type="number" role="price_strike" class="form-control" name="price_strike[0][]" placeholder="Price Strike..." /></div></div></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" min="1" role="price" class="form-control" name="weight[0][]" placeholder="Ex: 100" required/></div><div class="d-flex justify-content-between mb-2"><div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="pci" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div>';
+	var eshp_ctg = '<div class="form-product-item open"><div class="form-product-ctg"><div data-eshop-btn="true" class="form-ctg-view hide"><div class="d-flex justify-content-between align-items-center"><div class="form-ctg-text flex--1"><div class="form-ctg-name"></div></div><div class="d-flex"><div data-eshop="api" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="sci" class="dropdown-item none" href="javascript:;"><i class="fas fa-exchange-alt mr-1"></i> <span class="fbv-switch">Hide</span></a><a data-eshop="eci" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dci" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div></div><div class="form-ctg-edit show"><div class="form-group mt-1"><input class="form-control" name="category[]" value="" placeholder="Insert a category name" required /> </div><div class="d-flex justify-content-center mb-1" style="display:none !important"><div data-eshop="csp" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div></div></div></div><div class="form-product-bag"><div class="form-bag-item"><div class="form-bag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2"><div class="fbv-image form-image-preview wh-70"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fbv-title mb-1"><span></span></div><div class="fbv-description mb-1"></div><div class="fbv-mprice"><div class="text-nowrap">Rp<span class="fbv-price"></span></div><div class="fbv-pstrike text-nowrap">Rp<span class="fbv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="epi" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dpi" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div><div class="form-vrn-main"><div class="form-vrn-vrm mb-2"><div class="d-flex justify-content-between align-items-center"><div class="form-mvrn-text flex--1"><div class="form-vrn-name">Variants</div></div><div class="d-flex"><div data-eshop="vra" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div></div></div></div></div></div><div class="form-bag-edit show"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image[0][]" accept="image/x-png,image/gif,image/jpeg" required><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70"></div></div></div><small class="text-danger" data-field="image"></small></div><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label><input type="text" role="title" class="form-control" name="title[0][]" placeholder="Insert product title" required="required" /> </div><div class="form-group"><label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label><textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price[0][]" placeholder="Price..." required/> </div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price Strike <small>(Opsional)</small></label><input type="number" role="price_strike" class="form-control" name="price_strike[0][]" placeholder="Price Strike..." /> </div></div></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" min="1" role="price" class="form-control" name="weight[0][]" placeholder="Ex: 100" required/> </div><div class="d-flex justify-content-between mb-2"><div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="dci" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div></div></div>';
+	var eshp_vrn = '<div class="form-mvrn-item open"><div class="form-vrn-product"><div class="form-vrn-view hide"><div class="d-flex justify-content-between align-items-center"><div data-eshop="vrb" class="form-vrn-text flex--1"><div class="form-vrn-name"></div></div><div class="d-flex"><label data-eshop="vmr" class="form-radio btn btn-secondary cursor-pointer mr-1"><i class="fas fa-check"></i><input type="radio" class="form-control" role="select" name="select_variant[0][0][0]" value="0" /> </label><div data-eshop="vma" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"> <a data-eshop="vrs" class="dropdown-item none" href="javascript:;"><i class="fas fa-exchange-alt mr-1"></i> <span class="fvr-switch">Hide</span></a> <a data-eshop="vre" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a> <a data-eshop="vrd" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a> </div></div></div></div></div><div class="form-vrn-edit show"><div class="form-group mt-2"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Variant Name</label><input type="text" role="variant" class="form-control" name="title_variant[0][0][]" value="" placeholder="Ex: Color or Size" required/> </div><div class="d-flex justify-content-center mt-3 mb-1" style="display:none !important"><div data-eshop="vms" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div></div></div></div><div class="form-vrn-bag"><div class="form-vbag-item"><div class="form-vbag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview wh-60 mr-2"><div class="fvv-image form-image-preview wh-60"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fvv-title mb-2"><span>Blue</span></div><div class="fvv-mprice"><div class="text-nowrap"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price"></span></div><div class="fvv-pstrike text-nowrap" style="display:none"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"> <a data-eshop="vie" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a> <a data-eshop="vid" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a> </div></div></div></div></div><div class="form-vbag-edit show"><div class="product-vrn-item"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Name</label><input type="text" role="title" class="form-control" name="name_variant[0][0][0][]" value="" placeholder="Ex: Blue or M" required/> </div><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image_variant[0][0][0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70" style=""></div></div></div><small class="text-danger" data-field="image"></small> </div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price_variant[0][0][0][]" value="" placeholder="Insert price product" required/> </div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" role="weight" class="form-control" name="weight_variant[0][0][0][]" value="" placeholder="Ex: 100" required/> </div></div></div><div class="d-flex justify-content-between mb-2"><div data-eshop="vns" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="vmc" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div></div></div></div>';
+	var eshp_vri = '<div class="form-vbag-item"><div class="form-vbag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview wh-60 mr-2"><div class="fvv-image form-image-preview wh-60"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fvv-title mb-2"><span>Blue</span></div><div class="fvv-mprice"><div class="text-nowrap"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price"></span></div><div class="fvv-pstrike text-nowrap" style="display:none"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"> <a data-eshop="vie" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a> <a data-eshop="vid" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a> </div></div></div></div></div><div class="form-vbag-edit show"><div class="product-vrn-item"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Name</label><input type="text" role="title" class="form-control" name="name_variant[0][0][0][]" value="" placeholder="Ex: Blue or M" required/> </div><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image_variant[0][0][0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70" style=""></div></div></div><small class="text-danger" data-field="image"></small> </div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price_variant[0][0][0][]" value="" placeholder="Insert price product" required/> </div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" role="weight" class="form-control" name="weight_variant[0][0][0][]" value="" placeholder="Ex: 100" required/> </div></div></div><div class="d-flex justify-content-between mb-2"><div data-eshop="vns" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="vnc" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div></div>';
+	
+	$('[data-eshop-btn]').off('click').on('click',function(e) {
+		var p_form = $(this).parents('form[role="form"]').get(0);
+		if($(e.target).parents('.dropdown').length==0) {
+			if(p_form.reportValidity()) {
+				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item.open').not($(this).parents('.form-product-item')).toggleClass('open')
+				$(this).parents('form[role="form"]').find('.form-product-item .fbv-switch').text('Show')
+				$(this).parents('.form-product-item').toggleClass('open')
+				if($(this).parents('.form-product-item').hasClass('open')) {
+					$(this).parents('.form-product-item').find('.fbv-switch').text('Hide')
+				} else {
+					$(this).parents('.form-product-item').find('.fbv-switch').text('Show')
+				}
+			}
+		}
+	})
+	$('[data-eshop]').off('click').on('click',function(e) {
+		var p_form = $(this).parents('form[role="form"]').get(0);
+		
+		if($(this).data('eshop')=='dci') {
+			var lenItem = $(this).parents('.form-product-main').find('.form-product-item')
+			if(lenItem.length>1) {
+				$(this).parents('.form-product-item').remove();
+				e.preventDefault();
+			}
+		}
+		if($(this).data('eshop')=='pci') {
+			$(this).parents('.form-bag-item').remove();
+			e.preventDefault();
+		}
+		
+		if($(this).data('eshop')=='vmc') {
+			$(this).parents('.form-mvrn-item').remove();
+			e.preventDefault();
+		}
+		
+		if($(this).data('eshop')=='vnc') {
+			$(this).parents('.form-vbag-item').remove();
+			e.preventDefault();
+		}
+		
+		if(p_form.reportValidity()) {
+			if($(this).data('eshop')=='csp') {
+				var val = $(this).parents('.form-ctg-edit').find('input[name="category[]"]').val();
+				$(this).parents('.form-product-ctg').find('.form-ctg-name').text(val.ucwords());
+				$(this).parents('.form-product-ctg').find('.form-ctg-view').removeClass('hide')
+				$(this).parents('.form-product-ctg').find('.form-ctg-edit').removeClass('show')
+			} else if($(this).data('eshop')=='aci') {
+				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item.open').removeClass('open')
+				$(this).parents('form[role="form"]').find('.form-product-item .fbv-switch').text('Show')
+				$(this).parents('.form-product-container').find('.form-product-main').append(eshp_ctg)
+				var ctg_container = $(this).parents('form[role="form"]').find('.form-product-item')
+				$.each(ctg_container,function(a,b) {
+					$.each($(b).find('.form-product-bag').find('input.form-control,input.custom-file-input'),function(c,d) {
+						$(d).attr('name',$(d).attr('name').replace(/\[\d+\]\[\]/g,'['+a+'][]'));
+					})
+				})
+				eventButtonUpload();
+				getDataEshop()
+			} else if($(this).data('eshop')=='eci') {
+				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+				$(this).parents('.form-product-ctg').find('.form-ctg-view').removeClass('hide').addClass('hide');
+				$(this).parents('.form-product-ctg').find('.form-ctg-edit').removeClass('hide').removeClass('show').addClass('show');
+			} else if($(this).data('eshop')=='psi') {
+				var bagedit = $(this).parents('.form-bag-edit');
+				var bagitem = $(this).parents('.form-bag-item');
+				
+				var img = bagedit.find('div[role="image"]').attr('style');
+				var ttl = bagedit.find('input[role="title"]').val();
+				var dsc = bagedit.find('textarea[role="description"]').val();
+				var prc = bagedit.find('input[role="price"]').val();
+				var prs = bagedit.find('input[role="price_strike"]').val();
+				
+				bagitem.find('.fbv-image').attr('style',img)
+				
+				bagitem.find('.fbv-title').text(ttl.ucwords())
+				if(dsc)
+					bagitem.find('.fbv-description').removeAttr('style').text(dsc.ucfirst())
+				else
+					bagitem.find('.fbv-description').removeAttr('style').text('').hide();
+				bagitem.find('.fbv-price').text(prc.money())
+				if(prs)
+					bagitem.find('.fbv-pstrike').removeAttr('style').find('.fbv-price-strike').text(prs.money())
+				else
+					bagitem.find('.fbv-pstrike').hide().find('.fbv-price-strike').text('');
+				bagedit.find('[data-eshop="psi"]').parent().removeClass('justify-content-between').addClass('justify-content-center').find('[data-eshop="pci"]').remove()
+				var csp = $(this).parents('form[role="form"]').find('[data-eshop="csp"]')
+				if(csp.parent().not(':visible')) {
+					csp.parent().removeAttr('style')
+					csp.click()
+				}
+				bagitem.find('.form-bag-view').removeClass('hide')
+				bagitem.find('.form-bag-edit').removeClass('show')
+			} else if($(this).data('eshop')=='api') {
+				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item.open').removeClass('open')
+				$(this).parents('.form-product-item').removeClass('open').addClass('open')
+				$(this).parents('.form-product-item').find('.form-product-bag').append(eshp_prd);
+				var ctg_container = $(this).parents('form[role="form"]').find('.form-product-item')
+				$.each(ctg_container,function(a,b) {
+					$.each($(b).find('.form-product-bag').find('.form-control,.custom-file-input'),function(c,d) {
+						$(d).attr('name',$(d).attr('name').replace(/\[\d+\]\[\]/g,'['+a+'][]'));
+					})
+				})
+				eventButtonUpload();
+				getDataEshop()
+			} else if($(this).data('eshop')=='epi') {
+				var bagitem = $(this).parents('.form-bag-item');
+				
+				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+				bagitem.find('.form-bag-view').removeClass('hide').addClass('hide');
+				bagitem.find('.form-bag-edit').removeClass('show').addClass('show');
+			} else if($(this).data('eshop')=='dpi') {
+				var lenItem = $(this).parents('.form-product-bag').find('.form-bag-item')
+				if(lenItem.length>1) {
+					$(this).parents('.form-bag-item').remove();
+				}
+			} else if($(this).data('eshop')=='sci') {
+				$(this).parents('.form-product-item').find('[data-eshop-btn]').click();
+			} else if($(this).data('eshop')=='vra') {
+				$(this).parents('.form-vrn-main').find('.form-mvrn-item.open').removeClass('open')
+				$(this).parents('.form-vrn-main').append(eshp_vrn)
+				$.each($(this).parents('form[role="form"]').find('.form-product-item'),function(a,b) {
+					$.each($(b).find('.form-product-bag').find('.form-bag-item'),function(c,d){
+						$.each($(d).find('.form-mvrn-item'),function(e,f) {
+							$.each($(f).find('.form-control,.custom-file-input'),function(g,h){
+								$(h).attr('name',$(h).attr('name').replace(/select\_variant\[\d+\]\[\d+\]\[\d+\]/g,'select_variant['+a+']['+c+']['+e+']'));
+								$(h).attr('name',$(h).attr('name').replace(/\[\d+\]\[\d+\]\[\]/g,'['+a+']['+c+'][]'));
+								$(h).attr('name',$(h).attr('name').replace(/\[\d+\]\[\d+\]\[\d+\]\[\]/g,'['+a+']['+c+']['+e+'][]'));
+							})
+						})
+					})
+				})
+				eventButtonUpload();
+				getDataEshop()
+			} else if($(this).data('eshop')=='vrb') {
+				$(this).parents('.form-vrn-main').find('.form-mvrn-item.open').not($(this).parents('.form-mvrn-item')).removeClass('open')
+				$(this).parents('.form-mvrn-item').toggleClass('open')
+				if($(this).parents('.form-mvrn-item').hasClass('open')) {
+					$(this).parents('.form-mvrn-item').find('.fvr-switch').text('Hide')
+				} else {
+					$(this).parents('.form-mvrn-item').find('.fvr-switch').text('Show')
+				}
+			} else if($(this).data('eshop')=='vma') {
+				if(!$(this).parents('.form-mvrn-item:eq(0)').hasClass('open')) {
+					$(this).parents('.form-mvrn-item:eq(0)').addClass('open')
+				}
+				$(this).parents('.form-mvrn-item.open:eq(0)').find('.form-vrn-bag').append(eshp_vri)
+				$.each($(this).parents('.form-product-main').find('.form-product-item'),function(a,b) {
+					$.each($(b).find('.form-product-bag').find('.form-bag-item'),function(c,d){
+						$.each($(d).find('.form-mvrn-item'),function(e,f) {
+							$.each($(f).find('.form-control,.custom-file-input'),function(g,h){
+								$(h).attr('name',$(h).attr('name').replace(/\[\d+\]\[\d+\]\[\]/g,'['+a+']['+c+'][]'));
+								$(h).attr('name',$(h).attr('name').replace(/\[\d+\]\[\d+\]\[\d+\]\[\]/g,'['+a+']['+c+']['+e+'][]'));
+							})
+						})
+					})
+				})
+				eventButtonUpload();
+				getDataEshop()
+			} else if($(this).data('eshop')=='vms') {
+				var vval = $(this).parents('.form-vrn-edit:eq(0)').find('input[role="variant"]').val();
+				$(this).parents('.form-vrn-product').find('.form-vrn-name').text(vval.ucwords());
+				$(this).parents('.form-vrn-product').find('.form-vrn-view').removeClass('hide')
+				$(this).parents('.form-vrn-product').find('.form-vrn-edit').removeClass('show')
+			} else if($(this).data('eshop')=='vmr') {
+				$(this).parents('.form-vrn-main').find('[role="select"]').prop('checked',false).val('0')
+				$(this).parents('.form-vrn-main').find('.form-radio.btn-primary').removeClass('btn-primary').addClass('btn-secondary')
+				$(this).removeClass('btn-secondary').addClass('btn-primary')
+				$(this).find('[role="select"]').prop('checked',true).val('1')
+			} else if($(this).data('eshop')=='vrs') {
+				$(this).parents('.form-mvrn-item').find('[data-eshop="vrb"]').click();
+			} else if($(this).data('eshop')=='vre') {
+				$(this).parents('.form-vrn-product').find('.form-vrn-view').removeClass('hide').addClass('hide')
+				$(this).parents('.form-vrn-product').find('.form-vrn-edit').removeClass('show').addClass('show')
+			} else if($(this).data('eshop')=='vrd') {
+				var ths = $(this).parents('form[role="form"]')
+				var vrd = $(this).parents('.form-vrn-main')
+				$(this).parents('.form-mvrn-item').remove()
+				$.each(ths.find('.form-product-item'),function(a,b) {
+					$.each($(b).find('.form-product-bag').find('.form-bag-item'),function(c,d){
+						$.each($(d).find('.form-mvrn-item'),function(e,f) {
+							$.each($(f).find('.form-control,.custom-file-input'),function(g,h){
+								$(h).attr('name',$(h).attr('name').replace(/\[\d+\]\[\d+\]\[\d+\]\[\]/g,'['+a+']['+c+']['+e+'][]'));
+							})
+						})
+					})
+				})
+				var ct_i = 0;
+				var nm_i = vrd.find('.form-mvrn-item')
+				$.each(nm_i,function(i,j){
+					if($(j).find('.form-radio.btn-primary').length>0)
+						ct_i++;
+				})
+				if(ct_i==0)
+					vrd.find('.form-mvrn-item').eq(0).find('[data-eshop="vmr"]').click()
+			} else if($(this).data('eshop')=='vie') {
+				$(this).parents('.form-vbag-item').find('.form-vbag-view').removeClass('hide').addClass('hide')
+				$(this).parents('.form-vbag-item').find('.form-vbag-edit').removeClass('show').addClass('show')
+			} else if($(this).data('eshop')=='vns') {
+				var vrnedit = $(this).parents('.form-vbag-edit');
+				var vrnitem = $(this).parents('.form-vbag-item');
+				
+				var img = vrnedit.find('div[role="image"]').attr('style');
+				var ttl = vrnedit.find('input[role="title"]').val();
+				var prc = vrnedit.find('input[role="price"]').val();
+				var prs = vrnedit.find('input[role="price_strike"]').val();
+				
+				vrnitem.find('.fvv-image').attr('style',img)
+				
+				vrnitem.find('.fvv-title').text(ttl.ucwords())
+				vrnitem.find('.fvv-price').text(prc.money())
+				if(prs)
+					vrnitem.find('.fvv-pstrike').removeAttr('style').find('.fvv-price-strike').text(prs.money())
+				else
+					vrnitem.find('.fvv-pstrike').hide().find('.fvv-price-strike').text('');
+				vrnedit.find('[data-eshop="vns"]').parent().removeClass('justify-content-between').addClass('justify-content-center').find('[data-eshop="pci"]').remove()
+				vrnedit.find('[data-eshop="vmc"]').remove()
+				vrnedit.find('[data-eshop="vnc"]').remove()
+				
+				var csp = $(this).parents('.form-mvrn-item').find('[data-eshop="vms"]')
+				if(csp.parent().not(':visible')) {
+					csp.parent().removeAttr('style')
+					csp.click()
+				}
+				
+				vrnitem.find('.form-vbag-view').removeClass('hide')
+				vrnitem.find('.form-vbag-edit').removeClass('show')
+				
+				var ct_i = 0;
+				var nm_i = $(this).parents('.form-vrn-main').find('.form-mvrn-item')
+				$.each(nm_i,function(i,j){
+					if($(j).find('.form-radio.btn-primary').length>0)
+						ct_i++;
+				})
+				if(ct_i==0)
+					$(this).parents('.form-mvrn-item').eq(0).find('[data-eshop="vmr"]').click()
+				
+			} else if($(this).data('eshop')=='vid') {
+				$(this).parents('.form-vbag-item').remove()
+			}
+		}
+		if($(this).data('eshop')=='api')
+			e.stopPropagation();
+		if($(this).data('eshop')!='vmc')
+			e.preventDefault();
+	})
+}
+function eventButtonUpload() {
+	$('[data-image="upload"]').off('change').on('change',function(e) {
+		var reader = new FileReader();
+		var ths = $(this)
+		var fileSize = this.files[0].size / 1024;
+		
+		if (fileSize <= 700) {
+			$(this).parents('.form-group').find('.custom-file-label').text(this.files[0].name);
+			reader.onload = function(e) {
+			  ths.parents('.form-group').find('.form-image-preview').attr('style',"background-image:url('"+e.target.result+"')");
+			}
+			reader.readAsDataURL(this.files[0]);
+			ths.parents('.form-group').find('[data-field]').text('')
+		} else {
+			ths.parents('.form-group').find('[data-field]').text('File size exceeds 700KB');
+			ths.parents('.form-group').find('.form-image-preview').removeAttr('style')
+			$(this).parents('.form-group').find('.custom-file-label').text('');
+			ths.val('')
+		}
+	});
+}
+$('[data-add-image="true"]').off('click').on('click',function(e) {
+	var dataform = '<div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> <?= $this->language->create_biolink_sliders_modal->input->image_url ?></label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="images[]" accept="image/x-png,image/gif,image/jpeg" required><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div class="form-image-preview"></div><div class="form-image-close" data-close-image="true">&times;</div></div></div><small class="text-danger" data-field="images.0"></small></div>';
+	var img_parent = $(this).parents('.modal-body');
+	if(img_parent.length==0)
+		img_parent = $(this).parents('.card-body');
+	var img_container = img_parent.find('.form-images-container');
+	var cnt_img = img_container.find('.form-group')
+	if(cnt_img.length<10) { 
+		img_container.append(dataform);
+		cnt_img = img_container.find('.form-group')
+		$.each(cnt_img,function(i,j) {
+			$.each($(j).find('[data-field]'),function(a,b) {
+				if($(b).attr('data-field').indexOf('.')>-1) {
+					var bt = $(b).attr('data-field').split('.');
+					$(b).attr('data-field',bt[0] + '.' + i)
+				}
+			})
+		});
+	}
+	eventButtonUpload()
+	eventClose()
+});
+
+$('[data-add-pricing="true"]').off('click').on('click',function(e) {
+	var dataform = '<div class="form-pricing-item"><hr><div class="form-group"><div class="d-flex justify-content-between"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->name ?></label><a class="text-primary" data-close-pricing="true" href="javascript:;">Delete</a></div><input type="text" class="form-control" name="name[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->name_placeholder ?>" required/></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->currency ?></label><input type="text" class="form-control" name="currency[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->currency_placeholder ?>" required/></div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->period ?></label><input type="text" class="form-control" name="period[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->period_placeholder ?>" /></div></div></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->price ?></label><input type="text" class="form-control" name="price[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->price_placeholder ?>" required/></div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->price_strike ?></label><input type="text" class="form-control" name="price_strike[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->price_strike_placeholder ?>" /></div></div></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->button_text ?></label><input type="text" class="form-control" name="button_text[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->button_text_placeholder ?>"/></div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->per ?></label><input type="text" class="form-control" name="per_text[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->per_placeholder ?>"/></div></div></div><div class="form-group"><div class="d-flex justify-content-between"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->features ?></label><div class="d-flex"><div data-add-feature="true" class="btn btn-primary mr-1"><i class="fa fa-plus" aria-hidden="true"></i></div><div data-close-feature="true" class="btn btn-danger"><i class="fa fa-times" aria-hidden="true"></i></div></div></div></div><div class="form-feature-container"><div class="form-feature-item"><div class="form-group"><div class="input-group"><input type="text" class="form-control" name="feat_bold[0][]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->bold_placeholder ?>" required/><input type="text" class="form-control" name="feat_normal[0][]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->normal_placeholder ?>"/></div></div></div></div></div>';
+	var prc_parent = $(this).parents('.modal-body');
+	if(prc_parent.length==0)
+		prc_parent = $(this).parents('.card-body');
+	var prc_container = prc_parent.find('.form-pricing-container');
+	var cnt_prc = prc_container.find('.form-pricing-item')
+	if(cnt_prc.length<9) {
+		prc_container.append(dataform);
+		cnt_prc = prc_container.find('.form-pricing-item')
+		$.each(cnt_prc,function(a,b) {
+			$.each($(b).find('.form-feature-container').find('.form-control'),function(c,d) {
+				$(d).attr('name',$(d).attr('name').replace(/\[\d+\]\[\]/g,'['+a+'][]'));
+			})
+		})
+	}
+	eventClose()
+});
+
+$('[data-add-floating="true"]').off('click').on('click',function(e) {
+	var dataform = '<div class="form-floating-button-item"><div class="form-group"><div class="d-flex justify-content-between"><label><i class="fa fa-fw fa-globe fa-sm mr-1"></i> <?= $this->language->create_biolink_floatbutton_modal->input->icon_button ?></label><a class="text-primary" data-close-floating="true" href="javascript:;">Delete</a></div><div class="input-group"><span class="input-group-prepend"><button class="btn btn-secondary" data-icon="" data-iconset="fontawesome5" role="iconpicker"></button></span><input type="text" name="icon[]" class="form-control" value="" placeholder="<?= $this->language->create_biolink_floatbutton_modal->input->icon_button_placeholder ?>" /></div><small class="text-muted"><?= $this->language->create_biolink_link_modal->input->icon_help ?></small></div><div data-color-picker="true" data-index="0" class="form-group"><label for="settings_background_color"><?= $this->language->create_biolink_floatbutton_modal->input->background_color ?></label><input data-picker="val" type="hidden" name="background[]" class="form-control" value="#fd4235" /><div id="settings_background_color_float_pickr_0" data-picker="color"></div></div><div data-color-picker="true" data-index="0" class="form-group"><label for="settings_text_color"><?= $this->language->create_biolink_floatbutton_modal->input->text_color ?></label><input data-picker="val" type="hidden" name="text[]" class="form-control" value="#ffffff" /><div id="settings_text_color_float_pickr_0" data-picker="color"></div></div><div class="form-group"><label><i class="fa fa-fw fa-signature fa-sm mr-1"></i> <?= $this->language->create_biolink_floatbutton_modal->input->link_url ?></label><input type="text" class="form-control" name="link_url[]" required="required" placeholder="<?= $this->language->create_biolink_floatbutton_modal->input->link_url_placeholder ?>" /></div><div class="form-group"><label><i class="fa fa-fw fa-signature fa-sm mr-1"></i> <?= $this->language->create_biolink_floatbutton_modal->input->link_title ?></label><input type="text" class="form-control" name="link_title[]" required="required" placeholder="<?= $this->language->create_biolink_floatbutton_modal->input->link_title_placeholder ?>" /></div></div>';
+	var flt_parent = $(this).parents('.modal-body');
+	if(flt_parent.length==0)
+		flt_parent = $(this).parents('.card-body');
+	var flt_container = flt_parent.find('.form-floating-button-container');
+	var cnt_flt = flt_container.find('.form-floating-button-item')
+	if(cnt_flt.length<5) { 
+		flt_container.append(dataform);
+		$('[role="iconpicker"]:not(".ico-picker")').addClass('ico-picker').iconpicker()
+		/* Fontawesome icon picker */
+		$('[role="iconpicker"]').off('change').on('change', event => {
+			$(event.currentTarget).closest('.form-group').find('input').val(event.icon).trigger('change');
+		});
+		setDataColorPicker()
+	}
+	eventClose()
+});
+
+$('[role="iconpicker"]:not(".ico-picker")').addClass('ico-picker').iconpicker()
+$('[role="iconpicker"]').off('change').on('change', event => {
+	$(event.currentTarget).closest('.form-group').find('input').val(event.icon).trigger('change');
+});
+
+$('#password_protector').on('change',function(e){
+	if($(this).prop('checked')) {
+		$('#cpassword_protector').show().find('input[name="password_lock"]').attr('required','required')
+		$('#dpassword_protector').show()
+	} else {
+		$('#cpassword_protector').hide().find('input[name="password_lock"]').removeAttr('required')
+		$('#dpassword_protector').hide()
+	}
+})
+
+function eventClose() {
+	$('[data-close-image="true"]').off('click').on('click',function(e) {
+		var img_container = $(this).parents('.form-images-container')
+		$(this).parents('.form-group').remove();
+		$.each(img_container.find('.form-group'),function(i,j) {
+			$.each($(j).find('[data-field]'),function(a,b) {
+				if($(b).attr('data-field').indexOf('.')>-1) {
+					var bt = $(b).attr('data-field').split('.');
+					$(b).attr('data-field',bt[0] + '.' + i)
+					
+				}
+			})
+		});
+	});
+	$('[data-close-pricing="true"]').off('click').on('click',function(e) {
+		var prc_parent = $(this).parents('.modal-body');
+		if(prc_parent.length==0)
+			prc_parent = $(this).parents('.card-body');
+		$(this).parents('.form-pricing-item').remove();
+		var cnt_prc = prc_parent.find('.form-pricing-container').find('.form-pricing-item')
+		$.each(cnt_prc,function(a,b) {
+			$.each($(b).find('.form-feature-container').find('.form-control'),function(c,d) {
+				$(d).attr('name',$(d).attr('name').replace(/\[\d+\]\[\]/g,'['+a+'][]'));
+			})
+		})
+	});
+	$('[data-add-feature="true"]').off('click').on('click',function(e) {
+		var dataform = '<div class="form-feature-item"><div class="form-group"><div class="input-group"><input type="text" class="form-control" name="feat_bold[0][]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->bold_placeholder ?>" required/><input type="text" class="form-control" name="feat_normal[0][]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->normal_placeholder ?>"/></div></div></div>';
+		var ftr_parent = $(this).parents('.form-pricing-item');
+		var ftr_container = ftr_parent.find('.form-feature-container');
+		var cnt_ftr = ftr_container.find('.form-feature-item')
+		if(cnt_ftr.length<10) {
+			ftr_container.append(dataform);
+			cnt_ftr = ftr_container.find('.form-feature-item')
+			$.each(cnt_ftr.find('.form-control'),function(a,b) {
+				$(b).attr('name',$(b).attr('name').replace(/\[\d+\]\[\]/g,'['+ftr_parent.index()+'][]'));
+			})
+		}
+		eventClose()
+	});
+	$('[data-close-feature="true"]').off('click').on('click',function(e) {
+		var ftr_parent = $(this).parents('.form-pricing-item');
+		var ftr_container = ftr_parent.find('.form-feature-container');
+		var cnt_ftr = ftr_container.find('.form-feature-item')
+		if(cnt_ftr.length>1) 
+			cnt_ftr.last().remove();
+	});
+	$('[data-close-floating="true"]').off('click').on('click',function(e) {
+		$(this).parents('.form-floating-button-item').remove();
+	});
+}
+</script>
+<script>
+    /* Settings Tab */
+    /* Initiate the color picker */
+    let pickr_options = {
+        comparison: false,
+
+        components: {
+            preview: true,
+            opacity: true,
+            hue: true,
+            comparison: false,
+            interaction: {
+                hex: true,
+                rgba: false,
+                hsla: false,
+                hsva: false,
+                cmyk: false,
+                input: true,
+                clear: false,
+                save: true
+            }
+        }
+    };
+
+    /* Helper to generate avatar preview */
+    function generate_image_preview(input) {
+
+        if(input.files && input.files[0]) {
+            let reader = new FileReader();
+
+            reader.onload = event => {
+                $('#image_file_preview').attr('src', event.target.result);
+                $('#biolink_preview_iframe').contents().find('#image').attr('src', event.target.result).show();
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $('#image_file_input').on('change', event => {
+        $('#image_file_status').show();
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        $('input[name="image_delete"]').val(false);
+
+        generate_image_preview(event.currentTarget);
+    });
+
+    $('#image_file_remove').on('click', () => {
+        let default_src = $('#image_file_preview').attr('data-default-src');
+        let empty_src = $('#image_file_preview').attr('data-empty-src');
+
+        /* Check if new avatar is selected and act accordingly */
+        if($('#image_file_input').get(0).files.length > 0) {
+
+            /* Check if we had a non default image previously */
+            if(default_src == empty_src) {
+                $('#image_file_preview').attr('src', empty_src);
+                $('#biolink_preview_iframe').contents().find('#image').hide();
+                $('#image_file_status').hide();
+            } else {
+                $('#image_file_preview').attr('src', default_src);
+                $('#image_file_input').replaceWith($('#image_file_input').val('').clone(true));
+            }
+
+        } else {
+            $('#image_file_preview').attr('src', empty_src);
+            $('#biolink_preview_iframe').contents().find('#image').hide();
+            $('input[name="image_delete"]').val(true);
+            $('#image_file_status').hide();
+        }
+
+    });
+
+    /* Preview handlers */
+    $('#settings_title').on('change paste keyup', event => {
+        $('#biolink_preview_iframe').contents().find('#title').text($(event.currentTarget).val());
+    });
+
+    $('#settings_description').on('change paste keyup', event => {
+        $('#biolink_preview_iframe').contents().find('#description').text($(event.currentTarget).val());
+    });
+
+    /* Text Color Handler */
+    let settings_text_color_pickr = Pickr.create({
+        el: '#settings_text_color_pickr',
+        default: $('#settings_text_color').val(),
+        ...{
+            comparison: false,
+
+            components: {
+                preview: true,
+                opacity: false,
+                hue: true,
+                comparison: false,
+                interaction: {
+                    hex: true,
+                    rgba: false,
+                    hsla: false,
+                    hsva: false,
+                    cmyk: false,
+                    input: true,
+                    clear: false,
+                    save: true
+                }
+            }
+        }
+    });
+
+    settings_text_color_pickr.on('change', hsva => {
+        $('#settings_text_color').val(hsva.toHEXA().toString());
+
+
+        $('#biolink_preview_iframe').contents().find('header').css('color', hsva.toHEXA().toString());
+        $('#biolink_preview_iframe').contents().find('#branding').css('color', hsva.toHEXA().toString());
+    });
+	
+	setDataColorPicker()
+	function setDataColorPicker() {
+		$.each($('[data-color-picker]'),function(i,j) {
+			if(!$(this).hasClass('color-picked')) {
+				$(this).addClass('color-picked')
+				const pickr_background_type = Pickr.create({
+					el: $(this).find('[data-picker="color"]').get(0),
+					default: $(this).find('[data-picker="val"]').val(),
+					...pickr_options
+				}).on('change', (color, source, instance) => {
+					var container = $(instance.getRoot().root).parents('[data-color-picker]')
+					container.find('[data-picker="val"]').val(color.toHEXA().toString())
+					if(container.find('label').attr('for')=='settings_background_color')
+						$('#biolink_preview_iframe').contents().find('.items-wrapper .menu-item').eq(container.parents('.form-floating-button-item').index()).attr('style','background-color:'+color.toHEXA().toString());
+					else if(container.find('label').attr('for')=='settings_text_color')
+						$('#biolink_preview_iframe').contents().find('.items-wrapper .menu-item').eq(container.parents('.form-floating-button-item').index()).find('svg').attr('style','color:'+color.toHEXA().toString());
+				})
+			}
+		})
+	}
+
+    /* Socials Color Handler */
+    let settings_socials_color_pickr = Pickr.create({
+        el: '#settings_socials_color_pickr',
+        default: $('#settings_socials_color').val(),
+        ...pickr_options
+    });
+
+    settings_socials_color_pickr.on('change', hsva => {
+        $('#settings_socials_color').val(hsva.toHEXA().toString());
+
+
+        $('#biolink_preview_iframe').contents().find('#socials a svg').css('color', hsva.toHEXA().toString());
+    });
+
+    /* Background Type Handler */
+    let background_type_handler = () => {
+        let type = $('#settings_background_type').find(':selected').val();
+
+        /* Show only the active background type */
+        $(`div[id="background_type_${type}"]`).show();
+        $(`div[id="background_type_${type}"]`).find('[name^="background"]').removeAttr('disabled');
+
+        /* Disable the other possible types so they dont get submitted */
+        let background_type_containers = $(`div[id^="background_type_"]:not(div[id$="_${type}"])`);
+
+        background_type_containers.hide();
+        background_type_containers.find('[name^="background"]').attr('disabled', 'disabled');
+		if(type=='preset') {
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-one`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-two`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-three`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-four`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-five`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-six`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient')
+			$('#biolink_preview_iframe').contents().find('body').addClass(`link-body-background-one`).removeAttr('style');
+		} else if(type=='anigradient') {
+			let color_base_one = $('#settings_background_type_anigradient_color_one').val();
+			let color_base_two = $('#settings_background_type_anigradient_color_two').val();
+			let color_base_three = $('#settings_background_type_anigradient_color_three').val();
+			let color_base_four = $('#settings_background_type_anigradient_color_four').val();
+
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-one`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-two`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-three`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-four`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-five`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-six`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').addClass('link-body-background-anigradient').attr('style', `background: linear-gradient(110deg, ${color_base_one}, ${color_base_two}, ${color_base_three}, ${color_base_four});`);
+		} else if(type=='gradient') {
+			let color_one = $('#settings_background_type_gradient_color_one').val();
+			let color_two = $('#settings_background_type_gradient_color_two').val();
+			
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-one`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-two`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-three`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-four`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-five`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-six`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient')
+			$('#biolink_preview_iframe').contents().find('body').attr('style', `background-image: linear-gradient(135deg, ${color_one} 10%, ${color_two} 100%);`);
+		} else if(type=='color') {
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-one`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-two`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-three`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-four`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-five`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-six`)
+			$('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient')
+			$('#biolink_preview_iframe').contents().find('body').attr('style', `background: ${$('#settings_background_type_color').val()};`);
+		} else if(type=='image')  {
+			var img_preview = $('#background_type_image_preview')
+			var img_src = '';
+			console.log(img_preview.length);
+			if(img_preview.length>0) {
+				img_src = img_preview.attr('src');
+				$('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').attr('style','background:url('+img_src+')')
+			} else
+				$('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').removeAttr('style')
+		}	
+    };
+
+    background_type_handler();
+
+    $('#settings_background_type').on('change', background_type_handler);
+
+    /* Preset Baclground Preview */
+    $('#background_type_preset input[name="background"]').on('change', event => {
+        let value = $(event.currentTarget).val();
+		
+		$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-one`)
+		$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-two`)
+		$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-three`)
+		$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-four`)
+		$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-five`)
+		$('#biolink_preview_iframe').contents().find('body').removeClass(`link-body-background-six`)
+        $('#biolink_preview_iframe').contents().find('body').addClass(`link-body-background-${value}`).removeAttr('style');
+    });
+	
+	/* Transition Background */
+    let settings_background_type_anigradient_color_one_pickr = Pickr.create({
+        el: '#settings_background_type_anigradient_color_one_pickr',
+        default: $('#settings_background_type_anigradient_color_one').val(),
+        ...pickr_options
+    });
+	
+    settings_background_type_anigradient_color_one_pickr.on('change', hsva => {
+        $('#settings_background_type_anigradient_color_one').val(hsva.toHEXA().toString());
+
+        let color_base_one = $('#settings_background_type_anigradient_color_one').val();
+        let color_base_two = $('#settings_background_type_anigradient_color_two').val();
+		let color_base_three = $('#settings_background_type_anigradient_color_three').val();
+		let color_base_four = $('#settings_background_type_anigradient_color_four').val();
+
+        $('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').addClass('link-body-background-anigradient').attr('style', `background: linear-gradient(110deg, ${color_base_one}, ${color_base_two}, ${color_base_three}, ${color_base_four});`);
+    });
+	
+	let settings_background_type_anigradient_color_two_pickr = Pickr.create({
+        el: '#settings_background_type_anigradient_color_two_pickr',
+        default: $('#settings_background_type_anigradient_color_two').val(),
+        ...pickr_options
+    });
+
+    settings_background_type_anigradient_color_two_pickr.on('change', hsva => {
+        $('#settings_background_type_anigradient_color_two').val(hsva.toHEXA().toString());
+
+        let color_base_one = $('#settings_background_type_anigradient_color_one').val();
+        let color_base_two = $('#settings_background_type_anigradient_color_two').val();
+		let color_base_three = $('#settings_background_type_anigradient_color_three').val();
+		let color_base_four = $('#settings_background_type_anigradient_color_four').val();
+
+        $('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').addClass('link-body-background-anigradient').attr('style', `background: linear-gradient(110deg, ${color_base_one}, ${color_base_two}, ${color_base_three}, ${color_base_four});`);
+    });
+	
+	let settings_background_type_anigradient_color_three_pickr = Pickr.create({
+        el: '#settings_background_type_anigradient_color_three_pickr',
+        default: $('#settings_background_type_anigradient_color_three').val(),
+        ...pickr_options
+    });
+
+    settings_background_type_anigradient_color_three_pickr.on('change', hsva => {
+        $('#settings_background_type_anigradient_color_three').val(hsva.toHEXA().toString());
+
+        let color_base_one = $('#settings_background_type_anigradient_color_one').val();
+        let color_base_two = $('#settings_background_type_anigradient_color_two').val();
+		let color_base_three = $('#settings_background_type_anigradient_color_three').val();
+		let color_base_four = $('#settings_background_type_anigradient_color_four').val();
+
+        $('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').addClass('link-body-background-anigradient').attr('style', `background: linear-gradient(110deg, ${color_base_one}, ${color_base_two}, ${color_base_three}, ${color_base_four});`);
+    });
+	
+	let settings_background_type_anigradient_color_four_pickr = Pickr.create({
+        el: '#settings_background_type_anigradient_color_four_pickr',
+        default: $('#settings_background_type_anigradient_color_four').val(),
+        ...pickr_options
+    });
+
+    settings_background_type_anigradient_color_four_pickr.on('change', hsva => {
+        $('#settings_background_type_anigradient_color_four').val(hsva.toHEXA().toString());
+
+        let color_base_one = $('#settings_background_type_anigradient_color_one').val();
+        let color_base_two = $('#settings_background_type_anigradient_color_two').val();
+		let color_base_three = $('#settings_background_type_anigradient_color_three').val();
+		let color_base_four = $('#settings_background_type_anigradient_color_four').val();
+
+        $('#biolink_preview_iframe').contents().find('body').removeClass('link-body-background-anigradient').addClass('link-body-background-anigradient').attr('style', `background: linear-gradient(110deg, ${color_base_one}, ${color_base_two}, ${color_base_three}, ${color_base_four});`);
+    });
+
+    /* Gradient Background */
+    let settings_background_type_gradient_color_one_pickr = Pickr.create({
+        el: '#settings_background_type_gradient_color_one_pickr',
+        default: $('#settings_background_type_gradient_color_one').val(),
+        ...pickr_options
+    });
+
+    settings_background_type_gradient_color_one_pickr.on('change', hsva => {
+        $('#settings_background_type_gradient_color_one').val(hsva.toHEXA().toString());
+
+        let color_one = $('#settings_background_type_gradient_color_one').val();
+        let color_two = $('#settings_background_type_gradient_color_two').val();
+
+        $('#biolink_preview_iframe').contents().find('body').attr('style', `background-image: linear-gradient(135deg, ${color_one} 10%, ${color_two} 100%);`);
+    });
+
+    let settings_background_type_gradient_color_two_pickr = Pickr.create({
+        el: '#settings_background_type_gradient_color_two_pickr',
+        default: $('#settings_background_type_gradient_color_two').val(),
+        ...pickr_options
+    });
+
+    settings_background_type_gradient_color_two_pickr.on('change', hsva => {
+        $('#settings_background_type_gradient_color_two').val(hsva.toHEXA().toString());
+
+        let color_one = $('#settings_background_type_gradient_color_one').val();
+        let color_two = $('#settings_background_type_gradient_color_two').val();
+
+        $('#biolink_preview_iframe').contents().find('body').attr('style', `background-image: linear-gradient(135deg, ${color_one} 10%, ${color_two} 100%);`);
+    });
+
+    /* Color Background */
+    let settings_background_type_color_pickr = Pickr.create({
+        el: '#settings_background_type_color_pickr',
+        default: $('#settings_background_type_color').val(),
+        ...pickr_options
+    });
+
+    settings_background_type_color_pickr.on('change', hsva => {
+        $('#settings_background_type_color').val(hsva.toHEXA().toString());
+
+        $('#biolink_preview_iframe').contents().find('body').attr('style', `background: ${hsva.toHEXA().toString()};`);
+    });
+
+    /* Image Background */
+    function generate_background_preview(input) {
+        if(input.files && input.files[0]) {
+            let reader = new FileReader();
+
+            reader.onload = event => {
+                $('#background_type_image_preview').attr('src', event.target.result);
+                $('#biolink_preview_iframe').contents().find('body').attr('style', `background: url(${event.target.result});`);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $('#background_type_image_input').on('change', event => {
+        $('#background_type_image_status').show();
+
+        generate_background_preview(event.currentTarget);
+    });
+
+    $('#background_type_image_remove').on('click', () => {
+        $('#background_type_image_preview').attr('src', $('#background_type_image_preview').attr('data-default-src'));
+        $('#biolink_preview_iframe').contents().find('body').attr('class', 'link-body').attr('style', `background: url(${$('#background_type_image_preview').attr('data-default-src')});`);
+
+        $('#background_type_image_input').replaceWith($('#background_type_image_input').val('').clone(true));
+        $('#background_type_image_status').hide();
+    });
+
+    /* Display branding switcher */
+    $('#display_branding').on('change', event => {
+        if($(event.currentTarget).is(':checked')) {
+            $('#biolink_preview_iframe').contents().find('#branding').show();
+        } else {
+            $('#biolink_preview_iframe').contents().find('#branding').hide();
+        }
+    });
+
+    /* Branding change */
+    $('#branding_name').on('change paste keyup', event => {
+        $('#biolink_preview_iframe').contents().find('#branding').text($(event.currentTarget).val());
+    });
+
+    $('#branding_url').on('change paste keyup', event => {
+        $('#biolink_preview_iframe').contents().find('#branding').attr('src', ($(event.currentTarget).val()));
+    });
+
+    /* Form handling */
+    $('form[name="update_biolink"],form[name="update_biolink_"]').on('submit', event => {
+		var ths = $(event.currentTarget)
+		let form = ths[0];
+        let data = new FormData(form);
+        let notification_container = ths.find('.notification-container');
+		var did = $(form).find('.form-editor').attr('id');
+		
+        $.ajax({
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+            url: 'link-ajax',
+            data: data,
+            success: (data) => {
+				if(data.status == 'error') {
+					if(data.details=='form') {
+						$.each(data.message, function(i,j) {	
+							var html=''; var frm;
+							$.each(j,function(k,l) {
+								html += l;
+							});
+							$('[data-field="'+i+'"]').html(html);
+						})
+					} else {
+						let notification_container = $(event.currentTarget).find('.notification-container');
+
+						notification_container.html('');
+
+						display_notifications(data.message, 'error', notification_container);
+					}
+                } else {
+					ths.find('[data-image="upload"]').val('').removeAttr('required').parent().find('.custom-file-label').text('Choose file')
+					
+					display_notifications(data.message, data.status, notification_container);
+
+					notification_container[0].scrollIntoView();
+
+					update_main_url();
+				}
+
+            },
+            dataType: 'json'
+        });
+
+        event.preventDefault();
+		return false
+    })
+</script>
+<script>
+    /* Links tab */
+    let sortable = Sortable.create(document.getElementById('links'), {
+        animation: 150,
+        handle: '.drag',
+        onUpdate: (event) => {
+            let global_token = $('input[name="global_token"]').val();
+
+            let links = [];
+            $('#links > .link').each((i, elm) => {
+                let link = {
+                    link_id: $(elm).data('link-id'),
+                    order: i
+                };
+
+                links.push(link);
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: 'link-ajax',
+                data: {
+                    request_type: 'order',
+                    links,
+                    global_token
+                },
+                dataType: 'json'
+            });
+
+            /* Refresh iframe */
+            $('#biolink_preview_iframe').attr('src', $('#biolink_preview_iframe').attr('src'));
+        }
+    });
+	
+	/* Initiate the datepicker */
+	$.fn.datepicker.language['altum'] = <?= json_encode(require APP_PATH . 'includes/datepicker_translations.php') ?>;
+	$('.countdown_timer').datepicker({
+		classes: 'datepicker-modal',
+		language: 'altum',
+		position: 'top left',
+		dateFormat: 'yyyy-mm-dd',
+		timeFormat: 'hh:ii:00',
+		autoClose: true,
+		timepicker: true,
+		toggleSelected: false,
+		minDate: new Date(),
+	});
+
+    /* Status change handler for the links */
+    $('[id^="biolink_link_is_enabled_"]').on('click', event => {
+        ajax_call_helper(event, 'link-ajax', 'is_enabled_toggle', () => {
+
+            let link_id = $(event.currentTarget).data('row-id');
+
+            $(event.currentTarget).closest('.link').toggleClass('custom-row-inactive');
+
+            /* Refresh iframe */
+            $('#biolink_preview_iframe').attr('src', $('#biolink_preview_iframe').attr('src'));
+
+        });
+    });
+
+    /* Duplicate link handler for the links */
+    $('[data-duplicate="true"]').on('click', event => {
+        ajax_call_helper(event, 'link-ajax', 'duplicate', (event, data) => {
+
+            fade_out_redirect({ url: data.details.url, full: true });
+
+        });
+    });
+
+    /* When an expanding happens for a link settings */
+	$('[id^="link_expanded_content"]').on('hidden.bs.collapse', event => {
+		$('.tox-tbtn.tox-tbtn--enabled[title="More..."]').click();
+	});
+    $('[id^="link_expanded_content"]').on('show.bs.collapse', event => {
+		$('.tox-tbtn.tox-tbtn--enabled[title="More..."]').click();
+        let link_subtype = $(event.currentTarget).data('link-subtype');
+        let link_id = $(event.currentTarget.querySelector('input[name="link_id"]')).val();
+        let biolink_link = $('#biolink_preview_iframe').contents().find(`[data-link-id="${link_id}"]`);
+
+        switch (link_subtype) {
+
+            case 'text':
+            case 'runningtext':
+			case 'html':
+                let title_text_color_pickr_element = event.currentTarget.querySelector('.title_text_color_pickr');
+                let description_text_color_pickr_element = event.currentTarget.querySelector('.description_text_color_pickr');
+				
+                if(title_text_color_pickr_element) {
+                    let color_input = event.currentTarget.querySelector('input[name="title_text_color"]');
+
+                    /* Color Handler */
+                    let color_pickr = Pickr.create({
+                        el: title_text_color_pickr_element,
+                        default: $(color_input).val(),
+                        ...pickr_options
+                    });
+
+                    color_pickr.off().on('change', hsva => {
+                        $(color_input).val(hsva.toHEXA().toString());
+
+                        biolink_link.find('h2').css('color', hsva.toHEXA().toString());
+                    });
+                }
+
+                if(description_text_color_pickr_element) {
+                    let color_input = event.currentTarget.querySelector('input[name="description_text_color"]'||'input[name="description_runningtext_color"]');
+
+                    /* Color Handler */
+                    let color_pickr = Pickr.create({
+                        el: description_text_color_pickr_element,
+                        default: $(color_input).val(),
+                        ...pickr_options
+                    });
+
+                    color_pickr.off().on('change', hsva => {
+                        $(color_input).val(hsva.toHEXA().toString());
+
+                        biolink_link.find('p').css('color', hsva.toHEXA().toString());
+                    });
+                }
+
+                break;
+
+            default:
+
+                biolink_link = biolink_link.find('a');
+                let text_color_pickr_element = event.currentTarget.querySelector('.text_color_pickr');
+                let background_color_pickr_element = event.currentTarget.querySelector('.background_color_pickr');
+
+                /* Schedule Handler */
+                let schedule_handler = () => {
+                    if($(event.currentTarget.querySelector('input[name="schedule"]')).is(':checked')) {
+                        $(event.currentTarget.querySelector('.schedule_container')).show();
+                    } else {
+                        $(event.currentTarget.querySelector('.schedule_container')).hide();
+                    }
+                };
+
+                $(event.currentTarget.querySelector('input[name="schedule"]')).off().on('change', schedule_handler);
+
+                schedule_handler();
+
+                /* Initiate the datepicker */
+                $.fn.datepicker.language['altum'] = <?= json_encode(require APP_PATH . 'includes/datepicker_translations.php') ?>;
+                $('[name="start_date"]:not(.added),[name="end_date"]:not(.added)').datepicker({
+                    classes: 'datepicker-modal',
+                    language: 'altum',
+                    dateFormat: 'yyyy-mm-dd',
+                    timeFormat: 'hh:ii:00',
+                    autoClose: true,
+                    timepicker: true,
+                    toggleSelected: false,
+                    minDate: new Date(),
+                }).addClass('added');
+
+
+                let outside_event = event;
+                $(event.currentTarget.querySelector('input[name="name"]')).off().on('change paste keyup', event => {
+                    biolink_link.text($(event.currentTarget).val());
+
+                    $(outside_event.currentTarget.querySelector('input[name="icon"]')).trigger('change');
+                });
+
+                $(event.currentTarget.querySelector('input[name="icon"]')).off().on('change paste keyup', event => {
+                    let icon = $(event.currentTarget).val();
+
+                    if(!icon) {
+                        biolink_link.find('svg').remove();
+                    } else {
+
+                        biolink_link.find('svg,i').remove();
+                        biolink_link.prepend('<i class="${icon} mr-1"></i>');
+
+                    }
+
+                });
+
+                if(text_color_pickr_element) {
+                    let color_input = event.currentTarget.querySelector('input[name="text_color"]');
+
+                    /* Background Color Handler */
+                    let color_pickr = Pickr.create({
+                        el: text_color_pickr_element,
+                        default: $(color_input).val(),
+                        ...pickr_options
+                    });
+
+                    color_pickr.off().on('change', hsva => {
+                        $(color_input).val(hsva.toHEXA().toString());
+
+                        biolink_link.css('color', hsva.toHEXA().toString());
+                    });
+                }
+
+                if(background_color_pickr_element) {
+                    let color_input = event.currentTarget.querySelector('input[name="background_color"]');
+
+                    /* Background Color Handler */
+                    let color_pickr = Pickr.create({
+                        el: background_color_pickr_element,
+                        default: $(color_input).val(),
+                        ...pickr_options
+                    });
+
+                    color_pickr.off().on('change', hsva => {
+                        $(color_input).val(hsva.toHEXA().toString());
+
+                        /* Change the background or the border color */
+                        if(biolink_link.css('background-color') != 'rgba(0, 0, 0, 0)') {
+                            biolink_link.css('background-color', hsva.toHEXA().toString());
+                        } else {
+                            biolink_link.css('border-color', hsva.toHEXA().toString());
+                        }
+                    });
+                }
+
+                $(event.currentTarget.querySelector('input[name="outline"]')).off().on('change', event => {
+
+                    let outline = $(event.currentTarget).is(':checked');
+
+                    if(outline) {
+                        /* From background color to border */
+                        let background_color = biolink_link.css('background-color');
+
+                        biolink_link.css('background-color', 'transparent');
+                        biolink_link.css('border', `.1rem solid ${background_color}`);
+                    } else {
+                        /* From border to background color */
+                        let border_color = biolink_link.css('border-color');
+
+                        biolink_link.css('background-color', border_color);
+                        biolink_link.css('border', 'none');
+                    }
+
+                });
+
+                $(event.currentTarget.querySelector('select[name="border_radius"]')).off().on('change', event => {
+
+                    let border_radius = $(event.currentTarget).find(':selected').val();
+
+                    switch(border_radius) {
+                        case 'straight':
+
+                            biolink_link.removeClass('link-btn-round link-btn-rounded');
+
+                            break;
+
+                        case 'round':
+
+                            biolink_link.removeClass('link-btn-rounded').addClass('link-btn-round');
+
+                            break;
+
+                        case 'rounded':
+
+                            biolink_link.removeClass('link-btn-round').addClass('link-btn-rounded');
+
+                            break;
+                    }
+
+                });
+
+                let current_animation = $(event.currentTarget.querySelector('select[name="animation"]')).val();
+
+                $(event.currentTarget.querySelector('select[name="animation"]')).off().on('change', event => {
+
+                    let animation = $(event.currentTarget).find(':selected').val();
+
+                    switch(animation) {
+                        case 'false':
+
+                            biolink_link.removeClass(`animated ${current_animation}`);
+                            current_animation = false;
+
+                            break;
+
+                        default:
+
+                            biolink_link.removeClass(`animated ${current_animation}`).addClass(`animated ${animation}`);
+                            current_animation = animation;
+
+                            break;
+                    }
+
+                });
+        }
+
+
+
+    })
+
+</script>
+<?php $javascript = ob_get_clean() ?>
+
+<?php return (object) ['html' => $html, 'javascript' => $javascript] ?>

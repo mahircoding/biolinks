@@ -1,0 +1,175 @@
+<?php defined('ALTUMCODE') || die() ?>
+
+<div class="my-3">
+    <div class="pricing-table pricing-scroll hvr-pricing-<?= $data->link->link_id ?>">
+			<div class="pricing-content">
+			<?php foreach($data->link->settings->pricings as $ky => $pr) {?>
+				<div class="prcol">
+					<div class="item">
+						<div class="head-price">
+							<div class="head-content">
+								<div class="head_bg"></div>
+								<div class="head">
+									<span><?= $pr->name ?></span>
+								</div>
+							</div>
+							<div class="price-tag">
+								<div class="price">
+									<span class="sign"><?= $pr->currency ?></span>
+									<span class="currency"><?= number_format($pr->price,0,"",",") ?></span>
+								</div>
+								<?php if(!empty($pr->price_strike)) {?>
+								<span class="strike"><?= number_format($pr->price_strike,0,"",",") ?></span>
+								<?php }?>
+								<div class="month"><i><?= isset($pr->per) ? $pr->per : 'per' ?></i> <span><?= $pr->period ?></span></div>
+							</div>
+						</div>
+						<div class="features">
+							<ul>
+							<?php foreach($pr->features as $ft) {?>
+							<li><span><?= $ft->bold ?></span> <?= $ft->normal ?></li>
+							<?php }?>
+							</ul>
+						</div>
+						<div class="price_btn">
+							<a class="none" data-index="<?= $ky ?>" data-toggle="modal" data-target="#pricing_<?= $data->link->link_id ?>" href="javascript:;"><?= isset($pr->button)&&!empty($pr->button) ? $pr->button : 'Order' ?></a>
+						</div>
+						<style>.form-default form{margin:auto !important}</style>
+					</div>
+				</div>
+			<?php }?>
+			</div>
+		</div>
+	</div>
+	<style>
+	.hvr-pricing-<?= $data->link->link_id ?> .item:hover .head-price .head-content .head_bg{
+		border-color: <?= isset($data->link->settings->hover_color) ? $data->link->settings->hover_color : '#2E64CC' ?> rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) <?= isset($data->link->settings->hover_color) ? $data->link->settings->hover_color : '#2E64CC' ?> !important;
+	}
+	.hvr-pricing-<?= $data->link->link_id ?> .item {
+		border-top: 4px solid <?= isset($data->link->settings->hover_color) ? $data->link->settings->hover_color : '#2E64CC' ?> !important;
+	}
+	.hvr-pricing-<?= $data->link->link_id ?> .item:hover{
+		border-top: 4px solid rgba(0,0,0,.7) !important;
+	}
+	.hvr-pricing-<?= $data->link->link_id ?> .item .price_btn a {
+		border: 1px solid <?= isset($data->link->settings->hover_color) ? $data->link->settings->hover_color : '#2E64CC' ?> !important;
+		color: <?= isset($data->link->settings->hover_color) ? $data->link->settings->hover_color : '#2E64CC' ?> !important;
+	}
+	.hvr-pricing-<?= $data->link->link_id ?> .item:hover .price_btn a {
+		background-color: <?= isset($data->link->settings->hover_color) ? $data->link->settings->hover_color : '#2E64CC' ?> !important;
+		color:#fff !important
+	}
+	.pricing-scroll{
+		width:100%;
+		overflow:hidden;
+		overflow-x:auto;
+	}
+	.pricing-scroll .pricing-content{
+		display:flex;
+		align-items:stretch !important;
+	}
+	.pricing-scroll .pricing-content .prcol{
+		min-width:223.333px;
+		margin-left:30px;
+	}
+	.pricing-scroll .pricing-content .prcol:first-child{margin-left:0 !important}
+	</style>
+</div>
+
+<?php ob_start() ?>
+<div class="modal form-default fade" id="pricing_<?= $data->link->link_id ?>" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+				<div class="cartform pricingform">
+					<h1 class="title"></h1>
+					<div class="price"></div>
+				</div>
+			
+                <form id="pricing_form_<?= $data->link->link_id ?>" method="post" role="form">
+                    <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" required="required" />
+                    <input type="hidden" name="request_type" value="mail" />
+                    <input type="hidden" name="link_id" value="<?= $data->link->link_id ?>" />
+                    <input type="hidden" name="type" value="biolink" />
+                    <input type="hidden" name="subtype" value="pricingtable" />
+
+                    <div class="notification-container"></div>
+
+                    <div class="form-group">
+                        <label><i class="fa fa-fw fa-user fa-sm mr-1"></i> <?= $data->link->language_public->name?></label>
+                        <input type="text" class="form-control" name="name" placeholder="<?= $data->link->language_public->name_placeholder?>" required="required" />
+                    </div>
+					
+					<input type="hidden" name="title" value=""/>
+					<input type="hidden" name="currency" value=""/>
+                    <input type="hidden" name="price" value=""/>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-lg btn-block btn-primary submit"><?= $data->link->language_public->submit?></button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+listen("load", window, function() {
+    var pricingform_or_<?= $data->link->link_id ?> = {phone:"<?= $data->link->settings->phone_number?>"} 
+	var dataform_<?= $data->link->link_id ?> = <?= $data->link->settings->order_object?>
+	
+	var pricingform_url = 'https://api.whatsapp.com/send';
+	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+	  pricingform_url = 'whatsapp://send/';
+	}
+	
+	$("form#pricing_form_<?= $data->link->link_id ?>").validate({
+		// Specify validation rules
+		rules: {
+		  name: "required",
+		  name: {
+			required: true,
+			minlength: 3
+		  }
+		},
+		// Specify validation error messages
+		messages: {
+		  name: {
+			required: "Please insert your full name",
+			minlength: "Your full name must be at least 3 characters long"
+		  }
+		},
+		submitHandler: function(form) {
+			var via_url_<?= $data->link->link_id ?> = location.href,
+			title_<?= $data->link->link_id ?> = $('form#pricing_form_<?= $data->link->link_id ?> input[name="title"]').val(),
+			price_<?= $data->link->link_id ?> = $('form#pricing_form_<?= $data->link->link_id ?> input[name="price"]').val(),
+			currency_<?= $data->link->link_id ?> = $('form#pricing_form_<?= $data->link->link_id ?> input[name="currency"]').val(),
+			name_<?= $data->link->link_id ?> = $('form#pricing_form_<?= $data->link->link_id ?> input[name="name"]').val()
+			
+			var wa_url_<?= $data->link->link_id ?> = pricingform_url + '?phone= ' + pricingform_or_<?= $data->link->link_id ?>.phone + '&text=Order : *' + title_<?= $data->link->link_id ?> + '*%0A*' + currency_<?= $data->link->link_id ?> + ' ' + price_<?= $data->link->link_id ?> + '* %0A%0ANama : *' + name_<?= $data->link->link_id ?> + '* %0A%0AVia ' + via_url_<?= $data->link->link_id ?>;
+			
+			var win = window.open(wa_url_<?= $data->link->link_id ?>, '_blank');
+			win.focus();
+			return false;
+		}
+	});
+	$("#pricing_<?= $data->link->link_id ?>").on("show.bs.modal", function(e) {
+		var obj = dataform_<?= $data->link->link_id ?>[$(e.relatedTarget).data('index')]
+		$('#pricing_<?= $data->link->link_id ?> .pricingform .title').text(obj.name)
+		$('#pricing_<?= $data->link->link_id ?> .pricingform .price').text(obj.currency+' '+obj.price_text)
+		$('form#pricing_form_<?= $data->link->link_id ?> input[name="title"]').val(obj.name)
+		$('form#pricing_form_<?= $data->link->link_id ?> input[name="currency"]').val(obj.currency)
+		$('form#pricing_form_<?= $data->link->link_id ?> input[name="price"]').val(obj.price_text)
+	})
+})
+</script>
+
+<?php \Altum\Event::add_content(ob_get_clean(), 'modals') ?>

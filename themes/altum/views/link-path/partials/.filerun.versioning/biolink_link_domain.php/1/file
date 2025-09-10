@@ -1,0 +1,5 @@
+<?php defined('ALTUMCODE') || die() ?>
+
+<div class="my-3 embed-responsive embed-responsive-16by9 link-iframe-round" style="height : <?= $data->link->settings->height ?>;">
+    <iframe class="embed-responsive-item" scrolling="yes" frameborder="no" src="<?= $data->embed ?>"></iframe>
+</div>

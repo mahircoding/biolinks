@@ -1,0 +1,143 @@
+<?php defined('ALTUMCODE') || die() ?>
+
+<div class="modal fade" id="create_biolink_pricingtable" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"><?= $this->language->create_biolink_pricingtable_modal->header ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <p class="text-muted modal-subheader"><?= $this->language->create_biolink_pricingtable_modal->subheader ?></p>
+
+            <div class="modal-body">
+                <form name="create_biolink_pricingtable" method="post" role="form">
+                    <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" required="required" />
+                    <input type="hidden" name="request_type" value="create" />
+                    <input type="hidden" name="link_id" value="<?= $data->link->link_id ?>" />
+                    <input type="hidden" name="type" value="biolink" />
+                    <input type="hidden" name="subtype" value="pricingtable" />
+
+                    <div class="notification-container"></div>
+					
+					<div class="form-group">
+                        <label><i class="fab fa-fw fa-whatsapp fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->phone_number ?></label>
+                        <input type="text" class="form-control" name="phone_number" placeholder="<?= $this->language->create_biolink_waform_modal->input->wa_number_placeholder ?>" required="required" />
+                    </div>
+					
+					<div class="d-flex align-items-center justify-content-center mt-2 mb-2">
+						<div class="d-flex align-items-center">
+							<div class="btn btn-primary" data-add-pricing="true" data-required="required"><i class="fa fa-image" aria-hidden="true"></i> Add Pricing Section</div>
+						</div>
+					</div>
+					
+					<div class="form-pricing-container">
+						<div class="form-pricing-item">
+							<div class="form-group">
+								<div class="d-flex justify-content-between">
+									<label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->name ?></label>
+									<div></div>
+								</div>
+								<input type="text" class="form-control" name="name[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->name_placeholder ?>" required/>
+							</div>
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->currency ?></label>
+										<input type="text" class="form-control" name="currency[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->currency_placeholder ?>" required/>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->period ?></label>
+										<input type="text" class="form-control" name="period[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->period_placeholder ?>" required/>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->price ?></label>
+										<input type="text" class="form-control" name="price[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->price_placeholder ?>" required/>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->price_strike ?></label>
+										<input type="text" class="form-control" name="price_strike[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->price_strike_placeholder ?>"/>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->button_text ?></label>
+								<input type="text" class="form-control" name="button_text[]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->button_text_placeholder ?>"/>
+							</div>
+							<div class="form-group">
+								<div class="d-flex justify-content-between">
+									<label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> <?= $this->language->create_biolink_pricingtable_modal->input->features ?></label>
+									<div class="d-flex">
+										<div data-add-feature="true" class="btn btn-primary mr-1"><i class="fa fa-plus" aria-hidden="true"></i></div>
+										<div data-close-feature="true" class="btn btn-danger"><i class="fa fa-times" aria-hidden="true"></i></div>
+									</div>
+								</div>
+							</div>
+							<div class="form-feature-container">
+								<div class="form-feature-item">
+									<div class="form-group">
+										<div class="input-group">
+											<input type="text" class="form-control" name="feat_bold[0][]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->bold_placeholder ?>" required/>
+											<input type="text" class="form-control" name="feat_normal[0][]" placeholder="<?= $this->language->create_biolink_pricingtable_modal->input->normal_placeholder ?>"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" name="submit" class="btn btn-primary"><?= $this->language->create_biolink_text_modal->input->submit ?></button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<?php ob_start() ?>
+<script>
+    $('form[name="create_biolink_pricingtable"]').on('submit', event => {
+
+        $.ajax({
+            type: 'POST',
+            url: 'link-ajax',
+            data: $(event.currentTarget).serialize(),
+            success: (data) => {
+                if(data.status == 'error') {
+
+                    let notification_container = $(event.currentTarget).find('.notification-container');
+
+                    notification_container.html('');
+
+                    display_notifications(data.message, 'error', notification_container);
+
+                }
+
+                else if(data.status == 'success') {
+
+                    /* Fade out refresh */
+                    fade_out_redirect({ url: data.details.url, full: true });
+
+                }
+            },
+            dataType: 'json'
+        });
+
+        event.preventDefault();
+    })
+</script>
+<?php \Altum\Event::add_content(ob_get_clean(), 'javascript') ?>
