@@ -4,5 +4,5 @@
 <form method="POST" action="<?= url('p/checkout/'.$product->product_id) ?>">
     <input type="text" name="name" placeholder="Nama Anda" required>
     <input type="email" name="email" placeholder="Email" required>
-    <button type="submit">Beli Sekarang</button>
+    <button type="submit">Beli</button>
 </form>
