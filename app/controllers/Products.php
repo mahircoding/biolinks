@@ -315,41 +315,70 @@ class Products extends Controller {
             $products[] = $row;
         }
 
-        /* Get sales analytics for seller */
-        $sales_stats = [];
-        $periods = ['today', 'week', 'month', 'all'];
+        /* Get sales analytics for seller - using object structure expected by view */
+        $sales_stats = new \stdClass();
+        $sales_count = new \stdClass();
         
-        foreach($periods as $period) {
-            $where_conditions = ["o.status = 'completed'", "p.user_id = {$this->user->user_id}"];
-            
-            switch($period) {
-                case 'today':
-                    $where_conditions[] = "DATE(o.completed_datetime) = CURDATE()";
-                    break;
-                case 'week':
-                    $where_conditions[] = "o.completed_datetime >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
-                    break;
-                case 'month':
-                    $where_conditions[] = "o.completed_datetime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)";
-                    break;
-            }
-            
-            $where_clause = implode(' AND ', $where_conditions);
-            
-            $result = Database::$database->query("
-                SELECT 
-                    COUNT(*) as total_orders,
-                    COALESCE(SUM(o.amount), 0) as total_revenue,
-                    COALESCE(AVG(o.amount), 0) as average_order_value
-                FROM `orders` o
-                LEFT JOIN `products` p ON o.product_id = p.product_id
-                WHERE {$where_clause}
-            ");
-            
-            $sales_stats[$period] = $result->fetch_object();
-        }
+        // Today's sales
+        $result = Database::$database->query("
+            SELECT 
+                COUNT(*) as total_orders,
+                COALESCE(SUM(o.amount), 0) as total_revenue
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE o.status = 'completed' 
+                AND p.user_id = {$this->user->user_id}
+                AND DATE(o.completed_datetime) = CURDATE()
+        ");
+        $today_data = $result->fetch_object();
+        $sales_stats->today = $today_data->total_revenue;
+        $sales_count->today = $today_data->total_orders;
 
-        /* Get recent orders for seller's products */
+        // This week's sales
+        $result = Database::$database->query("
+            SELECT 
+                COUNT(*) as total_orders,
+                COALESCE(SUM(o.amount), 0) as total_revenue
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE o.status = 'completed' 
+                AND p.user_id = {$this->user->user_id}
+                AND o.completed_datetime >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        ");
+        $week_data = $result->fetch_object();
+        $sales_stats->this_week = $week_data->total_revenue;
+        $sales_count->this_week = $week_data->total_orders;
+
+        // This month's sales
+        $result = Database::$database->query("
+            SELECT 
+                COUNT(*) as total_orders,
+                COALESCE(SUM(o.amount), 0) as total_revenue
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE o.status = 'completed' 
+                AND p.user_id = {$this->user->user_id}
+                AND o.completed_datetime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+        ");
+        $month_data = $result->fetch_object();
+        $sales_stats->this_month = $month_data->total_revenue;
+        $sales_count->this_month = $month_data->total_orders;
+
+        // Total sales
+        $result = Database::$database->query("
+            SELECT 
+                COUNT(*) as total_orders,
+                COALESCE(SUM(o.amount), 0) as total_revenue
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE o.status = 'completed' 
+                AND p.user_id = {$this->user->user_id}
+        ");
+        $total_data = $result->fetch_object();
+        $sales_stats->total = $total_data->total_revenue;
+        $sales_count->total = $total_data->total_orders;
+
+        /* Get recent orders for seller's products only */
         $orders_result = Database::$database->query("
             SELECT 
                 o.*, 
@@ -362,7 +391,8 @@ class Products extends Controller {
                 CASE 
                     WHEN o.user_id IS NOT NULL THEN u.email 
                     ELSE o.customer_email 
-                END as customer_email
+                END as customer_email,
+                o.customer_phone
             FROM `orders` o
             LEFT JOIN `products` p ON o.product_id = p.product_id
             LEFT JOIN `users` u ON o.user_id = u.user_id
@@ -371,19 +401,20 @@ class Products extends Controller {
             LIMIT 20
         ");
 
-        $orders = [];
+        $recent_orders = [];
         while($row = $orders_result->fetch_object()) {
-            $orders[] = $row;
+            $recent_orders[] = $row;
         }
 
-        /* Prepare the view */
-        $data = [
+        /* Prepare the view data */
+        $data = (object) [
             'products' => $products,
             'sales_stats' => $sales_stats,
-            'orders' => $orders
+            'sales_count' => $sales_count,
+            'recent_orders' => $recent_orders
         ];
 
         $view = new \Altum\Views\View('products/sales', (array) $this);
-        $this->add_view_content('content', $view->run($data));
+        $this->add_view_content('content', $view->run(['data' => $data]));
     }
 }
