@@ -21,6 +21,11 @@ class Products extends Controller {
             $this->view();
             return;
         }
+
+        if($route == 'user-catalog') {
+            $this->user_catalog();
+            return;
+        }
         
         /* Default products management */
         Authentication::guard();
@@ -257,6 +262,41 @@ class Products extends Controller {
         ];
 
         $view = new \Altum\Views\View('products/catalog', (array) $this);
+        $this->add_view_content('content', $view->run($data));
+    }
+
+    public function user_catalog() {
+        $user_id = isset($this->params[0]) ? (int) $this->params[0] : null;
+
+        if(!$user_id) {
+            redirect('');
+        }
+
+        /* Get user info */
+        $user = Database::get(['user_id', 'name', 'email'], 'users', ['user_id' => $user_id]);
+        if(!$user) {
+            redirect('');
+        }
+
+        /* Get user's products */
+        $products_result = Database::$database->query("
+            SELECT * FROM `products` 
+            WHERE `user_id` = {$user_id} AND `status` = 1 
+            ORDER BY `datetime` DESC
+        ");
+
+        $products = [];
+        while($row = $products_result->fetch_object()) {
+            $products[] = $row;
+        }
+
+        /* Prepare the view */
+        $data = [
+            'products' => $products,
+            'user' => $user
+        ];
+
+        $view = new \Altum\Views\View('products/user_catalog', (array) $this);
         $this->add_view_content('content', $view->run($data));
     }
 }
