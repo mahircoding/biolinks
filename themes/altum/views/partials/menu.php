@@ -34,6 +34,10 @@
                 <?php if(\Altum\Middlewares\Authentication::check()): ?>
 
                     <li class="nav-item"><a class="nav-link" href="<?= url('dashboard') ?>"> <?= $this->language->dashboard->menu ?></a></li>
+                    
+                    <li class="nav-item"><a class="nav-link" href="<?= url('products/catalog') ?>"><i class="fa fa-fw fa-sm fa-shopping-bag mr-1"></i> Shop</a></li>
+                    
+                    <li class="nav-item"><a class="nav-link" href="<?= url('products') ?>"><i class="fa fa-fw fa-sm fa-box mr-1"></i> My Products</a></li>
 					
 					<li class="dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
@@ -57,6 +61,8 @@
 							<div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="<?= url('account') ?>"><i class="fa fa-fw fa-sm fa-wrench mr-1"></i> <?= $this->language->account->menu ?></a>
 
+                            <a class="dropdown-item" href="<?= url('orders') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> My Orders</a>
+
                             <?php if($this->settings->links->domains_is_enabled): ?>
                             <a class="dropdown-item" href="<?= url('domains') ?>"><i class="fa fa-fw fa-sm fa-anchor mr-1"></i> <?= $this->language->domains->menu ?></a>
                             <?php endif ?>
@@ -70,6 +76,8 @@
                     </li>
 
                 <?php else: ?>
+
+                    <li class="nav-item"><a class="nav-link" href="<?= url('products/catalog') ?>"><i class="fa fa-fw fa-sm fa-shopping-bag mr-1"></i> Shop</a></li>
 
                     <li class="nav-item active"><a class="nav-link" href="<?= url('login') ?>"><i class="fa fa-fw fa-sm fa-sign-in-alt mr-1"></i> <?= $this->language->login->menu ?></a></li>
 
