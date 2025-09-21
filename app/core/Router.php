@@ -192,6 +192,14 @@ class Router {
                 ]
             ],
 
+            'products/sales' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
             'orders' => [
                 'controller' => 'Orders',
                 'settings' => [

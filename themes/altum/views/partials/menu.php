@@ -63,6 +63,8 @@
 
                             <a class="dropdown-item" href="<?= url('orders') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> My Orders</a>
 
+                            <a class="dropdown-item" href="<?= url('products/sales') ?>"><i class="fa fa-fw fa-sm fa-chart-line mr-1"></i> Sales Dashboard</a>
+
                             <?php if($this->settings->links->domains_is_enabled): ?>
                             <a class="dropdown-item" href="<?= url('domains') ?>"><i class="fa fa-fw fa-sm fa-anchor mr-1"></i> <?= $this->language->domains->menu ?></a>
                             <?php endif ?>
