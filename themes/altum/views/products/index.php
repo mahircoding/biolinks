@@ -16,6 +16,30 @@
                             </a>
                         </div>
                     </div>
+                    
+                    <!-- Product Display Link -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="fa fa-store fa-fw mr-2"></i>
+                                <div class="flex-grow-1">
+                                    <strong>Link Toko Produk Anda:</strong>
+                                    <br>
+                                    <a href="<?= url($this->user->user_id) ?>" target="_blank" class="text-decoration-none">
+                                        <?= SITE_URL . $this->user->user_id ?>
+                                    </a>
+                                    <small class="text-muted d-block">
+                                        Bagikan link ini untuk menampilkan semua produk Anda (User ID: <?= $this->user->user_id ?>)
+                                    </small>
+                                </div>
+                                <div class="ml-2">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('<?= SITE_URL . $this->user->user_id ?>')">
+                                        <i class="fa fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,3 +112,25 @@
         </div>
     <?php endif ?>
 </div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show success message
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa fa-check"></i> Copied!';
+        btn.classList.remove('btn-outline-primary');
+        btn.classList.add('btn-success');
+        
+        setTimeout(function() {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-primary');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        alert('Failed to copy link');
+    });
+}
+</script>
