@@ -201,14 +201,14 @@ class Router {
             ],
 
             /* Public product routes */
-            'product' => [
+            'catalog' => [
                 'controller' => 'Products',
                 'settings' => [
                     'no_authentication_check' => true
                 ]
             ],
 
-            'catalog' => [
+            'product' => [
                 'controller' => 'Products',
                 'settings' => [
                     'no_authentication_check' => true
