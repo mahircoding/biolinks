@@ -1,5 +1,196 @@
 <?php defined('ALTUMCODE') || die() ?>
 
+<!-- Product Page Custom Styles -->
+<style>
+/* Product Page Enhancements */
+.product-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    border: none !important;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+.purchase-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: none !important;
+}
+
+.purchase-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+}
+
+.btn-purchase {
+    background: linear-gradient(45deg, #007bff, #0056b3) !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 15px 30px !important;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3) !important;
+    color: white !important;
+}
+
+.btn-purchase:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,123,255,0.4) !important;
+    color: white !important;
+}
+
+.price-highlight {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 900 !important;
+}
+
+.product-stats {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.features-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.features-list li:hover {
+    background: rgba(0,123,255,0.05);
+    padding-left: 10px;
+}
+
+.security-badge {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    color: white !important;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(40,167,69,0.2);
+}
+
+.guest-info-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    border: 2px dashed #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.guest-info-section:hover {
+    border-color: #007bff;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+.form-control-lg {
+    border-radius: 10px !important;
+    border: 2px solid #e9ecef !important;
+    transition: all 0.3s ease;
+}
+
+.form-control-lg:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 20px rgba(0,123,255,0.2) !important;
+    transform: translateY(-2px);
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+.slide-up {
+    transform: translateY(30px);
+    opacity: 0;
+    animation: slideUp 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 767.98px) {
+    .product-stats .row { flex-direction: column; }
+    .stat-item { margin-bottom: 10px; }
+    .purchase-card { margin-top: 2rem; }
+    .guest-info-section { padding: 20px; }
+    .security-badge { padding: 15px; margin-bottom: 1rem; }
+}
+
+/* Form Validation Styles */
+.form-control.is-valid {
+    border-color: #28a745 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.7-.7L4.6 4.47l2.6-2.6-.7-.7L4.6 3.07 2.3 5.37l-.7.7z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4m-2.4 0 2.4-2.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.invalid-feedback {
+    display: block !important;
+    font-size: 0.8rem;
+    color: #dc3545;
+    margin-top: 0.25rem;
+}
+
+/* Ensure clickable elements */
+button, input, a {
+    pointer-events: auto !important;
+}
+
+/* Debug styles for troubleshooting */
+#purchase-form {
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+button[type="submit"] {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 9999 !important;
+}
+</style>
+
 <div class="container">
     <!-- Product Header -->
     <div class="row mb-4">
@@ -139,7 +330,11 @@
                             </div>
                         <?php else: ?>
                             <!-- Purchase Form -->
-                            <form action="<?= url('orders/create/' . $data->product->product_id) ?>" method="post" id="purchase-form">
+                            <form action="<?= url('orders/create/' . $data->product->product_id) ?>" 
+                                  method="post" 
+                                  id="purchase-form" 
+                                  style="position: relative; z-index: 10;"
+                                  onsubmit="console.log('Form submitted!'); return validateForm();">
                                 <input type="hidden" name="token" value="<?= \Altum\Csrf::get() ?>" />
                                 
                                 <?php if(!$this->user): ?>
@@ -157,7 +352,7 @@
                                                    id="customer_name" name="customer_name" 
                                                    required maxlength="128" 
                                                    placeholder="Masukkan nama lengkap Anda"
-                                                   style="border-radius: 15px;">
+                                                   style="border-radius: 15px; z-index: 5; position: relative;">
                                         </div>
                                         
                                         <div class="mb-3">
@@ -168,7 +363,7 @@
                                                    id="customer_email" name="customer_email" 
                                                    required maxlength="320" 
                                                    placeholder="Masukkan email Anda"
-                                                   style="border-radius: 15px;">
+                                                   style="border-radius: 15px; z-index: 5; position: relative;">
                                         </div>
                                         
                                         <div class="mb-3">
@@ -179,7 +374,7 @@
                                                    id="customer_phone" name="customer_phone" 
                                                    required maxlength="20" 
                                                    placeholder="Contoh: 081234567890"
-                                                   style="border-radius: 15px;">
+                                                   style="border-radius: 15px; z-index: 5; position: relative;">
                                         </div>
                                         
                                         <div class="alert alert-info border-0 mb-0" style="border-radius: 15px; background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);">
@@ -192,10 +387,31 @@
                                 <?php endif ?>
                                 
                                 <!-- Purchase Button -->
-                                <button type="submit" class="btn btn-purchase btn-lg btn-block shadow" style="border-radius: 50px; padding: 18px; font-size: 1.1rem;">
+                                <button type="submit" 
+                                        class="btn btn-primary btn-lg btn-block btn-purchase shadow" 
+                                        id="buy-now-btn"
+                                        onclick="console.log('Button clicked directly!'); return true;"
+                                        style="background: linear-gradient(45deg, #007bff, #0056b3) !important; 
+                                               border: none !important; 
+                                               border-radius: 50px !important; 
+                                               padding: 18px !important; 
+                                               font-size: 1.1rem !important; 
+                                               color: white !important; 
+                                               cursor: pointer !important; 
+                                               z-index: 9999 !important; 
+                                               position: relative !important;
+                                               display: block !important;
+                                               width: 100% !important;">
                                     <i class="fa fa-fw fa-credit-card"></i> 
                                     Beli Sekarang - <?= format_idr($data->product->price) ?>
                                 </button>
+                                
+                                <!-- Debug Info -->
+                                <div class="mt-2 text-center">
+                                    <small class="text-muted">
+                                        Form Action: <?= url('orders/create/' . $data->product->product_id) ?>
+                                    </small>
+                                </div>
                             </form>
                             
                             <?php if(!$this->user): ?>
@@ -313,83 +529,79 @@
 <!-- Custom JavaScript for Product Page -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Add animation classes
+    console.log('Product page loaded'); // Debug log
+    
+    // Fix any potential overlay issues
+    const purchaseForm = document.getElementById('purchase-form');
+    const purchaseBtn = document.querySelector('button[type="submit"]');
+    
+    if (purchaseBtn) {
+        console.log('Purchase button found'); // Debug log
+        
+        // Ensure button is clickable
+        purchaseBtn.style.pointerEvents = 'auto';
+        purchaseBtn.style.position = 'relative';
+        purchaseBtn.style.zIndex = '9999';
+        
+        // Add click event listener
+        purchaseBtn.addEventListener('click', function(e) {
+            console.log('Purchase button clicked'); // Debug log
+            
+            // Basic validation for guest users
+            if (!document.querySelector('input[name="token"]').value) {
+                alert('Error: Missing security token. Please refresh the page.');
+                e.preventDefault();
+                return false;
+            }
+            
+            // Check guest fields if user is not logged in
+            const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
+            if (!userLoggedIn) {
+                const name = document.getElementById('customer_name').value.trim();
+                const email = document.getElementById('customer_email').value.trim();
+                const phone = document.getElementById('customer_phone').value.trim();
+                
+                if (!name || !email || !phone) {
+                    alert('Harap lengkapi semua informasi yang diperlukan.');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                if (!isValidEmail(email)) {
+                    alert('Format email tidak valid.');
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+            
+            // Allow form submission
+            return true;
+        });
+    }
+    
+    // Add animation classes with delay
     const animateElements = document.querySelectorAll('.fade-in, .slide-up');
     animateElements.forEach((el, index) => {
         el.style.animationDelay = (index * 0.1) + 's';
     });
     
-    // Enhanced form validation
-    const purchaseForm = document.getElementById('purchase-form');
-    if (purchaseForm) {
-        purchaseForm.addEventListener('submit', function(e) {
-            let isValid = true;
-            const requiredFields = purchaseForm.querySelectorAll('input[required]');
-            
-            requiredFields.forEach(field => {
-                const feedback = field.parentElement.querySelector('.invalid-feedback');
-                if (feedback) feedback.remove();
-                
-                field.classList.remove('is-invalid', 'is-valid');
-                
-                if (!field.value.trim()) {
-                    field.classList.add('is-invalid');
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'invalid-feedback';
-                    errorMsg.textContent = 'Field ini wajib diisi';
-                    field.parentElement.appendChild(errorMsg);
-                    isValid = false;
-                } else if (field.type === 'email' && !isValidEmail(field.value)) {
-                    field.classList.add('is-invalid');
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'invalid-feedback';
-                    errorMsg.textContent = 'Format email tidak valid';
-                    field.parentElement.appendChild(errorMsg);
-                    isValid = false;
-                } else if (field.type === 'tel' && !isValidPhone(field.value)) {
-                    field.classList.add('is-invalid');
-                    const errorMsg = document.createElement('div');
-                    errorMsg.className = 'invalid-feedback';
-                    errorMsg.textContent = 'Format nomor handphone tidak valid';
-                    field.parentElement.appendChild(errorMsg);
-                    isValid = false;
-                } else {
-                    field.classList.add('is-valid');
-                }
-            });
-            
-            if (!isValid) {
-                e.preventDefault();
-                // Scroll to first error
-                const firstError = purchaseForm.querySelector('.is-invalid');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstError.focus();
-                }
-            } else {
-                // Show loading state
-                const submitBtn = purchaseForm.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
-                }
-            }
+    // Enhanced form validation for inputs
+    const inputs = document.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
         });
         
-        // Real-time validation
-        const inputs = purchaseForm.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('blur', function() {
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) {
                 validateField(this);
-            });
-            
-            input.addEventListener('input', function() {
-                if (this.classList.contains('is-invalid')) {
-                    validateField(this);
-                }
-            });
+            }
         });
-    }
+    });
     
     // Add hover effects to feature list
     const featureItems = document.querySelectorAll('.features-list li');
@@ -402,18 +614,6 @@ document.addEventListener('DOMContentLoaded', function() {
         item.addEventListener('mouseleave', function() {
             this.style.transform = 'translateX(0)';
             this.style.backgroundColor = 'transparent';
-        });
-    });
-    
-    // Smooth scroll for better UX
-    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
-    smoothScrollLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
         });
     });
 });
@@ -459,21 +659,50 @@ function isValidPhone(phone) {
     return phoneRegex.test(phone.replace(/\s/g, ''));
 }
 
-// Add copy to clipboard functionality for product ID
-function copyProductId() {
-    const productId = '<?= $data->product->product_id ?>';
-    navigator.clipboard.writeText(productId).then(function() {
-        // Show success message
-        const toast = document.createElement('div');
-        toast.className = 'alert alert-success position-fixed';
-        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; border-radius: 10px;';
-        toast.innerHTML = '<i class="fa fa-check"></i> ID Produk disalin!';
-        document.body.appendChild(toast);
+// Fallback validation function for form onsubmit
+function validateForm() {
+    console.log('Validating form...');
+    
+    const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
+    
+    if (!userLoggedIn) {
+        const nameInput = document.getElementById('customer_name');
+        const emailInput = document.getElementById('customer_email');
+        const phoneInput = document.getElementById('customer_phone');
         
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    });
+        if (!nameInput || !emailInput || !phoneInput) {
+            console.log('Required fields not found');
+            return true; // Let browser validation handle it
+        }
+        
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const phone = phoneInput.value.trim();
+        
+        if (!name || !email || !phone) {
+            alert('Harap lengkapi semua informasi yang diperlukan.');
+            return false;
+        }
+        
+        if (!isValidEmail(email)) {
+            alert('Format email tidak valid.');
+            return false;
+        }
+        
+        if (!isValidPhone(phone)) {
+            alert('Format nomor handphone tidak valid.');
+            return false;
+        }
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('buy-now-btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+    }
+    
+    return true;
 }
 </script>
 
