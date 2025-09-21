@@ -37,8 +37,6 @@ class Orders extends Controller {
     }
 
     public function create() {
-        Authentication::guard();
-
         $product_id = isset($this->params[0]) ? $this->params[0] : null;
 
         /* Check if product exists and is active */
@@ -47,18 +45,76 @@ class Orders extends Controller {
             redirect('products/catalog');
         }
 
-        /* Check if user already purchased this product */
-        $existing_order = Database::get('*', 'orders', [
-            'user_id' => $this->user->user_id, 
-            'product_id' => $product_id, 
-            'status' => 'completed'
-        ]);
+        /* Check if user/customer already purchased this product */
+        $existing_order = null;
         
+        if($this->user) {
+            /* For logged in users */
+            $existing_order = Database::get('*', 'orders', [
+                'user_id' => $this->user->user_id, 
+                'product_id' => $product_id, 
+                'status' => 'completed'
+            ]);
+        }
+
         if($existing_order) {
-            redirect('orders');
+            if($this->user) {
+                redirect('orders');
+            } else {
+                redirect('products/product/' . $product_id);
+            }
         }
 
         if(!empty($_POST)) {
+            /* Validate CSRF token */
+            if(!\Altum\Csrf::check()) {
+                redirect('products/product/' . $product_id);
+            }
+
+            $customer_name = null;
+            $customer_email = null;
+            $customer_phone = null;
+            $user_id = null;
+
+            if($this->user) {
+                /* For logged in users */
+                $user_id = $this->user->user_id;
+                $customer_name = $this->user->name;
+                $customer_email = $this->user->email;
+            } else {
+                /* For guest checkout */
+                $customer_name = trim($_POST['customer_name'] ?? '');
+                $customer_email = trim($_POST['customer_email'] ?? '');
+                $customer_phone = trim($_POST['customer_phone'] ?? '');
+
+                /* Basic validation */
+                if(empty($customer_name) || strlen($customer_name) < 2 || strlen($customer_name) > 128) {
+                    redirect('products/product/' . $product_id);
+                }
+
+                if(!filter_var($customer_email, FILTER_VALIDATE_EMAIL) || strlen($customer_email) > 320) {
+                    redirect('products/product/' . $product_id);
+                }
+
+                if(empty($customer_phone) || strlen($customer_phone) < 10 || strlen($customer_phone) > 20) {
+                    redirect('products/product/' . $product_id);
+                }
+
+                /* Check if guest customer already purchased this product */
+                $guest_order = Database::$database->query("
+                    SELECT * FROM `orders` 
+                    WHERE `customer_email` = '" . Database::clean_string($customer_email) . "' 
+                    AND `product_id` = '" . Database::clean_string($product_id) . "' 
+                    AND `status` = 'completed'
+                ")->fetch_object();
+
+                if($guest_order) {
+                    /* Store email in session to show purchased status */
+                    $_SESSION['guest_email'] = $customer_email;
+                    redirect('products/product/' . $product_id);
+                }
+            }
+
             /* Create order */
             $order_id = 'ORD-' . time() . '-' . rand(1000, 9999);
             $transaction_id = 'TXN-' . time() . '-' . rand(10000, 99999);
@@ -66,13 +122,22 @@ class Orders extends Controller {
             Database::insert('orders', [
                 'order_id' => $order_id,
                 'transaction_id' => $transaction_id,
-                'user_id' => $this->user->user_id,
+                'user_id' => $user_id,
                 'product_id' => $product_id,
+                'customer_name' => $customer_name,
+                'customer_email' => $customer_email,
+                'customer_phone' => $customer_phone,
                 'amount' => $product->price,
                 'payment_method' => 'midtrans',
                 'status' => 'pending',
                 'datetime' => \Altum\Date::$date
             ]);
+
+            /* Store guest email in session for future reference */
+            if(!$this->user) {
+                $_SESSION['guest_email'] = $customer_email;
+                $_SESSION['guest_order_id'] = $order_id;
+            }
 
             /* Redirect to payment */
             redirect('orders/payment/' . $order_id);
@@ -88,14 +153,34 @@ class Orders extends Controller {
     }
 
     public function payment() {
-        Authentication::guard();
-
         $order_id = isset($this->params[0]) ? $this->params[0] : null;
 
-        /* Check if order exists and belongs to user */
-        $order = Database::get('*', 'orders', ['order_id' => $order_id, 'user_id' => $this->user->user_id]);
+        /* Check if order exists */
+        $order = null;
+        
+        if($this->user) {
+            /* For logged in users */
+            $order = Database::get('*', 'orders', ['order_id' => $order_id, 'user_id' => $this->user->user_id]);
+        } else {
+            /* For guest users, check by session or order_id */
+            if(isset($_SESSION['guest_order_id']) && $_SESSION['guest_order_id'] == $order_id) {
+                $order = Database::get('*', 'orders', ['order_id' => $order_id]);
+            } else {
+                /* Allow guest to access if they know the order_id and it's a guest order */
+                $order = Database::get('*', 'orders', ['order_id' => $order_id]);
+                if($order && $order->user_id !== null) {
+                    /* This is not a guest order */
+                    $order = null;
+                }
+            }
+        }
+        
         if(!$order) {
-            redirect('orders');
+            if($this->user) {
+                redirect('orders');
+            } else {
+                redirect('products/catalog');
+            }
         }
 
         /* Get product details */
@@ -108,24 +193,43 @@ class Orders extends Controller {
 
         /* Initialize Midtrans */
         if(!empty($_POST['pay_now'])) {
-            // TODO: Implement Midtrans payment flow
-            // For now, we'll simulate successful payment
-            Database::update('orders', [
-                'status' => 'completed',
-                'completed_datetime' => \Altum\Date::$date
-            ], ['order_id' => $order_id]);
-
-            /* Update product sales count */
-            Database::$database->query("
-                UPDATE `products` 
-                SET `sales` = `sales` + 1 
-                WHERE `product_id` = '" . Database::clean_string($order->product_id) . "'
-            ");
-
-            /* Send email notification */
-            $this->send_purchase_email($order, $product);
-
-            redirect('orders/success/' . $order_id);
+            /* Create Midtrans transaction */
+            $transaction_details = [
+                'order_id' => $order->transaction_id,
+                'gross_amount' => (int)$order->amount // IDR amount as integer
+            ];
+            
+            $customer_details = [
+                'first_name' => $order->customer_name ?? ($this->user ? $this->user->name : 'Customer'),
+                'email' => $order->customer_email ?? ($this->user ? $this->user->email : ''),
+                'phone' => $order->customer_phone ?? ($this->user && isset($this->user->phone) ? $this->user->phone : '')
+            ];
+            
+            $item_details = [
+                [
+                    'id' => $product->product_id,
+                    'price' => (int)$order->amount,
+                    'quantity' => 1,
+                    'name' => $product->name,
+                    'category' => 'Digital Product'
+                ]
+            ];
+            
+            try {
+                $snap_token = \Altum\Helpers\Midtrans::get_snap_token($transaction_details, $customer_details, $item_details);
+                
+                /* Store snap token in order */
+                Database::update('orders', [
+                    'payment_details' => json_encode(['snap_token' => $snap_token])
+                ], ['order_id' => $order_id]);
+                
+                /* Prepare payment data for view */
+                $data['snap_token'] = $snap_token;
+                $data['client_key'] = MIDTRANS_CLIENT_KEY;
+                
+            } catch(\Exception $e) {
+                $error = 'Payment initialization failed: ' . $e->getMessage();
+            }
         }
 
         /* Prepare the view */
@@ -139,14 +243,34 @@ class Orders extends Controller {
     }
 
     public function success() {
-        Authentication::guard();
-
         $order_id = isset($this->params[0]) ? $this->params[0] : null;
 
-        /* Check if order exists and belongs to user */
-        $order = Database::get('*', 'orders', ['order_id' => $order_id, 'user_id' => $this->user->user_id]);
+        /* Check if order exists */
+        $order = null;
+        
+        if($this->user) {
+            /* For logged in users */
+            $order = Database::get('*', 'orders', ['order_id' => $order_id, 'user_id' => $this->user->user_id]);
+        } else {
+            /* For guest users, check by session or order_id */
+            if(isset($_SESSION['guest_order_id']) && $_SESSION['guest_order_id'] == $order_id) {
+                $order = Database::get('*', 'orders', ['order_id' => $order_id]);
+            } else {
+                /* Allow guest to access if they know the order_id and it's a guest order */
+                $order = Database::get('*', 'orders', ['order_id' => $order_id]);
+                if($order && $order->user_id !== null) {
+                    /* This is not a guest order */
+                    $order = null;
+                }
+            }
+        }
+        
         if(!$order || $order->status != 'completed') {
-            redirect('orders');
+            if($this->user) {
+                redirect('orders');
+            } else {
+                redirect('products/catalog');
+            }
         }
 
         /* Get product details */
@@ -208,34 +332,48 @@ class Orders extends Controller {
     }
 
     private function send_purchase_email($order, $product) {
-        /* Get user details */
-        $user = Database::get(['name', 'email'], 'users', ['user_id' => $order->user_id]);
+        $customer_name = '';
+        $customer_email = '';
         
-        if($user && $user->email) {
-            $subject = "Purchase Confirmation - " . $product->name;
+        if($order->user_id) {
+            /* Get user details for registered users */
+            $user = Database::get(['name', 'email'], 'users', ['user_id' => $order->user_id]);
+            if($user && $user->email) {
+                $customer_name = $user->name;
+                $customer_email = $user->email;
+            }
+        } else {
+            /* Use guest customer details */
+            $customer_name = $order->customer_name;
+            $customer_email = $order->customer_email;
+        }
+        
+        if($customer_email) {
+            $subject = "Konfirmasi Pembelian - " . $product->name;
             
             $message = "
-            <h2>Thank you for your purchase!</h2>
-            <p>Dear {$user->name},</p>
-            <p>Your order has been successfully completed. Here are your purchase details:</p>
+            <h2>Terima kasih atas pembelian Anda!</h2>
+            <p>Halo {$customer_name},</p>
+            <p>Pesanan Anda telah berhasil diselesaikan. Berikut adalah detail pembelian Anda:</p>
             
-            <h3>Order Details:</h3>
+            <h3>Detail Pesanan:</h3>
             <ul>
-                <li><strong>Order ID:</strong> {$order->order_id}</li>
-                <li><strong>Product:</strong> {$product->name}</li>
-                <li><strong>Amount:</strong> $" . number_format($order->amount, 2) . "</li>
-                <li><strong>Purchase Date:</strong> {$order->completed_datetime}</li>
+                <li><strong>ID Pesanan:</strong> {$order->order_id}</li>
+                <li><strong>Produk:</strong> {$product->name}</li>
+                <li><strong>Total:</strong> " . format_idr($order->amount) . "</li>
+                <li><strong>Tanggal Pembelian:</strong> {$order->completed_datetime}</li>
             </ul>
             
-            <h3>Product Access:</h3>
+            <h3>Akses Produk:</h3>
             <p>{$product->description}</p>
-            " . ($product->digital_link ? "<p><strong>Access Link:</strong> <a href='{$product->digital_link}'>Click here to access your product</a></p>" : "") . "
+            " . ($product->digital_link ? "<p><strong>Link Akses:</strong> <a href='{$product->digital_link}' target='_blank'>Klik disini untuk mengakses produk Anda</a></p>" : "") . "
             
-            <p>Thank you for your purchase!</p>
+            <p>Terima kasih atas pembelian Anda!</p>
+            <p>Tim KiblatBio</p>
             ";
 
             /* Send email */
-            $this->send_email($user->email, $subject, $message);
+            $this->send_email($customer_email, $subject, $message);
         }
     }
 

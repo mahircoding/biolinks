@@ -37,13 +37,14 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="price">Price *</label>
+                            <label for="price">Price (IDR) *</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" required />
+                                <input type="number" id="price" name="price" class="form-control" step="1000" min="1000" placeholder="10000" required />
                             </div>
+                            <small class="form-text text-muted">Minimum price: Rp 1.000</small>
                         </div>
 
                         <div class="form-group">

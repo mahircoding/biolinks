@@ -76,3 +76,10 @@ function CustomDomain($str) {
         die();
      }
 }
+
+/* Midtrans Payment Gateway Configuration for IDR */
+define('MIDTRANS_SERVER_KEY', 'SB-Mid-server-YOUR_SERVER_KEY'); // Replace with your server key
+define('MIDTRANS_CLIENT_KEY', 'SB-Mid-client-YOUR_CLIENT_KEY'); // Replace with your client key  
+define('MIDTRANS_IS_PRODUCTION', false); // Set to true for production
+define('SITE_CURRENCY', 'IDR');
+define('SITE_CURRENCY_SYMBOL', 'Rp');

@@ -54,7 +54,7 @@
                             <div class="mt-auto">
                                 <div class="row align-items-center mb-3">
                                     <div class="col">
-                                        <span class="h5 text-primary mb-0">$<?= number_format($product->price, 2) ?></span>
+                                        <span class="h5 text-primary mb-0"><?= format_idr($product->price) ?></span>
                                     </div>
                                     <div class="col-auto">
                                         <small class="text-muted">

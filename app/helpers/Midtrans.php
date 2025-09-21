@@ -16,6 +16,49 @@ class Midtrans {
         self::$base_url = $is_production ? 'https://api.midtrans.com/v2' : 'https://api.sandbox.midtrans.com/v2';
     }
 
+    /**
+     * Get Snap token for IDR transactions
+     */
+    public static function get_snap_token($transaction_details, $customer_details, $item_details) {
+        $url = self::$is_production ? 'https://app.midtrans.com/snap/v1/transactions' : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+        
+        $data = [
+            'transaction_details' => [
+                'order_id' => $transaction_details['order_id'],
+                'gross_amount' => (int)$transaction_details['gross_amount'] // Ensure integer for IDR
+            ],
+            'customer_details' => $customer_details,
+            'item_details' => $item_details,
+            'credit_card' => [
+                'secure' => true
+            ]
+        ];
+
+        $headers = [
+            'Content-Type: application/json',
+            'Accept: application/json',
+            'Authorization: Basic ' . base64_encode(self::$server_key . ':')
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_code !== 201) {
+            throw new \Exception('Failed to get snap token: ' . $response);
+        }
+
+        $result = json_decode($response, true);
+        return $result['token'];
+    }
+
     public static function create_transaction($order_data) {
         $url = self::$base_url . '/charge';
         

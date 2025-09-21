@@ -7,8 +7,8 @@
                 <div class="card-body">
                     <div class="text-center mb-4">
                         <i class="fa fa-credit-card fa-3x text-primary mb-3"></i>
-                        <h1 class="h3">Complete Your Payment</h1>
-                        <p class="text-muted">Review your order and proceed with payment</p>
+                        <h1 class="h3">Selesaikan Pembayaran Anda</h1>
+                        <p class="text-muted">Tinjau pesanan Anda dan lanjutkan dengan pembayaran</p>
                     </div>
                     
                     <div class="row">
@@ -26,19 +26,39 @@
                             
                             <div class="row">
                                 <div class="col-6">
-                                    <strong>Order ID:</strong>
+                                    <strong>ID Pesanan:</strong>
                                 </div>
                                 <div class="col-6">
                                     <?= $data->order->order_id ?>
                                 </div>
                             </div>
                             
+                            <?php if($data->order->customer_name): ?>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Nama:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <?= $data->order->customer_name ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Email:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <?= $data->order->customer_email ?>
+                                    </div>
+                                </div>
+                            <?php endif ?>
+                            
                             <div class="row">
                                 <div class="col-6">
-                                    <strong>Amount:</strong>
+                                    <strong>Total:</strong>
                                 </div>
                                 <div class="col-6">
-                                    <span class="h5 text-primary">$<?= number_format($data->order->amount, 2) ?></span>
+                                    <span class="h5 text-primary"><?= format_idr($data->order->amount) ?></span>
                                 </div>
                             </div>
                             
@@ -56,30 +76,36 @@
                     <hr>
                     
                     <div class="alert alert-info">
-                        <h6><i class="fa fa-fw fa-info-circle"></i> Payment Information</h6>
+                        <h6><i class="fa fa-fw fa-info-circle"></i> Informasi Pembayaran</h6>
                         <ul class="mb-0">
-                            <li>You will receive instant access after successful payment</li>
-                            <li>A confirmation email will be sent to your registered email</li>
-                            <li>You can access your purchase anytime from the Orders page</li>
+                            <li>Anda akan mendapat akses instan setelah pembayaran berhasil</li>
+                            <li>Email konfirmasi akan dikirim ke alamat email Anda</li>
+                            <li>Anda dapat mengakses pembelian Anda kapan saja</li>
                         </ul>
                     </div>
                     
                     <form action="" method="post" class="text-center">
                         <button type="submit" name="pay_now" class="btn btn-primary btn-lg">
-                            <i class="fa fa-fw fa-credit-card"></i> Pay $<?= number_format($data->order->amount, 2) ?>
+                            <i class="fa fa-fw fa-credit-card"></i> Bayar <?= format_idr($data->order->amount) ?>
                         </button>
                         
                         <div class="mt-3">
                             <small class="text-muted">
-                                Secured by Midtrans Payment Gateway
+                                Dilindungi oleh Gateway Pembayaran Midtrans
                             </small>
                         </div>
                     </form>
                     
                     <div class="text-center mt-3">
-                        <a href="<?= url('orders') ?>" class="btn btn-outline-secondary">
-                            <i class="fa fa-fw fa-arrow-left"></i> Back to Orders
-                        </a>
+                        <?php if($this->user): ?>
+                            <a href="<?= url('orders') ?>" class="btn btn-outline-secondary">
+                                <i class="fa fa-fw fa-arrow-left"></i> Kembali ke Pesanan
+                            </a>
+                        <?php else: ?>
+                            <a href="<?= url('products/catalog') ?>" class="btn btn-outline-secondary">
+                                <i class="fa fa-fw fa-arrow-left"></i> Kembali ke Katalog
+                            </a>
+                        <?php endif ?>
                     </div>
                 </div>
             </div>

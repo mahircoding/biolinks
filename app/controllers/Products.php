@@ -13,11 +13,13 @@ class Products extends Controller {
         $route = \Altum\Routing\Router::$controller_key;
         
         if($route == 'catalog') {
-            return $this->catalog();
+            $this->catalog();
+            return;
         }
         
         if($route == 'product') {
-            return $this->view();
+            $this->view();
+            return;
         }
         
         /* Default products management */
@@ -51,13 +53,13 @@ class Products extends Controller {
         if(!empty($_POST)) {
             $name = Database::clean_string($_POST['name']);
             $description = Database::clean_string($_POST['description']);
-            $price = (float) $_POST['price'];
+            $price = clean_idr_input($_POST['price']);
             $digital_link = Database::clean_string($_POST['digital_link']);
             $status = isset($_POST['status']) ? 1 : 0;
 
             /* Basic validation */
-            if(empty($name) || empty($description) || $price < 0) {
-                $error = 'Please fill all required fields correctly';
+            if(empty($name) || empty($description) || $price < 1000) {
+                $error = 'Please fill all required fields correctly. Minimum price is Rp 1.000';
             } else {
                 /* Handle image upload */
                 $image = null;
@@ -115,7 +117,7 @@ class Products extends Controller {
         if(!empty($_POST)) {
             $name = Database::clean_string($_POST['name']);
             $description = Database::clean_string($_POST['description']);
-            $price = (float) $_POST['price'];
+            $price = clean_idr_input($_POST['price']);
             $digital_link = Database::clean_string($_POST['digital_link']);
             $status = isset($_POST['status']) ? 1 : 0;
 
@@ -182,7 +184,7 @@ class Products extends Controller {
         }
 
         /* Delete the product */
-        Database::delete('products', ['product_id' => $product_id, 'user_id' => $this->user->user_id]);
+        Database::$database->query("DELETE FROM `products` WHERE `product_id` = '" . Database::clean_string($product_id) . "' AND `user_id` = {$this->user->user_id}");
 
         redirect('products');
     }
@@ -204,9 +206,22 @@ class Products extends Controller {
 
         /* Check if user has already purchased this product */
         $has_purchased = false;
+        
         if($this->user) {
+            /* For logged in users, check by user_id */
             $order = Database::get('*', 'orders', ['user_id' => $this->user->user_id, 'product_id' => $product_id, 'status' => 'completed']);
             $has_purchased = (bool) $order;
+        } else {
+            /* For guest users, check if they provided email and already purchased */
+            if(isset($_SESSION['guest_email'])) {
+                $order = Database::$database->query("
+                    SELECT * FROM `orders` 
+                    WHERE `customer_email` = '" . Database::clean_string($_SESSION['guest_email']) . "' 
+                    AND `product_id` = '" . Database::clean_string($product_id) . "' 
+                    AND `status` = 'completed'
+                ")->fetch_object();
+                $has_purchased = (bool) $order;
+            }
         }
 
         /* Prepare the view */

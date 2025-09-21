@@ -36,7 +36,7 @@
                                 </div>
                                 
                                 <div class="col-12 col-md-2 text-center">
-                                    <span class="h5 text-primary">$<?= number_format($order->amount, 2) ?></span>
+                                    <span class="h5 text-primary"><?= format_idr($order->amount) ?></span>
                                 </div>
                                 
                                 <div class="col-12 col-md-2 text-center">

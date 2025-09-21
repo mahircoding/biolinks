@@ -37,7 +37,7 @@
                             <div class="mt-auto">
                                 <div class="row align-items-center">
                                     <div class="col">
-                                        <span class="h5 text-primary">$<?= number_format($product->price, 2) ?></span>
+                                        <span class="h5 text-primary"><?= format_idr($product->price) ?></span>
                                     </div>
                                     <div class="col-auto">
                                         <span class="badge <?= $product->status ? 'badge-success' : 'badge-secondary' ?>">

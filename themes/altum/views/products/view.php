@@ -18,7 +18,7 @@
                     <?php endif ?>
                     
                     <div class="mb-4">
-                        <span class="h4 text-primary">$<?= number_format($data->product->price, 2) ?></span>
+                        <span class="h4 text-primary"><?= format_idr($data->product->price) ?></span>
                         <span class="text-muted ml-2">
                             <i class="fa fa-fw fa-eye"></i> <?= $data->product->views ?> views
                             <i class="fa fa-fw fa-shopping-cart ml-2"></i> <?= $data->product->sales ?? 0 ?> sales
@@ -54,7 +54,7 @@
                     <h5 class="card-title">Purchase this product</h5>
                     
                     <div class="mb-3">
-                        <div class="h4 text-primary">$<?= number_format($data->product->price, 2) ?></div>
+                        <div class="h4 text-primary"><?= format_idr($data->product->price) ?></div>
                         <small class="text-muted">One-time payment</small>
                     </div>
                     
@@ -70,25 +70,42 @@
                             </a>
                         <?php endif ?>
                     <?php else: ?>
-                        <?php if($this->user): ?>
-                            <form action="<?= url('orders/create/' . $data->product->product_id) ?>" method="post">
-                                <button type="submit" class="btn btn-primary btn-block btn-lg">
-                                    <i class="fa fa-fw fa-shopping-cart"></i> Buy Now
-                                </button>
-                            </form>
-                        <?php else: ?>
-                            <div class="alert alert-info">
-                                <small>Please login to purchase this product</small>
-                            </div>
+                        <form action="<?= url('orders/create/' . $data->product->product_id) ?>" method="post" id="purchase-form">
+                            <input type="hidden" name="token" value="<?= \Altum\Csrf::get() ?>" />
                             
-                            <a href="<?= url('login') ?>" class="btn btn-primary btn-block">
-                                <i class="fa fa-fw fa-sign-in-alt"></i> Login to Buy
-                            </a>
+                            <?php if(!$this->user): ?>
+                                <div class="mb-3">
+                                    <label for="customer_name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="customer_name" name="customer_name" required maxlength="128" placeholder="Masukkan nama lengkap Anda">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="customer_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="customer_email" name="customer_email" required maxlength="320" placeholder="Masukkan email Anda">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="customer_phone" class="form-label">No. Handphone <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="customer_phone" name="customer_phone" required maxlength="20" placeholder="Contoh: 081234567890">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="fa fa-info-circle"></i> 
+                                        Detail produk akan dikirim ke email Anda setelah pembayaran berhasil.
+                                    </small>
+                                </div>
+                            <?php endif ?>
                             
-                            <div class="text-center mt-2">
-                                <small>
-                                    Don't have an account? 
-                                    <a href="<?= url('register') ?>">Sign up</a>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                <i class="fa fa-fw fa-shopping-cart"></i> Beli Sekarang
+                            </button>
+                        </form>
+                        
+                        <?php if(!$this->user): ?>
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    Sudah punya akun? <a href="<?= url('login') ?>">Login disini</a>
                                 </small>
                             </div>
                         <?php endif ?>
