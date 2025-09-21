@@ -375,9 +375,13 @@ button[type="submit"] {
                             <form action="<?= url('orders/create/' . $data->product->product_id) ?>" 
                                   method="post" 
                                   id="purchase-form" 
-                                  style="position: relative; z-index: 10;"
-                                  onsubmit="console.log('Form submitted!'); return validateForm();">
-                                <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" />
+                                  style="position: relative; z-index: 10;">
+                                <?php 
+                                /* Ensure CSRF token is generated */
+                                \Altum\Middlewares\Csrf::set(); 
+                                $csrf_token = \Altum\Middlewares\Csrf::get();
+                                ?>
+                                <input type="hidden" name="token" value="<?= $csrf_token ?>" />
                                 
                                 <?php if(!$this->user): ?>
                                     <!-- Guest Checkout Fields -->
@@ -452,7 +456,8 @@ button[type="submit"] {
                                 <!-- Debug Info -->
                                 <div class="mt-2 text-center">
                                     <small class="text-muted">
-                                        Form Action: <?= url('orders/create/' . $data->product->product_id) ?>
+                                        Form Action: <?= url('orders/create/' . $data->product->product_id) ?><br>
+                                        CSRF Token: <?= substr($csrf_token ?? 'not-set', 0, 8) ?>...
                                     </small>
                                 </div>
                             </form>
@@ -593,54 +598,76 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add click event listener
         purchaseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
             console.log('Purchase button clicked!');
+            
+            // Prevent the default behavior only for validation
+            e.preventDefault();
             
             // Get the form
             const form = document.getElementById('purchase-form');
-            if (form) {
-                // Validate form if user is guest
-                const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
-                if (!userLoggedIn) {
-                    const nameInput = document.getElementById('customer_name');
-                    const emailInput = document.getElementById('customer_email');
-                    const phoneInput = document.getElementById('customer_phone');
-                    
-                    if (!nameInput || !emailInput || !phoneInput) {
-                        alert('Error: Required fields not found. Please refresh the page.');
-                        return false;
-                    }
-                    
-                    const name = nameInput.value.trim();
-                    const email = emailInput.value.trim();
-                    const phone = phoneInput.value.trim();
-                    
-                    if (!name || !email || !phone) {
-                        alert('Mohon isi semua informasi yang diperlukan untuk melanjutkan pembelian.');
-                        return false;
-                    }
-                    
-                    if (!validateEmail(email)) {
-                        alert('Format email tidak valid.');
-                        emailInput.focus();
-                        return false;
-                    }
-                    
-                    if (!validatePhone(phone)) {
-                        alert('Format nomor handphone tidak valid.');
-                        phoneInput.focus();
-                        return false;
-                    }
+            if (!form) {
+                console.error('Form not found!');
+                return false;
+            }
+            
+            // Check if already processing
+            if (this.disabled) {
+                console.log('Button already disabled, preventing double submit');
+                return false;
+            }
+            
+            // Check CSRF token exists
+            const tokenInput = form.querySelector('input[name="token"]');
+            if (!tokenInput || !tokenInput.value) {
+                alert('Error: Security token missing. Please refresh the page and try again.');
+                console.error('CSRF token not found or empty');
+                return false;
+            }
+            console.log('CSRF token found:', tokenInput.value.substring(0, 8) + '...');
+            
+            // Validate form if user is guest
+            const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
+            if (!userLoggedIn) {
+                const nameInput = document.getElementById('customer_name');
+                const emailInput = document.getElementById('customer_email');
+                const phoneInput = document.getElementById('customer_phone');
+                
+                if (!nameInput || !emailInput || !phoneInput) {
+                    alert('Error: Required fields not found. Please refresh the page.');
+                    return false;
                 }
                 
-                // Show loading state
-                this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
-                this.disabled = true;
+                const name = nameInput.value.trim();
+                const email = emailInput.value.trim();
+                const phone = phoneInput.value.trim();
                 
-                // Submit form
-                console.log('Submitting form...');
-                form.submit();
+                if (!name || !email || !phone) {
+                    alert('Mohon isi semua informasi yang diperlukan untuk melanjutkan pembelian.');
+                    return false;
+                }
+                
+                if (!validateEmail(email)) {
+                    alert('Format email tidak valid.');
+                    emailInput.focus();
+                    return false;
+                }
+                
+                if (!validatePhone(phone)) {
+                    alert('Format nomor handphone tidak valid.');
+                    phoneInput.focus();
+                    return false;
+                }
             }
+            
+            // Show loading state
+            this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+            this.disabled = true;
+            
+            // Submit form after a short delay
+            setTimeout(() => {
+                console.log('Submitting form to:', form.action);
+                form.submit();
+            }, 500);
         });
         
         // Ensure button is clickable

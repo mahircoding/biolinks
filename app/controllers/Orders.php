@@ -4,6 +4,7 @@ namespace Altum\Controllers;
 
 use Altum\Database\Database;
 use Altum\Middlewares\Authentication;
+use Altum\Middlewares\Csrf;
 use Altum\Models\Order;
 use Altum\Models\Product;
 
@@ -67,7 +68,7 @@ class Orders extends Controller {
 
         if(!empty($_POST)) {
             /* Validate CSRF token */
-            if(!\Altum\Csrf::check()) {
+            if(!Csrf::check()) {
                 redirect('products/product/' . $product_id);
             }
 

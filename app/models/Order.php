@@ -26,7 +26,7 @@ class Order extends Model {
         return $data;
     }
 
-    public function create($user_id, $product_id, $amount, $payment_method = 'midtrans', $settings = null) {
+    public function create($product_id, $amount, $payment_method = 'midtrans', $settings = null) {
         $order_id = 'ORD-' . time() . '-' . rand(1000, 9999);
         $transaction_id = 'TXN-' . time() . '-' . rand(10000, 99999);
         
@@ -35,7 +35,6 @@ class Order extends Model {
         Database::insert('orders', [
             'order_id' => $order_id,
             'transaction_id' => $transaction_id,
-            'user_id' => $user_id,
             'product_id' => $product_id,
             'amount' => $amount,
             'payment_method' => $payment_method,
