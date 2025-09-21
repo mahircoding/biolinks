@@ -188,6 +188,48 @@ button[type="submit"] {
     pointer-events: auto !important;
     position: relative !important;
     z-index: 9999 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* Force button clickability */
+#buy-now-btn {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 99999 !important;
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+    outline: none !important;
+    border: none !important;
+    background: linear-gradient(45deg, #007bff, #0056b3) !important;
+    color: white !important;
+}
+
+#buy-now-btn:hover {
+    background: linear-gradient(45deg, #0056b3, #003d82) !important;
+    color: white !important;
+}
+
+#buy-now-btn:focus {
+    background: linear-gradient(45deg, #007bff, #0056b3) !important;
+    color: white !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25) !important;
+}
+
+/* Ensure no overlay blocks the button */
+.purchase-card .card-body {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.purchase-card .card-body > * {
+    position: relative !important;
+    z-index: 2 !important;
 }
 </style>
 
@@ -390,7 +432,6 @@ button[type="submit"] {
                                 <button type="submit" 
                                         class="btn btn-primary btn-lg btn-block btn-purchase shadow" 
                                         id="buy-now-btn"
-                                        onclick="console.log('Button clicked directly!'); return true;"
                                         style="background: linear-gradient(45deg, #007bff, #0056b3) !important; 
                                                border: none !important; 
                                                border-radius: 50px !important; 
@@ -398,10 +439,12 @@ button[type="submit"] {
                                                font-size: 1.1rem !important; 
                                                color: white !important; 
                                                cursor: pointer !important; 
+                                               pointer-events: auto !important; 
                                                z-index: 9999 !important; 
                                                position: relative !important;
                                                display: block !important;
-                                               width: 100% !important;">
+                                               width: 100% !important;
+                                               outline: none !important;">
                                     <i class="fa fa-fw fa-credit-card"></i> 
                                     Beli Sekarang - <?= format_idr($data->product->price) ?>
                                 </button>
@@ -534,6 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fix any potential overlay issues
     const purchaseForm = document.getElementById('purchase-form');
     const purchaseBtn = document.querySelector('button[type="submit"]');
+    const buyNowBtn = document.getElementById('buy-now-btn');
     
     if (purchaseBtn) {
         console.log('Purchase button found'); // Debug log
@@ -541,47 +585,128 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ensure button is clickable
         purchaseBtn.style.pointerEvents = 'auto';
         purchaseBtn.style.position = 'relative';
-        purchaseBtn.style.zIndex = '9999';
+        purchaseBtn.style.zIndex = '99999';
+        purchaseBtn.style.cursor = 'pointer';
         
-        // Add click event listener
-        purchaseBtn.addEventListener('click', function(e) {
-            console.log('Purchase button clicked'); // Debug log
+        // Remove any conflicting event handlers
+        purchaseBtn.onclick = null;
+        
+        // Add multiple event listeners for reliability
+        ['click', 'touchstart'].forEach(eventType => {
+            purchaseBtn.addEventListener(eventType, function(e) {
+                console.log('Purchase button ' + eventType); // Debug log
+                handleButtonClick(e, this);
+            }, { passive: false });
+        });
+    }
+    
+    // Additional handler specifically for buy-now-btn ID
+    if (buyNowBtn && buyNowBtn !== purchaseBtn) {
+        ['click', 'touchstart'].forEach(eventType => {
+            buyNowBtn.addEventListener(eventType, function(e) {
+                console.log('Buy now button ' + eventType); // Debug log
+                handleButtonClick(e, this);
+            }, { passive: false });
+        });
+    }
+    
+    function handleButtonClick(e, button) {
+        console.log('Button click handler triggered'); // Debug log
+        
+        // Prevent multiple rapid clicks
+        if (button.disabled) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Basic validation for guest users
+        const tokenInput = document.querySelector('input[name="token"]');
+        if (!tokenInput || !tokenInput.value) {
+            alert('Error: Missing security token. Please refresh the page.');
+            e.preventDefault();
+            return false;
+        }
+        
+        // Check guest fields if user is not logged in
+        const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
+        if (!userLoggedIn) {
+            const nameInput = document.getElementById('customer_name');
+            const emailInput = document.getElementById('customer_email');
+            const phoneInput = document.getElementById('customer_phone');
             
-            // Basic validation for guest users
-            if (!document.querySelector('input[name="token"]').value) {
-                alert('Error: Missing security token. Please refresh the page.');
+            if (!nameInput || !emailInput || !phoneInput) {
+                alert('Error: Required fields not found. Please refresh the page.');
                 e.preventDefault();
                 return false;
             }
             
-            // Check guest fields if user is not logged in
-            const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
-            if (!userLoggedIn) {
-                const name = document.getElementById('customer_name').value.trim();
-                const email = document.getElementById('customer_email').value.trim();
-                const phone = document.getElementById('customer_phone').value.trim();
-                
-                if (!name || !email || !phone) {
-                    alert('Harap lengkapi semua informasi yang diperlukan.');
-                    e.preventDefault();
-                    return false;
-                }
-                
-                if (!isValidEmail(email)) {
-                    alert('Format email tidak valid.');
-                    e.preventDefault();
-                    return false;
-                }
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const phone = phoneInput.value.trim();
+            
+            if (!name || !email || !phone) {
+                alert('Harap lengkapi semua informasi yang diperlukan.');
+                e.preventDefault();
+                return false;
             }
             
-            // Show loading state
-            this.disabled = true;
-            this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+            if (!isValidEmail(email)) {
+                alert('Format email tidak valid.');
+                emailInput.focus();
+                e.preventDefault();
+                return false;
+            }
             
-            // Allow form submission
-            return true;
+            if (!isValidPhone(phone)) {
+                alert('Format nomor handphone tidak valid.');
+                phoneInput.focus();
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+        
+        // Submit the form
+        setTimeout(() => {
+            if (purchaseForm) {
+                console.log('Submitting form...');
+                purchaseForm.submit();
+            }
+        }, 100);
+        
+        // Allow form submission
+        return true;
+    }
+    
+    // Fallback: Direct form submission if button doesn't work
+    if (purchaseForm) {
+        purchaseForm.addEventListener('submit', function(e) {
+            console.log('Form submit event triggered');
         });
     }
+    
+    // Debug: Add visual feedback on button hover
+    if (purchaseBtn) {
+        purchaseBtn.addEventListener('mouseenter', function() {
+            console.log('Button hover detected');
+            this.style.transform = 'scale(1.02)';
+        });
+        
+        purchaseBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    }
+    
+    // Ensure form can be submitted manually if needed
+    window.submitPurchaseForm = function() {
+        console.log('Manual form submission triggered');
+        if (purchaseForm) {
+            purchaseForm.submit();
+        }
+    };
     
     // Add animation classes with delay
     const animateElements = document.querySelectorAll('.fade-in, .slide-up');
