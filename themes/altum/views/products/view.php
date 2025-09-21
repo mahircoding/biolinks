@@ -377,7 +377,7 @@ button[type="submit"] {
                                   id="purchase-form" 
                                   style="position: relative; z-index: 10;"
                                   onsubmit="console.log('Form submitted!'); return validateForm();">
-                                <input type="hidden" name="token" value="<?= \Altum\Csrf::get() ?>" />
+                                <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" />
                                 
                                 <?php if(!$this->user): ?>
                                     <!-- Guest Checkout Fields -->
@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const buyNowBtn = document.getElementById('buy-now-btn');
     
     if (purchaseBtn) {
-        console.log('Purchase button found'); // Debug log
+        console.log('Purchase button found:', purchaseBtn);
         
         // Ensure button is clickable
         purchaseBtn.style.pointerEvents = 'auto';
@@ -591,22 +591,70 @@ document.addEventListener('DOMContentLoaded', function() {
         // Remove any conflicting event handlers
         purchaseBtn.onclick = null;
         
-        // Add multiple event listeners for reliability
-        ['click', 'touchstart'].forEach(eventType => {
-            purchaseBtn.addEventListener(eventType, function(e) {
-                console.log('Purchase button ' + eventType); // Debug log
-                handleButtonClick(e, this);
-            }, { passive: false });
+        // Add click event listener
+        purchaseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Purchase button clicked!');
+            
+            // Get the form
+            const form = document.getElementById('purchase-form');
+            if (form) {
+                // Validate form if user is guest
+                const userLoggedIn = <?= $this->user ? 'true' : 'false' ?>;
+                if (!userLoggedIn) {
+                    const nameInput = document.getElementById('customer_name');
+                    const emailInput = document.getElementById('customer_email');
+                    const phoneInput = document.getElementById('customer_phone');
+                    
+                    if (!nameInput || !emailInput || !phoneInput) {
+                        alert('Error: Required fields not found. Please refresh the page.');
+                        return false;
+                    }
+                    
+                    const name = nameInput.value.trim();
+                    const email = emailInput.value.trim();
+                    const phone = phoneInput.value.trim();
+                    
+                    if (!name || !email || !phone) {
+                        alert('Mohon isi semua informasi yang diperlukan untuk melanjutkan pembelian.');
+                        return false;
+                    }
+                    
+                    if (!validateEmail(email)) {
+                        alert('Format email tidak valid.');
+                        emailInput.focus();
+                        return false;
+                    }
+                    
+                    if (!validatePhone(phone)) {
+                        alert('Format nomor handphone tidak valid.');
+                        phoneInput.focus();
+                        return false;
+                    }
+                }
+                
+                // Show loading state
+                this.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Memproses...';
+                this.disabled = true;
+                
+                // Submit form
+                console.log('Submitting form...');
+                form.submit();
+            }
         });
+        
+        // Ensure button is clickable
+        purchaseBtn.style.pointerEvents = 'auto';
+        purchaseBtn.style.cursor = 'pointer';
+    } else {
+        console.log('Purchase button not found');
     }
     
     // Additional handler specifically for buy-now-btn ID
     if (buyNowBtn && buyNowBtn !== purchaseBtn) {
-        ['click', 'touchstart'].forEach(eventType => {
-            buyNowBtn.addEventListener(eventType, function(e) {
-                console.log('Buy now button ' + eventType); // Debug log
-                handleButtonClick(e, this);
-            }, { passive: false });
+        buyNowBtn.addEventListener('click', function(e) {
+            console.log('Buy now button clicked!');
+            handleButtonClick(e, this);
         });
     }
     
@@ -650,14 +698,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
             
-            if (!isValidEmail(email)) {
+            if (!validateEmail(email)) {
                 alert('Format email tidak valid.');
                 emailInput.focus();
                 e.preventDefault();
                 return false;
             }
             
-            if (!isValidPhone(phone)) {
+            if (!validatePhone(phone)) {
                 alert('Format nomor handphone tidak valid.');
                 phoneInput.focus();
                 e.preventDefault();
@@ -772,6 +820,18 @@ function validateField(field) {
     } else {
         field.classList.add('is-valid');
     }
+}
+
+// Email validation function
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Phone validation function
+function validatePhone(phone) {
+    const phoneRegex = /^[\+]?[0-9\-\s\(\)]{10,}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
 }
 
 function isValidEmail(email) {
