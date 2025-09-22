@@ -371,6 +371,21 @@ button[type="submit"] {
                                 <?php endif ?>
                             </div>
                         <?php else: ?>
+                            <!-- Guest Access Option -->
+                            <div class="text-center mb-4">
+                                <div class="alert border-0 mb-3" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 15px;">
+                                    <i class="fa fa-info-circle fa-2x text-primary mb-2"></i>
+                                    <div class="font-weight-bold h6 text-primary">Sudah Membeli Produk Ini?</div>
+                                    <small class="text-muted">Akses produk tanpa perlu login</small>
+                                </div>
+                                
+                                <a href="<?= url('access/verify/' . $data->product->product_id) ?>" 
+                                   class="btn btn-outline-primary btn-sm mb-3" 
+                                   style="border-radius: 20px;">
+                                    <i class="fa fa-key fa-fw"></i> Akses dengan Email
+                                </a>
+                            </div>
+
                             <!-- Purchase Form -->
                             <form action="<?= url('orders/create/' . $data->product->product_id) ?>" 
                                   method="post" 

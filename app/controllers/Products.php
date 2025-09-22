@@ -384,18 +384,11 @@ class Products extends Controller {
                 o.*, 
                 p.name as product_name,
                 p.image as product_image,
-                CASE 
-                    WHEN o.user_id IS NOT NULL THEN u.name 
-                    ELSE o.customer_name 
-                END as customer_name,
-                CASE 
-                    WHEN o.user_id IS NOT NULL THEN u.email 
-                    ELSE o.customer_email 
-                END as customer_email,
+                o.customer_name,
+                o.customer_email,
                 o.customer_phone
             FROM `orders` o
             LEFT JOIN `products` p ON o.product_id = p.product_id
-            LEFT JOIN `users` u ON o.user_id = u.user_id
             WHERE p.user_id = {$this->user->user_id}
             ORDER BY o.datetime DESC
             LIMIT 20

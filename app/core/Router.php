@@ -231,6 +231,21 @@ class Router {
                 ]
             ],
 
+            /* Guest product access routes */
+            'access' => [
+                'controller' => 'Access',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'access/verify' => [
+                'controller' => 'Access',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
 
             /* Webhooks */
             'webhook-paypal' => [

@@ -97,8 +97,8 @@ class Orders extends Controller {
                     redirect('products/product/' . $product_id);
                 }
 
-                if(empty($customer_phone) || strlen($customer_phone) < 10 || strlen($customer_phone) > 20) {
-                    redirect('products/product/' . $product_id);
+                if(empty($customer_phone)) {
+                    $customer_phone = null; // Allow empty phone for guest orders
                 }
 
                 /* Check if guest customer already purchased this product */
@@ -352,6 +352,23 @@ class Orders extends Controller {
         if($customer_email) {
             $subject = "Konfirmasi Pembelian - " . $product->name;
             
+            /* Generate access token for guest users */
+            $access_link = '';
+            if(!$order->user_id) {
+                $access_token = md5($order->order_id . $customer_email . time());
+                
+                /* Store access token in database */
+                Database::insert('guest_access_tokens', [
+                    'order_id' => $order->order_id,
+                    'token' => $access_token,
+                    'email' => $customer_email,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'expires_at' => date('Y-m-d H:i:s', strtotime('+30 days'))
+                ]);
+                
+                $access_link = url('access?token=' . $access_token);
+            }
+            
             $message = "
             <h2>Terima kasih atas pembelian Anda!</h2>
             <p>Halo {$customer_name},</p>
@@ -366,11 +383,34 @@ class Orders extends Controller {
             </ul>
             
             <h3>Akses Produk:</h3>
-            <p>{$product->description}</p>
-            " . ($product->digital_link ? "<p><strong>Link Akses:</strong> <a href='{$product->digital_link}' target='_blank'>Klik disini untuk mengakses produk Anda</a></p>" : "") . "
+            <p>{$product->description}</p>";
             
+            if($order->user_id) {
+                /* For registered users - direct product link */
+                if($product->digital_link) {
+                    $message .= "<p><strong>Link Akses:</strong> <a href='{$product->digital_link}' target='_blank' style='background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Akses Produk Anda</a></p>";
+                }
+            } else {
+                /* For guest users - access via email verification */
+                $message .= "
+                <div style='background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;'>
+                    <h4 style='color: #28a745; margin-bottom: 15px;'>🔐 Akses Produk Anda</h4>
+                    <p>Untuk mengakses produk yang telah Anda beli, silakan klik tombol di bawah ini:</p>
+                    <p style='text-align: center; margin: 20px 0;'>
+                        <a href='{$access_link}' target='_blank' style='background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px;'>
+                            🚀 Akses Produk Sekarang
+                        </a>
+                    </p>
+                    <p style='font-size: 14px; color: #6c757d;'>
+                        <strong>Catatan:</strong> Link akses ini berlaku selama 30 hari dan hanya dapat digunakan dengan email ini.
+                    </p>
+                </div>";
+            }
+            
+            $message .= "
+            <p>Jika Anda memiliki pertanyaan atau membutuhkan bantuan, jangan ragu untuk menghubungi tim support kami.</p>
             <p>Terima kasih atas pembelian Anda!</p>
-            <p>Tim KiblatBio</p>
+            <p><strong>Tim KiblatBio</strong></p>
             ";
 
             /* Send email */
