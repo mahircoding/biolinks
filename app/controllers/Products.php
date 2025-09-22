@@ -326,9 +326,9 @@ class Products extends Controller {
                 COALESCE(SUM(o.amount), 0) as total_revenue
             FROM `orders` o
             LEFT JOIN `products` p ON o.product_id = p.product_id
-            WHERE o.status = 'completed' 
+            WHERE o.status IN ('completed', 'paid', 'pending') 
                 AND p.user_id = {$this->user->user_id}
-                AND DATE(o.completed_datetime) = CURDATE()
+                AND DATE(o.datetime) = CURDATE()
         ");
         $today_data = $result->fetch_object();
         $sales_stats->today = $today_data->total_revenue;
@@ -341,9 +341,9 @@ class Products extends Controller {
                 COALESCE(SUM(o.amount), 0) as total_revenue
             FROM `orders` o
             LEFT JOIN `products` p ON o.product_id = p.product_id
-            WHERE o.status = 'completed' 
+            WHERE o.status IN ('completed', 'paid', 'pending') 
                 AND p.user_id = {$this->user->user_id}
-                AND o.completed_datetime >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+                AND o.datetime >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ");
         $week_data = $result->fetch_object();
         $sales_stats->this_week = $week_data->total_revenue;
@@ -356,9 +356,9 @@ class Products extends Controller {
                 COALESCE(SUM(o.amount), 0) as total_revenue
             FROM `orders` o
             LEFT JOIN `products` p ON o.product_id = p.product_id
-            WHERE o.status = 'completed' 
+            WHERE o.status IN ('completed', 'paid', 'pending') 
                 AND p.user_id = {$this->user->user_id}
-                AND o.completed_datetime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+                AND o.datetime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
         ");
         $month_data = $result->fetch_object();
         $sales_stats->this_month = $month_data->total_revenue;
@@ -371,7 +371,7 @@ class Products extends Controller {
                 COALESCE(SUM(o.amount), 0) as total_revenue
             FROM `orders` o
             LEFT JOIN `products` p ON o.product_id = p.product_id
-            WHERE o.status = 'completed' 
+            WHERE o.status IN ('completed', 'paid', 'pending') 
                 AND p.user_id = {$this->user->user_id}
         ");
         $total_data = $result->fetch_object();
