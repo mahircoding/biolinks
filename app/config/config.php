@@ -1,11 +1,11 @@
 <?php
 /* Configuration of the site */
-define('DATABASE_SERVER',   '127.0.0.1:3307');
-define('DATABASE_USERNAME', 'root');
-define('DATABASE_PASSWORD', '');
-define('DATABASE_NAME',     'kiblatbio');
+define('DATABASE_SERVER',   'localhost');
+define('DATABASE_USERNAME', 'kibl_us_kiblatbio');
+define('DATABASE_PASSWORD', 'nkglCorHCoJ30Pd8');
+define('DATABASE_NAME',     'kibl_db_kiblatbio');
 
-define('BASE_DOMAIN', 'demo.sekolahotakkananindonesia.sch.id');
+define('BASE_DOMAIN', 'kiblatbio.link');
 define('BASE_IP', '103.163.139.126');
 define('WA_NUMBER', '6285784989876');
 
@@ -76,10 +76,3 @@ function CustomDomain($str) {
         die();
      }
 }
-
-/* Midtrans Payment Gateway Configuration for IDR */
-define('MIDTRANS_SERVER_KEY', 'SB-Mid-server-YOUR_SERVER_KEY'); // Replace with your server key
-define('MIDTRANS_CLIENT_KEY', 'SB-Mid-client-YOUR_CLIENT_KEY'); // Replace with your client key  
-define('MIDTRANS_IS_PRODUCTION', false); // Set to true for production
-define('SITE_CURRENCY', 'IDR');
-define('SITE_CURRENCY_SYMBOL', 'Rp');

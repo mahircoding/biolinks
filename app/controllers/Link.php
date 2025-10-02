@@ -29,8 +29,8 @@ class Link extends Controller {
             redirect('dashboard');
         }
 		
-		$this->link->main_domain = BASE_DOMAIN;
-		if(trim($_SERVER['SERVER_NAME'])!=BASE_DOMAIN)
+		$this->link->main_domain = 'smartbio.link';
+		if(trim($_SERVER['SERVER_NAME'])!='smartbio.link')
 			$this->link->main_domain = trim($_SERVER['SERVER_NAME']);
 		
 		$this->link->main_domain = 'https://' . $this->link->main_domain . '/';
@@ -88,7 +88,8 @@ class Link extends Controller {
                 }
 
                 /* Get the available domains to use */
-                $domains = (new Domain())->get_biolink_domains($this->user->user_id);
+				$whereWid = null;
+				$domains = (new Domain())->get_biolink_domains($this->user->user_id);
 
                 /* Prepare variables for the view */
                 $data = [
@@ -419,10 +420,13 @@ class Link extends Controller {
 		$url 		= 'https://pro.rajaongkir.com/api/cost';
 		$postdata 	= "origin=".$origin."&originType=city&destination=".$destination."&destinationType=city&weight=".$weight."&courier=".$courier;
 	
+		$url = 'https://mainly-helpful-slug.ngrok-free.app/api/shipping/cost/get';
+		$postdata 	= "origin=".$origin."&destination=".$destination."&weight=".$weight;
 		
 		$response = null;
 		
 		$curl = curl_init();
+		$api_key = '78lsPd4tAsLCIzMOQd60Bkqj6y72O5uvWuAl';
 
 		curl_setopt_array($curl, array(
 		  CURLOPT_URL => $url,
@@ -435,7 +439,7 @@ class Link extends Controller {
 		  CURLOPT_POSTFIELDS => $postdata,
 		  CURLOPT_HTTPHEADER => array(
 			"content-type: application/x-www-form-urlencoded",
-			"key: ".$apikey
+			"key: ".$api_key
 		  ),
 		));
 
@@ -447,21 +451,20 @@ class Link extends Controller {
 		$result = null;
 		$ongkir = json_decode($response,true);
 		$num = 0;
-		if($ongkir['rajaongkir']['status']['code']==400) {
+		if($ongkir['status']=='error') {
 			$result['status'] = 'error';
 			$result['message'] = 'Invalid API KEY';
 		} else {
-		
-			foreach($ongkir['rajaongkir']['results'] as $cr) {
+			foreach($ongkir['results'] as $cr) {
 				$costs = null;
 				
 				foreach($cr['costs'] as $ok) {
-					$etd = $ok['cost'][0]['etd'];
+					$etd = $ok['cost']['etd'];
 					if($etd) {
-						$etd = str_replace("hari","",strtolower($ok['cost'][0]['etd']));
+						$etd = str_replace("hari","",strtolower($ok['cost']['etd']));
 					}
-					if($ok['cost'][0]['value'])
-						$costs[] = array("name" => ucwords($ok['service']), "name_long" => strtoupper($cr['code']).' '.$ok['service'], 'desc' => $ok['description'], "cost" => $ok['cost'][0]['value'], "costtext" => number_format($ok['cost'][0]['value'], 0, "", ","), "etd" => $etd);
+					if($ok['cost']['value'])
+						$costs[] = array("name" => ucwords($ok['service']), "name_long" => strtoupper($cr['code']).' '.$ok['service'], 'desc' => $ok['description'], "cost" => $ok['cost']['value'], "costtext" => number_format($ok['cost']['value'], 0, "", ","), "etd" => $etd);
 				}
 				$result[] = array('cd' => $cr['code'],
 								'nm' => $cr['name'],

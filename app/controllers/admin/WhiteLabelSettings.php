@@ -81,8 +81,8 @@ class WhiteLabelSettings extends Controller {
                     $_SESSION['error'][] = sprintf($this->language->global->error_message->directory_not_writable, UPLOADS_PATH . 'whitelabel/logo/');
                 }
                 move_uploaded_file($logo_file_temp, UPLOADS_PATH . 'whitelabel/logo/' . $logo_new_name);
-                $stmt = Database::$database->prepare("UPDATE `whitelabel` SET `logo` = ? WHERE `url` = '{$_SERVER['SERVER_NAME']}'");
-                $stmt->bind_param('s', $_POST['logo']);
+              	$stmt = Database::$database->prepare("UPDATE `whitelabel` SET `logo` = ? WHERE `id` = ?");
+                $stmt->bind_param('ss', $logo_new_name,$whitelabel->id);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -105,8 +105,8 @@ class WhiteLabelSettings extends Controller {
                     $_SESSION['error'][] = sprintf($this->language->global->error_message->directory_not_writable, UPLOADS_PATH . 'whitelabel/favicon/');
                 }
                 move_uploaded_file($favicon_file_temp, UPLOADS_PATH . 'whitelabel/favicon/' . $favicon_new_name);
-                $stmt = Database::$database->prepare("UPDATE `whitelabel` SET `favicon` = ? WHERE `url` = '{$_SERVER['SERVER_NAME']}'");
-                $stmt->bind_param('s', $_POST['favicon']);
+                $stmt = Database::$database->prepare("UPDATE `whitelabel` SET `favicon` = ? WHERE `id` = ?");
+                $stmt->bind_param('ss', $favicon_new_name,$whitelabel->id);
                 $stmt->execute();
                 $stmt->close();
             }

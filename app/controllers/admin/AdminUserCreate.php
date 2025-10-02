@@ -111,7 +111,7 @@ class AdminUserCreate extends Controller {
 				if(is_null($licenses_user) || $licenses_user == -1) {
 				} else {
 					if($licenses_user<-1) $licenses_user = 1;
-					if($licenses_user>300) $licenses_user = 300;
+					//if($licenses_user>300) $licenses_user = 300;
 					if(intval($licenses_user) > 0) {
 						$licenses_user -= 1;
 						$stmt = Database::$database->prepare("UPDATE `users` SET `ulicense` = ? WHERE `user_id` = ?");

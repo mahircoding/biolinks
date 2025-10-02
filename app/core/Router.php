@@ -183,69 +183,6 @@ class Router {
                 'controller' => 'Pay'
             ],
 
-            /* Digital Products */
-            'products' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/sales' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'orders' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            /* Public product routes */
-            'catalog' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'product' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            /* User catalog route - must be after other routes to avoid conflicts */
-            'user-catalog' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            /* Guest product access routes */
-            'access' => [
-                'controller' => 'Access',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'access/verify' => [
-                'controller' => 'Access',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
 
             /* Webhooks */
             'webhook-paypal' => [
@@ -254,13 +191,6 @@ class Router {
 
             'webhook-stripe' => [
                 'controller' => 'WebhookStripe'
-            ],
-
-            'webhook-midtrans' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
             ],
 
             /* Ajax */
@@ -498,23 +428,6 @@ class Router {
                 unset(self::$params[0]);
 
             } else {
-
-                /* Check if it's a numeric user_id for user catalog */
-                if(is_numeric(self::$params[0])) {
-                    /* Check if user exists */
-                    $user_exists = Database::simple_get('user_id', 'users', ['user_id' => (int) self::$params[0]]);
-                    
-                    if($user_exists) {
-                        self::$controller_key = 'user-catalog';
-                        self::$controller = 'Products';
-                        self::$path = '';
-                        
-                        /* Keep the user_id as parameter */
-                        // Don't unset params[0] as we need it for user_id
-                        
-                        return self::$controller;
-                    }
-                }
 
                 /* Try to check if the link exists via the cache */
                 $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);

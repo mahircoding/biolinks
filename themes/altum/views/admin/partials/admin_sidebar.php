@@ -3,7 +3,7 @@
 <section class="admin-sidebar">
     <div class="admin-sidebar-title">
         <a href="<?= url().'dashboard' ?>" class="text-decoration-none">
-            <?php if($this->user->whitelabel == 'Y' || $_SERVER['SERVER_NAME'] == whitelabel('url')): ?>
+            <?php if($_SERVER['SERVER_NAME'] == whitelabel('url')): ?>
                 <img src="<?= SITE_URL . UPLOADS_URL_PATH . 'whitelabel/logo/' . whitelabel('logo'); ?>" class="img-fluid navbar-logo" alt="<?= $this->language->global->accessibility->logo_alt ?>" />
             <?php elseif($this->settings->logo != ''): ?>
                 <img src="<?= SITE_URL . UPLOADS_URL_PATH . 'logo/' . $this->settings->logo ?>" class="img-fluid navbar-logo" alt="<?= $this->language->global->accessibility->logo_alt ?>" />
