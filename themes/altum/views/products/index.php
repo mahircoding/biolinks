@@ -41,6 +41,33 @@
         </div>
     </div>
 
+    <script>
+    $(document).ready(function() {
+        // Check for success message in session and show toast
+        <?php if(isset($_SESSION['success'])): ?>
+            <?php 
+                $success_messages = is_array($_SESSION['success']) ? $_SESSION['success'] : [$_SESSION['success']];
+                foreach($success_messages as $message): 
+            ?>
+                $.toast({
+                    text: '<?= addslashes($message) ?>',
+                    heading: 'Berhasil!',
+                    icon: 'success',
+                    showHideTransition: 'slide',
+                    allowToastClose: true,
+                    hideAfter: 5000,
+                    stack: 5,
+                    position: 'top-right',
+                    textAlign: 'left',
+                    loader: true,
+                    loaderBg: '#9EC600'
+                });
+            <?php endforeach; ?>
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+    });
+    </script>
+
     <?php if(count($data->products)): ?>
         <div class="row">
             <?php foreach($data->products as $row): ?>
