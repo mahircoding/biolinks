@@ -52,8 +52,6 @@ require_once APP_PATH . 'models/Page.php';
 require_once APP_PATH . 'models/User.php';
 require_once APP_PATH . 'models/Settings.php';
 require_once APP_PATH . 'models/Domain.php';
-require_once APP_PATH . 'models/Product.php';
-require_once APP_PATH . 'models/Order.php';
 
 /* Load some helpers */
 require_once APP_PATH . 'helpers/Cache.php';
@@ -68,8 +66,6 @@ require_once APP_PATH . 'helpers/links.php';
 require_once APP_PATH . 'helpers/strings.php';
 require_once APP_PATH . 'helpers/email.php';
 require_once APP_PATH . 'helpers/notifications.php';
-require_once APP_PATH . 'helpers/Alerts.php';
-require_once APP_PATH . 'helpers/language.php';
 require_once APP_PATH . 'helpers/others.php';
 require_once APP_PATH . 'helpers/Validation.php';
 
