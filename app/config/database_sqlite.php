@@ -1,8 +1,14 @@
 <?php
 /* SQLite Database Configuration for Development */
 
+// Create database directory if it doesn't exist
+$db_dir = __DIR__ . '/../database';
+if (!is_dir($db_dir)) {
+    mkdir($db_dir, 0755, true);
+}
+
 // Create SQLite database file if it doesn't exist
-$sqlite_db_path = __DIR__ . '/../../database.sqlite';
+$sqlite_db_path = $db_dir . '/database.db';
 
 // Create database file if it doesn't exist
 if (!file_exists($sqlite_db_path)) {

@@ -8,6 +8,35 @@ class Database {
 
     public static function initialize() {
 
+        // Try SQLite first for development
+        if (defined('USE_SQLITE') && USE_SQLITE) {
+            try {
+                $sqlite_db_path = __DIR__ . '/../database/database.db';
+                
+                // Create database directory if it doesn't exist
+                $db_dir = dirname($sqlite_db_path);
+                if (!is_dir($db_dir)) {
+                    mkdir($db_dir, 0755, true);
+                }
+                
+                // Create database file if it doesn't exist
+                if (!file_exists($sqlite_db_path)) {
+                    touch($sqlite_db_path);
+                }
+                
+                // Use PDO for SQLite
+                self::$database = new \PDO('sqlite:' . $sqlite_db_path);
+                self::$database->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                
+                // Create basic tables for development
+                self::createSQLiteTables();
+                
+                return self::$database;
+            } catch (\Exception $e) {
+                // Fall back to MySQL if SQLite fails
+            }
+        }
+
         self::$database = new \mysqli(
             DATABASE_SERVER,
             DATABASE_USERNAME,
@@ -29,6 +58,66 @@ class Database {
         self::$database->set_charset('utf8mb4');
 
         return self::$database;
+    }
+
+    public static function createSQLiteTables() {
+        if (self::$database instanceof \PDO) {
+            // Create basic tables for development
+            self::$database->exec("
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email VARCHAR(255) UNIQUE,
+                    password VARCHAR(255),
+                    name VARCHAR(255),
+                    type INTEGER DEFAULT 0,
+                    package_id VARCHAR(50) DEFAULT 'free',
+                    package_expiration_date DATETIME,
+                    datetime DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ");
+            
+            self::$database->exec("
+                CREATE TABLE IF NOT EXISTS products (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    product_id VARCHAR(64) UNIQUE,
+                    user_id INTEGER,
+                    name VARCHAR(255),
+                    description TEXT,
+                    price DECIMAL(15,0) DEFAULT 0,
+                    image VARCHAR(255),
+                    digital_link TEXT,
+                    status INTEGER DEFAULT 1,
+                    views INTEGER DEFAULT 0,
+                    sales INTEGER DEFAULT 0,
+                    settings TEXT,
+                    datetime DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ");
+            
+            self::$database->exec("
+                CREATE TABLE IF NOT EXISTS orders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    order_id VARCHAR(64) UNIQUE,
+                    user_id INTEGER,
+                    product_id INTEGER,
+                    customer_name VARCHAR(255),
+                    customer_email VARCHAR(255),
+                    customer_phone VARCHAR(50),
+                    amount DECIMAL(15,0),
+                    status VARCHAR(50) DEFAULT 'pending',
+                    payment_method VARCHAR(50),
+                    datetime DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ");
+            
+            // Insert default admin user if not exists
+            $stmt = self::$database->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+            $stmt->execute(['admin@example.com']);
+            if ($stmt->fetchColumn() == 0) {
+                $stmt = self::$database->prepare("INSERT INTO users (email, password, name, type) VALUES (?, ?, ?, ?)");
+                $stmt->execute(['admin@example.com', password_hash('admin123', PASSWORD_DEFAULT), 'Admin', 1]);
+            }
+        }
     }
 
     public static function get($what, $from, Array $conditions = [], $order = false, $clean = true) {
@@ -60,22 +149,42 @@ class Database {
 
     public static function simple_get($raw_what, $from, Array $conditions, $clean = true) {
 
-        $what = '`' . $raw_what . '`';
+        if (self::$database instanceof \PDO) {
+            // SQLite/PDO implementation
+            $what = '`' . $raw_what . '`';
+            $from = '`' . $from . '`';
+            
+            $where = [];
+            $params = [];
+            foreach($conditions as $key => $value) {
+                $value = ($clean) ? self::clean_string($value) : $value;
+                $where[] = '`' . $key . '` = ?';
+                $params[] = $value;
+            }
+            $where = implode(' AND ', $where);
+            
+            $stmt = self::$database->prepare("SELECT {$what} FROM {$from} WHERE {$where}");
+            $stmt->execute($params);
+            $data = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            return $data ? $data[$raw_what] : false;
+        } else {
+            // MySQL/mysqli implementation
+            $what = '`' . $raw_what . '`';
+            $from = '`' . $from . '`';
 
-        $from = '`' . $from . '`';
+            $where = [];
+            foreach($conditions as $key => $value) {
+                $value = ($clean) ? self::clean_string($value) : $value;
+                $where[] = '`' . $key . '` = \'' . $value . '\'';
+            }
+            $where = implode(' AND ', $where);
 
-        $where = [];
-        foreach($conditions as $key => $value) {
-            $value = ($clean) ? self::clean_string($value) : $value;
-            $where[] = '`' . $key . '` = \'' . $value . '\'';
+            $result = self::$database->query("SELECT {$what} FROM {$from} WHERE {$where}");
+            $data = $result->fetch_object();
+
+            return ($result->num_rows) ? $data->{$raw_what} : false;
         }
-        $where = implode(' AND ', $where);
-
-        $result = self::$database->query("SELECT {$what} FROM {$from} WHERE {$where}");
-        $data = $result->fetch_object();
-
-        return ($result->num_rows) ? $data->{$raw_what} : false;
-
     }
 
     public static function exists($what = [], $from, $conditions = []) {
