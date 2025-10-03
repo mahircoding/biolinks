@@ -181,6 +181,12 @@ class Database {
             $where = implode(' AND ', $where);
 
             $result = self::$database->query("SELECT {$what} FROM {$from} WHERE {$where}");
+            
+            // Add error handling for failed query
+            if ($result === false) {
+                return false;
+            }
+            
             $data = $result->fetch_object();
 
             return ($result->num_rows) ? $data->{$raw_what} : false;
