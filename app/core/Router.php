@@ -183,6 +183,31 @@ class Router {
                 'controller' => 'Pay'
             ],
 
+            /* Digital Products */
+            'products' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'orders' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'store' => [
+                'controller' => 'Store',
+                'settings' => [
+                    'no_authentication_check' => true,
+                    'body_white' => false
+                ]
+            ],
+
 
             /* Webhooks */
             'webhook-paypal' => [
@@ -191,6 +216,10 @@ class Router {
 
             'webhook-stripe' => [
                 'controller' => 'WebhookStripe'
+            ],
+
+            'webhook-duitku' => [
+                'controller' => 'WebhookDuitku'
             ],
 
             /* Ajax */

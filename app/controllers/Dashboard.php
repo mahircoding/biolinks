@@ -4,79 +4,218 @@ namespace Altum\Controllers;
 
 use Altum\Database\Database;
 use Altum\Middlewares\Authentication;
-use Altum\Models\Package;
-use Altum\Routing\Router;
 
 class Dashboard extends Controller {
 
     public function index() {
 
         Authentication::guard();
-		
-		if(strtotime($this->user->package_expiration_date) < strtotime('NOW')) {
-			redirect('package/new');
-		}
-		
-		$message = $admin_sales_settings = null;
-		$is_admin = false;
-		$admin_email = $admin_phone = null;
-		$message = urlencode("Order ReNew Package \r\n\r\nName: ".$this->user->name." \r\n\r\nEmail: ".$this->user->email.($this->user->phone ? "\r\n\r\nPhone: ".$this->user->phone : ''));
-		if($this->user->ids_insert>0){
-			if($admin = Database::get(['name','email','phone','sales_page'], 'users', ['user_id' => $this->user->ids_insert])) {
-				if($admin->sales_page && is_null($admin_sales_settings)) $admin_sales_settings = json_decode($admin->sales_page);
-				$admin_email[] = array("name" => $admin->name, "email" => $admin->email);
-				if($admin->phone) $admin_phone[] = array("name" => $admin->name, "phone" => $admin->phone);
-			}
-		} else {
-			if($admin = Database::get(['name','email','phone','sales_page'], 'users', ['user_id' => 1])) {
-				$is_admin = true;
-				if($admin->sales_page && is_null($admin_sales_settings)) $admin_sales_settings = json_decode($admin->sales_page);
-				$admin_email[] = array("name" => $admin->name, "email" => $admin->email);
-				if($admin->phone) $admin_phone[] = array("name" => $admin->name, "phone" => $admin->phone);
-			}
-		}
 
-        /* Create Modal */
-        $view = new \Altum\Views\View('project/project_create_modal', (array) $this);
-        \Altum\Event::add_content($view->run(), 'modals');
+        /* Check if the user has access to this page */
+        if(!$this->user->package_settings->analytics_is_enabled) {
+            redirect('links');
+        }
 
-        /* Update Modal */
-        $view = new \Altum\Views\View('project/project_update_modal', (array) $this);
-        \Altum\Event::add_content($view->run(), 'modals');
+        /* Get total products */
+        $total_products = Database::simple_get('COUNT(*)', 'products', ['user_id' => $this->user->user_id]);
 
-        /* Delete Modal */
-        $view = new \Altum\Views\View('project/project_delete_modal', (array) $this);
-        \Altum\Event::add_content($view->run(), 'modals');
+        /* Get total orders */
+        $total_orders_result = Database::$database->query("SELECT COUNT(*) as total FROM `orders` o LEFT JOIN `products` p ON o.product_id = p.product_id WHERE p.user_id = {$this->user->user_id}");
+        $total_orders = $total_orders_result->fetch_object()->total ?? 0;
 
-        /* Get the campaigns list for the user */
-        $projects_result = Database::$database->query("SELECT * FROM `projects` WHERE `user_id` = {$this->user->user_id}");
+        /* Get completed orders */
+        $completed_orders_result = Database::$database->query("SELECT COUNT(*) as total FROM `orders` o LEFT JOIN `products` p ON o.product_id = p.product_id WHERE p.user_id = {$this->user->user_id} AND o.status = 'completed'");
+        $completed_orders = $completed_orders_result->fetch_object()->total ?? 0;
 
-        /* Some statistics for the widgets */
-        $links_total = Database::$database->query("SELECT COUNT(*) AS `total` FROM `links` WHERE `user_id` = {$this->user->user_id}")->fetch_object()->total;
+        /* Get total revenue */
+        $total_revenue_result = Database::$database->query("SELECT SUM(total_amount) as total FROM `orders` o LEFT JOIN `products` p ON o.product_id = p.product_id WHERE p.user_id = {$this->user->user_id} AND o.status = 'completed'");
+        $total_revenue = $total_revenue_result->fetch_object()->total ?? 0;
 
-        /* Get statistics based on the total clicks */
-        $links_clicks_total = Database::$database->query("SELECT SUM(`clicks`) AS `total` FROM `links` WHERE `user_id` = {$this->user->user_id}")->fetch_object()->total;
+        /* Get monthly revenue for chart */
+        $monthly_revenue = [];
+        for($i = 11; $i >= 0; $i--) {
+            $month_start = (new \DateTime())->modify("-{$i} months")->format('Y-m-01');
+            $month_end = (new \DateTime())->modify("-{$i} months")->format('Y-m-t');
+            
+            $revenue_result = Database::$database->query("
+                SELECT COALESCE(SUM(o.total_amount), 0) as revenue 
+                FROM `orders` o
+                LEFT JOIN `products` p ON o.product_id = p.product_id
+                WHERE p.user_id = {$this->user->user_id} 
+                AND o.status = 'completed' 
+                AND DATE(o.datetime) BETWEEN '{$month_start}' AND '{$month_end}'
+            ");
+            $monthly_revenue[] = [
+                'month' => (new \DateTime())->modify("-{$i} months")->format('M Y'),
+                'revenue' => $revenue_result->fetch_object()->revenue
+            ];
+        }
 
-        /* Get license for the user */
-        $license = $this->user->ulicense;
+        /* Get recent orders */
+        $recent_orders_result = Database::$database->query("
+            SELECT o.*, p.title as product_title, p.price as product_price
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE p.user_id = {$this->user->user_id}
+            ORDER BY o.datetime DESC
+            LIMIT 10
+        ");
+        
+        $recent_orders = [];
+        while($row = $recent_orders_result->fetch_object()) {
+            $recent_orders[] = $row;
+        }
+
+        /* Get top selling products */
+        $top_products_result = Database::$database->query("
+            SELECT p.*, COUNT(o.order_id) as order_count, SUM(o.total_amount) as total_revenue
+            FROM `products` p
+            LEFT JOIN `orders` o ON p.product_id = o.product_id AND o.status = 'completed'
+            WHERE p.user_id = {$this->user->user_id}
+            GROUP BY p.product_id
+            ORDER BY order_count DESC, total_revenue DESC
+            LIMIT 5
+        ");
+        
+        $top_products = [];
+        while($row = $top_products_result->fetch_object()) {
+            $top_products[] = $row;
+        }
+
+        /* Get daily sales for the last 30 days */
+        $daily_sales = [];
+        for($i = 29; $i >= 0; $i--) {
+            $date_check = (new \DateTime())->modify("-{$i} days")->format('Y-m-d');
+            
+            $sales_result = Database::$database->query("
+                SELECT COUNT(*) as orders, COALESCE(SUM(o.total_amount), 0) as revenue
+                FROM `orders` o
+                LEFT JOIN `products` p ON o.product_id = p.product_id
+                WHERE p.user_id = {$this->user->user_id} 
+                AND o.status = 'completed'
+                AND DATE(o.datetime) = '{$date_check}'
+            ");
+            
+            $sales_data = $sales_result->fetch_object();
+            $daily_sales[] = [
+                'date' => $date_check,
+                'orders' => $sales_data->orders,
+                'revenue' => $sales_data->revenue
+            ];
+        }
 
         /* Prepare the View */
         $data = [
-			'sales_settings'		=> $admin_sales_settings,
-			'admin_email' 			=> $admin_email ? $admin_email[array_rand($admin_email)] : null,
-			'admin_phone' 			=> $admin_phone ? $admin_phone[array_rand($admin_phone)] : null,
-			'message'				=> $message,
-			'is_admin'				=> $is_admin,
-            'projects_result'       => $projects_result,
-            'links_total'           => $links_total,
-            'links_clicks_total'    => $links_clicks_total,
-            'license'               => $license
+            'total_products' => $total_products,
+            'total_orders' => $total_orders,
+            'completed_orders' => $completed_orders,
+            'total_revenue' => $total_revenue,
+            'monthly_revenue' => $monthly_revenue,
+            'recent_orders' => $recent_orders,
+            'top_products' => $top_products,
+            'daily_sales' => $daily_sales
         ];
 
         $view = new \Altum\Views\View('dashboard/index', (array) $this);
-
         $this->add_view_content('content', $view->run($data));
-
     }
 
+    public function orders() {
+        Authentication::guard();
+
+        /* Get total count for pagination */
+        $total_rows_result = Database::$database->query("SELECT COUNT(*) as total FROM `orders` o LEFT JOIN `products` p ON o.product_id = p.product_id WHERE p.user_id = {$this->user->user_id}");
+        $total_rows = $total_rows_result->fetch_object()->total ?? 0;
+        
+        /* Simple pagination */
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $per_page = 25;
+        $offset = ($page - 1) * $per_page;
+
+        /* Get orders */
+        $orders_result = Database::$database->query("
+            SELECT o.*, p.title as product_title, p.price as product_price
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE p.user_id = {$this->user->user_id}
+            ORDER BY o.datetime DESC
+            LIMIT {$offset}, {$per_page}
+        ");
+
+        $orders = [];
+        while($row = $orders_result->fetch_object()) {
+            $orders[] = $row;
+        }
+
+        /* Prepare the View */
+        $data = [
+            'orders' => $orders,
+            'total_rows' => $total_rows,
+            'current_page' => $page,
+            'per_page' => $per_page
+        ];
+
+        $view = new \Altum\Views\View('dashboard/orders', (array) $this);
+        $this->add_view_content('content', $view->run($data));
+    }
+
+    public function analytics() {
+        Authentication::guard();
+
+        /* Get date range from parameters */
+        $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : (new \DateTime())->modify('-30 days')->format('Y-m-d');
+        $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : (new \DateTime())->format('Y-m-d');
+
+        /* Get analytics data */
+        $analytics_result = Database::$database->query("
+            SELECT 
+                DATE(o.datetime) as date,
+                COUNT(o.order_id) as orders,
+                SUM(o.total_amount) as revenue,
+                COUNT(DISTINCT o.customer_email) as unique_customers
+            FROM `orders` o
+            LEFT JOIN `products` p ON o.product_id = p.product_id
+            WHERE p.user_id = {$this->user->user_id}
+            AND o.status = 'completed'
+            AND DATE(o.datetime) BETWEEN '{$start_date}' AND '{$end_date}'
+            GROUP BY DATE(o.datetime)
+            ORDER BY date ASC
+        ");
+
+        $analytics_data = [];
+        while($row = $analytics_result->fetch_object()) {
+            $analytics_data[] = $row;
+        }
+
+        /* Get product performance */
+        $product_performance_result = Database::$database->query("
+            SELECT 
+                p.title,
+                p.price,
+                COUNT(o.order_id) as total_orders,
+                SUM(o.total_amount) as total_revenue
+            FROM `products` p
+            LEFT JOIN `orders` o ON p.product_id = o.product_id AND o.status = 'completed'
+            WHERE p.user_id = {$this->user->user_id}
+            AND DATE(o.datetime) BETWEEN '{$start_date}' AND '{$end_date}'
+            GROUP BY p.product_id
+            ORDER BY total_revenue DESC
+        ");
+
+        $product_performance = [];
+        while($row = $product_performance_result->fetch_object()) {
+            $product_performance[] = $row;
+        }
+
+        /* Prepare the View */
+        $data = [
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'analytics_data' => $analytics_data,
+            'product_performance' => $product_performance
+        ];
+
+        $view = new \Altum\Views\View('dashboard/analytics', (array) $this);
+        $this->add_view_content('content', $view->run($data));
+    }
 }

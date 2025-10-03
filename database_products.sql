@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `customer_name` varchar(255) DEFAULT NULL COMMENT 'Guest customer name',
   `customer_email` varchar(255) DEFAULT NULL COMMENT 'Guest customer email',
   `customer_phone` varchar(20) DEFAULT NULL COMMENT 'Guest customer phone',
-  `payment_method` varchar(50) NOT NULL DEFAULT 'midtrans',
+  `payment_method` varchar(50) NOT NULL DEFAULT 'duitku',
   `status` enum('pending','processing','completed','failed','cancelled') NOT NULL DEFAULT 'pending',
   `payment_details` text DEFAULT NULL COMMENT 'JSON payment details from gateway',
   `settings` text DEFAULT NULL COMMENT 'JSON additional settings',
