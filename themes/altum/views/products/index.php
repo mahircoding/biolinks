@@ -31,7 +31,7 @@
                         <i class="fa fa-fw fa-plus-circle"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a href="#" data-toggle="modal" data-target="#product_create_modal" class="dropdown-item">
+                        <a href="products/create" class="dropdown-item">
                             <i class="fa fa-fw fa-sm fa-plus mr-2"></i>
                             <?= l('product.create') ?>
                         </a>
@@ -142,6 +142,5 @@
 <?php endif ?>
 
 <!-- Modals -->
-<?php ob_start(); include THEME_PATH . 'views/products/product_create_modal.php'; \Altum\Event::add_content(ob_get_clean(), 'modals') ?>
 <?php ob_start(); include THEME_PATH . 'views/products/product_update_modal.php'; \Altum\Event::add_content(ob_get_clean(), 'modals') ?>
 <?php ob_start(); include THEME_PATH . 'views/products/product_delete_modal.php'; \Altum\Event::add_content(ob_get_clean(), 'modals') ?>
