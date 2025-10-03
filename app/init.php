@@ -69,6 +69,7 @@ require_once APP_PATH . 'helpers/strings.php';
 require_once APP_PATH . 'helpers/email.php';
 require_once APP_PATH . 'helpers/notifications.php';
 require_once APP_PATH . 'helpers/Alerts.php';
+require_once APP_PATH . 'helpers/language.php';
 require_once APP_PATH . 'helpers/others.php';
 require_once APP_PATH . 'helpers/Validation.php';
 
