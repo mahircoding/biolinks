@@ -4,6 +4,7 @@ namespace Altum\Controllers;
 
 use Altum\Database\Database;
 use Altum\Middlewares\Authentication;
+use Altum\Middlewares\Csrf;
 use Altum\Models\Product;
 use Altum\Models\User;
 use Altum\Routing\Router;
@@ -55,48 +56,55 @@ class Products extends Controller {
     public function create() {
         Authentication::guard();
 
-        if(!empty($_POST)) {
-            /* Clean some posted variables */
-            $_POST['name'] = Database::clean_string($_POST['name']);
-            $_POST['description'] = Database::clean_string($_POST['description']);
-            $_POST['price'] = (int) $_POST['price'];
-            $_POST['digital_link'] = Database::clean_string($_POST['digital_link']);
+        if(!empty($_POST) && (Csrf::check('token') || Csrf::check('global_token')) && isset($_POST['request_type'])) {
+            
+            switch($_POST['request_type']) {
+                case 'create':
+                    /* Clean some posted variables */
+                    $_POST['title'] = Database::clean_string($_POST['title']);
+                    $_POST['description'] = Database::clean_string($_POST['description']);
+                    $_POST['price'] = (int) $_POST['price'];
+                    $_POST['category'] = Database::clean_string($_POST['category']);
+                    $_POST['digital_link'] = isset($_POST['file']) ? Database::clean_string($_POST['file']) : '';
 
-            /* Image upload */
-            $image = null;
-            if(!empty($_FILES['image']['name'])) {
-                $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                $file_extension = explode('.', $_FILES['image']['name']);
-                $file_extension = strtolower(end($file_extension));
+                    /* Image upload */
+                    $image = null;
+                    if(!empty($_FILES['image']['name'])) {
+                        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        $file_extension = explode('.', $_FILES['image']['name']);
+                        $file_extension = strtolower(end($file_extension));
 
-                if(in_array($file_extension, $allowed_extensions)) {
-                    $image = md5(time() . rand()) . '.' . $file_extension;
-                    $upload_path = UPLOADS_PATH . 'products/' . $image;
+                        if(in_array($file_extension, $allowed_extensions)) {
+                            $image = md5(time() . rand()) . '.' . $file_extension;
+                            $upload_path = UPLOADS_PATH . 'products/' . $image;
 
-                    /* Create directory if not exists */
-                    if(!is_dir(UPLOADS_PATH . 'products/')) {
-                        mkdir(UPLOADS_PATH . 'products/', 0755, true);
+                            /* Create directory if not exists */
+                            if(!is_dir(UPLOADS_PATH . 'products/')) {
+                                mkdir(UPLOADS_PATH . 'products/', 0755, true);
+                            }
+
+                            move_uploaded_file($_FILES['image']['tmp_name'], $upload_path);
+                        }
                     }
 
-                    move_uploaded_file($_FILES['image']['tmp_name'], $upload_path);
-                }
+                    /* Insert to database */
+                    $product_model = new Product();
+                    $product_id = $product_model->create($this->user->user_id, [
+                        'name' => $_POST['title'],
+                        'description' => $_POST['description'],
+                        'price' => $_POST['price'],
+                        'image' => $image,
+                        'digital_link' => $_POST['digital_link'],
+                        'category' => $_POST['category'],
+                        'status' => 1
+                    ]);
+
+                    /* Set a nice success message */
+                    $_SESSION['success'][] = 'Produk berhasil dibuat: ' . $_POST['title'];
+
+                    redirect('products');
+                    break;
             }
-
-            /* Insert to database */
-            $product_model = new Product();
-            $product_id = $product_model->create($this->user->user_id, [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'],
-                'price' => $_POST['price'],
-                'image' => $image,
-                'digital_link' => $_POST['digital_link'],
-                'status' => 1
-            ]);
-
-            /* Set a nice success message */
-            $_SESSION['success'][] = 'Produk berhasil dibuat: ' . $_POST['name'];
-
-            redirect('products');
         }
 
         /* Prepare the View */
