@@ -48,9 +48,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="file">Product File</label>
-                        <input type="file" id="file" name="file" class="form-control-file" required />
-                        <small class="form-text text-muted">Maximum file size: 50MB</small>
+                        <label for="file">Product File Link</label>
+                        <input type="url" id="file" name="file" class="form-control" placeholder="https://example.com/your-digital-product" required />
+                        <small class="form-text text-muted">Enter the direct download link or access URL for your digital product</small>
                     </div>
 
                     <div class="form-group">
