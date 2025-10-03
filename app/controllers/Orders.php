@@ -24,8 +24,10 @@ class Orders extends Controller {
         ");
 
         $orders = [];
-        while($row = $orders_result->fetch_object()) {
-            $orders[] = $row;
+        if($orders_result && $orders_result !== false) {
+            while($row = $orders_result->fetch_object()) {
+                $orders[] = $row;
+            }
         }
 
         /* Get statistics */
