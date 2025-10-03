@@ -126,21 +126,26 @@ class Products extends Controller {
 
         $product->settings = json_decode($product->settings);
 
-        if(!empty($_POST)) {
-            /* Clean some posted variables */
-            $_POST['name'] = Database::clean_string($_POST['name']);
-            $_POST['description'] = Database::clean_string($_POST['description']);
-            $_POST['price'] = (int) $_POST['price'];
-            $_POST['digital_link'] = Database::clean_string($_POST['digital_link']);
-            $_POST['status'] = (int) $_POST['status'];
+        if(!empty($_POST) && (Csrf::check('token') || Csrf::check('global_token')) && isset($_POST['request_type'])) {
+            
+            switch($_POST['request_type']) {
+                case 'update':
+                    /* Clean some posted variables */
+                    $_POST['title'] = Database::clean_string($_POST['title']);
+                    $_POST['description'] = Database::clean_string($_POST['description']);
+                    $_POST['price'] = (int) $_POST['price'];
+                    $_POST['category'] = Database::clean_string($_POST['category']);
+                    $_POST['digital_link'] = Database::clean_string($_POST['digital_link']);
+                    $_POST['is_enabled'] = isset($_POST['is_enabled']) ? 1 : 0;
 
-            $update_data = [
-                'name' => $_POST['name'],
-                'description' => $_POST['description'],
-                'price' => $_POST['price'],
-                'digital_link' => $_POST['digital_link'],
-                'status' => $_POST['status']
-            ];
+                    $update_data = [
+                        'name' => $_POST['title'],
+                        'description' => $_POST['description'],
+                        'price' => $_POST['price'],
+                        'category' => $_POST['category'],
+                        'digital_link' => $_POST['digital_link'],
+                        'is_enabled' => $_POST['is_enabled']
+                    ];
 
             /* Image upload */
             if(!empty($_FILES['image']['name'])) {
@@ -168,14 +173,16 @@ class Products extends Controller {
                 }
             }
 
-            /* Update database */
-            $product_model = new Product();
-            $product_model->update($product_id, $update_data);
+                    /* Update database */
+                    $product_model = new Product();
+                    $product_model->update($product_id, $update_data);
 
-            /* Set a nice success message */
-            $_SESSION['success'][] = 'Produk berhasil diperbarui: ' . $_POST['name'];
+                    /* Set a nice success message */
+                    $_SESSION['success'][] = 'Produk berhasil diperbarui: ' . $_POST['title'];
 
-            redirect('products');
+                    redirect('products/' . $product_id);
+                    break;
+            }
         }
 
         /* Prepare the View */
@@ -199,20 +206,31 @@ class Products extends Controller {
             redirect('products');
         }
 
-        if(!empty($_POST)) {
-            /* Delete the image */
-            if($product->image && file_exists(UPLOADS_PATH . 'products/' . $product->image)) {
-                unlink(UPLOADS_PATH . 'products/' . $product->image);
+        if(!empty($_POST) && (Csrf::check('token') || Csrf::check('global_token')) && isset($_POST['request_type'])) {
+            
+            switch($_POST['request_type']) {
+                case 'delete':
+                    /* Validate confirmation */
+                    if(!isset($_POST['confirmation']) || strtoupper($_POST['confirmation']) !== 'DELETE') {
+                        $_SESSION['error'][] = 'Please type "DELETE" to confirm deletion.';
+                        redirect('products/' . $product_id . '/delete');
+                    }
+
+                    /* Delete the image */
+                    if($product->image && file_exists(UPLOADS_PATH . 'products/' . $product->image)) {
+                        unlink(UPLOADS_PATH . 'products/' . $product->image);
+                    }
+
+                    /* Delete from database */
+                    $product_model = new Product();
+                    $product_model->delete($product_id);
+
+                    /* Set a nice success message */
+                    $_SESSION['success'][] = 'Produk berhasil dihapus';
+
+                    redirect('products');
+                    break;
             }
-
-            /* Delete from database */
-            $product_model = new Product();
-            $product_model->delete($product_id);
-
-            /* Set a nice success message */
-            $_SESSION['success'][] = 'Produk berhasil dihapus';
-
-            redirect('products');
         }
 
         /* Prepare the View */
@@ -266,36 +284,26 @@ class Products extends Controller {
     }
 
     public function view() {
+        Authentication::guard();
+
         $product_id = isset($this->params[0]) ? $this->params[0] : null;
 
-        /* Get product */
-        $product = Database::get('*', 'products', ['product_id' => $product_id, 'status' => 1]);
+        /* Check if product exists and belongs to user */
+        $product = Database::get('*', 'products', ['product_id' => $product_id, 'user_id' => $this->user->user_id]);
 
         if(!$product) {
-            redirect('products/catalog');
+            redirect('products');
         }
 
         $product->settings = json_decode($product->settings);
-
-        /* Get seller info */
-        $seller = Database::get(['name', 'email'], 'users', ['user_id' => $product->user_id]);
 
         /* Increment views */
         $product_model = new Product();
         $product_model->increment_views($product_id);
 
-        /* Check if current user already purchased this product */
-        $already_purchased = false;
-        if($this->user) {
-            $order_model = new \Altum\Models\Order();
-            $already_purchased = $order_model->check_customer_purchased($this->user->email, $product_id);
-        }
-
         /* Prepare the View */
         $data = [
-            'product' => $product,
-            'seller' => $seller,
-            'already_purchased' => $already_purchased
+            'product' => $product
         ];
 
         $view = new \Altum\Views\View('products/view', (array) $this);

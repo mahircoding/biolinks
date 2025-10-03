@@ -89,12 +89,12 @@
                                             <i class="fa fa-fw fa-sm fa-eye mr-2"></i>
                                             <?= l('global.view') ?>
                                         </a>
-                                        <a href="#" data-toggle="modal" data-target="#product_update_modal" data-product-id="<?= $row->product_id ?>" class="dropdown-item">
+                                        <a href="products/<?= $row->product_id ?>/update" class="dropdown-item">
                                             <i class="fa fa-fw fa-sm fa-pencil-alt mr-2"></i>
                                             <?= l('global.edit') ?>
                                         </a>
                                         <div class="dropdown-divider"></div>
-                                        <a href="#" data-toggle="modal" data-target="#product_delete_modal" data-product-id="<?= $row->product_id ?>" class="dropdown-item">
+                                        <a href="products/<?= $row->product_id ?>/delete" class="dropdown-item">
                                             <i class="fa fa-fw fa-sm fa-trash mr-2"></i>
                                             <?= l('global.delete') ?>
                                         </a>
@@ -140,7 +140,3 @@
         </div>
     </div>
 <?php endif ?>
-
-<!-- Modals -->
-<?php ob_start(); include THEME_PATH . 'views/products/product_update_modal.php'; \Altum\Event::add_content(ob_get_clean(), 'modals') ?>
-<?php ob_start(); include THEME_PATH . 'views/products/product_delete_modal.php'; \Altum\Event::add_content(ob_get_clean(), 'modals') ?>
