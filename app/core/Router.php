@@ -183,6 +183,85 @@ class Router {
                 'controller' => 'Pay'
             ],
 
+            /* Digital Products */
+            'products' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'products/create' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'products/edit' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'products/delete' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'orders' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'orders/create' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'orders/payment' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'orders/success' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'webhook-midtrans' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'webhook-duitku' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
 
             /* Webhooks */
             'webhook-paypal' => [
