@@ -2,6 +2,9 @@
 
 namespace Altum\Models;
 
+use Altum\Database\Database;
+use Altum\Models\Model;
+
 class Order extends Model {
     public function get_orders_by_user_id($user_id, $page = 1, $max_items = 10) {
         $offset = ($page - 1) * $max_items;
@@ -13,21 +16,21 @@ class Order extends Model {
             LIMIT ? OFFSET ?
         ";
         
-        $orders = Database::query($query, [$user_id, $max_items, $offset]);
+        $orders = Database::$database->query($query, [$user_id, $max_items, $offset]);
         
         return $orders ? $orders->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     public function get_order_by_id($order_id) {
         $query = "SELECT * FROM `orders` WHERE `order_id` = ?";
-        $result = Database::query($query, [$order_id]);
+        $result = Database::$database->query($query, [$order_id]);
         
         return $result ? $result->fetch_assoc() : null;
     }
 
     public function get_order_by_transaction_id($transaction_id) {
         $query = "SELECT * FROM `orders` WHERE `transaction_id` = ?";
-        $result = Database::query($query, [$transaction_id]);
+        $result = Database::$database->query($query, [$transaction_id]);
         
         return $result ? $result->fetch_assoc() : null;
     }
@@ -42,7 +45,7 @@ class Order extends Model {
             LIMIT ? OFFSET ?
         ";
         
-        $orders = Database::query($query, [$product_id, $max_items, $offset]);
+        $orders = Database::$database->query($query, [$product_id, $max_items, $offset]);
         
         return $orders ? $orders->fetch_all(MYSQLI_ASSOC) : [];
     }
@@ -57,7 +60,7 @@ class Order extends Model {
             LIMIT ? OFFSET ?
         ";
         
-        $orders = Database::query($query, [$email, $max_items, $offset]);
+        $orders = Database::$database->query($query, [$email, $max_items, $offset]);
         
         return $orders ? $orders->fetch_all(MYSQLI_ASSOC) : [];
     }
@@ -74,7 +77,7 @@ class Order extends Model {
         
         $datetime = \Altum\Date::$date;
         
-        Database::query($query, [
+        Database::$database->query($query, [
             $order_id,
             $transaction_id,
             $data['user_id'] ?? null,
@@ -107,7 +110,7 @@ class Order extends Model {
             WHERE `order_id` = ?
         ";
         
-        Database::query($query, [
+        Database::$database->query($query, [
             $data['status'],
             $data['payment_details'] ?? null,
             $data['settings'] ?? null,
@@ -127,7 +130,7 @@ class Order extends Model {
         
         $completed_datetime = ($status == 'completed') ? \Altum\Date::$date : null;
         
-        Database::query($query, [
+        Database::$database->query($query, [
             $status,
             $payment_details,
             $completed_datetime,
@@ -139,13 +142,13 @@ class Order extends Model {
 
     public function get_user_total_orders($user_id) {
         $query = "SELECT COUNT(*) as `total` FROM `orders` WHERE `user_id` = ?";
-        $result = Database::query($query, [$user_id]);
+        $result = Database::$database->query($query, [$user_id]);
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
     public function get_user_completed_orders($user_id) {
         $query = "SELECT COUNT(*) as `total` FROM `orders` WHERE `user_id` = ? AND `status` = 'completed'";
-        $result = Database::query($query, [$user_id]);
+        $result = Database::$database->query($query, [$user_id]);
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
@@ -155,7 +158,7 @@ class Order extends Model {
             FROM `orders` 
             WHERE `user_id` = ? AND `status` = 'completed'
         ";
-        $result = Database::query($query, [$user_id]);
+        $result = Database::$database->query($query, [$user_id]);
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
@@ -165,7 +168,7 @@ class Order extends Model {
             FROM `orders` 
             WHERE `product_id` = ? AND `status` = 'completed'
         ";
-        $result = Database::query($query, [$product_id]);
+        $result = Database::$database->query($query, [$product_id]);
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
@@ -175,7 +178,7 @@ class Order extends Model {
             FROM `orders` 
             WHERE `product_id` = ? AND `status` = 'completed'
         ";
-        $result = Database::query($query, [$product_id]);
+        $result = Database::$database->query($query, [$product_id]);
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
@@ -197,7 +200,7 @@ class Order extends Model {
             $params[] = $customer_email;
         }
         
-        $result = Database::query($query, $params);
+        $result = Database::$database->query($query, $params);
         return $result ? $result->fetch_assoc()['total'] > 0 : false;
     }
 
@@ -213,7 +216,7 @@ class Order extends Model {
             WHERE `user_id` = ?
         ";
         
-        $result = Database::query($query, [$user_id]);
+        $result = Database::$database->query($query, [$user_id]);
         return $result ? $result->fetch_assoc() : [
             'total_orders' => 0,
             'completed_orders' => 0,
@@ -236,7 +239,7 @@ class Order extends Model {
             LIMIT ?
         ";
         
-        $result = Database::query($query, [$user_id, $limit]);
+        $result = Database::$database->query($query, [$user_id, $limit]);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
@@ -252,7 +255,7 @@ class Order extends Model {
             AND MONTH(`datetime`) = ?
         ";
         
-        $result = Database::query($query, [$user_id, $year, $month]);
+        $result = Database::$database->query($query, [$user_id, $year, $month]);
         return $result ? $result->fetch_assoc() : [
             'sales_count' => 0,
             'total_revenue' => 0
@@ -273,13 +276,13 @@ class Order extends Model {
             ORDER BY `date` DESC
         ";
         
-        $result = Database::query($query, [$user_id, $days]);
+        $result = Database::$database->query($query, [$user_id, $days]);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     public function get_pending_orders_count($user_id) {
         $query = "SELECT COUNT(*) as `total` FROM `orders` WHERE `user_id` = ? AND `status` = 'pending'";
-        $result = Database::query($query, [$user_id]);
+        $result = Database::$database->query($query, [$user_id]);
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
@@ -291,7 +294,7 @@ class Order extends Model {
             LIMIT 1
         ";
         
-        $result = Database::query($query, [$email, $product_id]);
+        $result = Database::$database->query($query, [$email, $product_id]);
         return $result ? $result->fetch_assoc() : null;
     }
 
@@ -302,13 +305,13 @@ class Order extends Model {
             AND `datetime` < DATE_SUB(NOW(), INTERVAL ? DAY)
         ";
         
-        Database::query($query, [$days]);
+        Database::$database->query($query, [$days]);
         return true;
     }
 
     public function delete($order_id, $user_id) {
         $query = "DELETE FROM `orders` WHERE `order_id` = ? AND `user_id` = ?";
-        Database::query($query, [$order_id, $user_id]);
+        Database::$database->query($query, [$order_id, $user_id]);
         return true;
     }
 }

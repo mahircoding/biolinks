@@ -3,6 +3,7 @@
 namespace Altum\Models;
 
 use Altum\Database\Database;
+use Altum\Models\Model;
 
 class Domain extends Model {
 

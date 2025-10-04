@@ -3,6 +3,7 @@
 namespace Altum\Models;
 
 use Altum\Database\Database;
+use Altum\Models\Model;
 
 class Product extends Model {
     public function get_products_by_user_id($user_id, $page = 1, $max_items = 10) {
