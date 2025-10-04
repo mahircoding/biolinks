@@ -208,6 +208,88 @@ class Router {
                 ]
             ],
 
+            'products/catalog' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'products/view' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'orders' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'orders/create' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'orders/payment' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'orders/success' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'orders/callback' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'orders/webhook' => [
+                'controller' => 'Orders',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            /* Digital Products */
+            'products' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'products/create' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'products/edit' => [
+                'controller' => 'Products',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
             'products/delete' => [
                 'controller' => 'Products',
                 'settings' => [
@@ -432,8 +514,22 @@ class Router {
 		
 		's' => [
 			'index' => [
-                'controller' => 'ShopIndex'
-            ],
+		              'controller' => 'ShopIndex'
+		          ],
+		],
+		
+		'store' => [
+			'index' => [
+		              'controller' => 'Store'
+		          ],
+			
+			'products' => [
+		              'controller' => 'Store'
+		          ],
+			
+			'product' => [
+		              'controller' => 'Store'
+		          ],
 		],
 		
 		/* Super Agency Panel */
@@ -484,7 +580,7 @@ class Router {
         /* Check for potential other paths than the default one (admin panel) */
         if(!empty(self::$params[0])) {
 
-            if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p'])) {
+            if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p','store'])) {
                 self::$path = self::$params[0];
 
                 unset(self::$params[0]);

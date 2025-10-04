@@ -17,23 +17,17 @@ class Product extends Model {
         
         $result = Database::$database->query($query, [$user_id, $max_items, $offset]);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-        
-        return $products ? $products->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     public function get_product_by_id($product_id) {
         $query = "SELECT * FROM `products` WHERE `product_id` = ?";
         $result = Database::$database->query($query, [$product_id]);
         return $result ? $result->fetch_assoc() : null;
-        
-        return $result ? $result->fetch_assoc() : null;
     }
 
     public function get_product_by_id_and_user_id($product_id, $user_id) {
         $query = "SELECT * FROM `products` WHERE `product_id` = ? AND `user_id` = ?";
         $result = Database::$database->query($query, [$product_id, $user_id]);
-        return $result ? $result->fetch_assoc() : null;
-        
         return $result ? $result->fetch_assoc() : null;
     }
 
@@ -74,8 +68,6 @@ class Product extends Model {
         
         $result = Database::$database->query($query, $params);
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
-        
-        return $products ? $products->fetch_all(MYSQLI_ASSOC) : [];
     }
 
     public function get_total_active_products($search = null, $category = null) {
@@ -98,7 +90,6 @@ class Product extends Model {
         $query = "SELECT COUNT(*) as `total` FROM `products` {$where_clause}";
         
         $result = Database::$database->query($query, $params);
-        return $result ? $result->fetch_assoc()['total'] : 0;
         return $result ? $result->fetch_assoc()['total'] : 0;
     }
 
@@ -237,6 +228,36 @@ class Product extends Model {
         ";
         
         $result = Database::$database->query($query, [$product_id, $limit]);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    public function get_active_products_by_user($user_id, $page = 1, $max_items = 12) {
+        $offset = ($page - 1) * $max_items;
+        
+        $query = "
+            SELECT * FROM `products`
+            WHERE `user_id` = ? AND `status` = 1
+            ORDER BY `datetime` DESC
+            LIMIT ? OFFSET ?
+        ";
+        
+        $result = Database::$database->query($query, [$user_id, $max_items, $offset]);
+        
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    public function get_user_products($user_id, $page = 1, $max_items = 10) {
+        $offset = ($page - 1) * $max_items;
+        
+        $query = "
+            SELECT * FROM `products`
+            WHERE `user_id` = ?
+            ORDER BY `datetime` DESC
+            LIMIT ? OFFSET ?
+        ";
+        
+        $result = Database::$database->query($query, [$user_id, $max_items, $offset]);
+        
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 }

@@ -100,4 +100,10 @@ class User extends Model {
 
     }
 
+    public function get_by_username($username) {
+        $query = "SELECT * FROM `users` WHERE `username` = ?";
+        $result = Database::$database->query($query, [$username]);
+        return $result ? $result->fetch_assoc() : null;
+    }
+
 }

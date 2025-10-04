@@ -1,273 +1,170 @@
 <?php
 
-namespace Altum\Helpers;
-
 class Midtrans {
-
     private $server_key;
     private $client_key;
-    private $production_mode;
-    private $api_url;
-
+    private $production = false;
+    private $api_url = 'https://api.sandbox.midtrans.com/v2';
+    
     public function __construct() {
-        $this->server_key = getenv('MIDTRANS_SERVER_KEY') ?? 'YOUR_SERVER_KEY';
-        $this->client_key = getenv('MIDTRANS_CLIENT_KEY') ?? 'YOUR_CLIENT_KEY';
-        $this->production_mode = getenv('MIDTRANS_PRODUCTION_MODE') ?? false;
-        $this->api_url = $this->production_mode ? 'https://api.midtrans.com/v2' : 'https://api.sandbox.midtrans.com/v2';
+        $this->server_key = getenv('MIDTRANS_SERVER_KEY') ?? '';
+        $this->client_key = getenv('MIDTRANS_CLIENT_KEY') ?? '';
+        
+        // Check if production mode
+        if(getenv('MIDTRANS_PRODUCTION') === 'true') {
+            $this->production = true;
+            $this->api_url = 'https://api.midtrans.com/v2';
+        }
     }
-
-    public function create_transaction($data) {
-        try {
-            $headers = [
+    
+    public function generate_snap_token($order_data) {
+        $curl = curl_init();
+        
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order_data['order_id'],
+                'gross_amount' => $order_data['amount']
+            ],
+            'customer_details' => [
+                'first_name' => $order_data['customer_name'],
+                'email' => $order_data['customer_email'],
+                'phone' => $order_data['customer_phone']
+            ],
+            'item_details' => [
+                [
+                    'id' => $order_data['product_id'],
+                    'price' => $order_data['amount'],
+                    'quantity' => 1,
+                    'name' => $order_data['product_name']
+                ]
+            ],
+            'callbacks' => [
+                'finish' => url('orders/success/' . $order_data['order_id'])
+            ]
+        ];
+        
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $this->api_url . '/charge',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($params),
+            CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 'Accept: application/json',
                 'Authorization: Basic ' . base64_encode($this->server_key . ':')
-            ];
-
-            $payload = [
-                'payment_type' => 'gopay',
-                'transaction_details' => $data['transaction_details'],
-                'customer_details' => $data['customer_details'],
-                'item_details' => $data['item_details'],
-                'callbacks' => [
-                    'finish' => SITE_URL . '/orders/success/{order_id}'
-                ]
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->api_url . '/charge');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            if ($error) {
-                throw new \Exception('cURL Error: ' . $error);
-            }
-
-            $result = json_decode($response, true);
-
-            if ($result['status_code'] == 201) {
-                return [
-                    'status' => 'success',
-                    'redirect_url' => $result['redirect_url'],
-                    'transaction_id' => $result['transaction_id'],
-                    'token' => $result['token']
-                ];
-            } else {
-                throw new \Exception($result['status_message'] ?? 'Failed to create transaction');
-            }
-
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
+            ],
+        ]);
+        
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        
+        if($err) {
+            throw new Exception('cURL Error: ' . $err);
         }
+        
+        $result = json_decode($response);
+        
+        if($result->status_code != 201) {
+            throw new Exception('Midtrans Error: ' . $result->status_message);
+        }
+        
+        return $result->token;
     }
-
+    
     public function get_transaction_status($order_id) {
-        try {
-            $headers = [
+        $curl = curl_init();
+        
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $this->api_url . '/' . $order_id . '/status',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
                 'Authorization: Basic ' . base64_encode($this->server_key . ':')
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->api_url . '/' . $order_id . '/status');
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            if ($error) {
-                throw new \Exception('cURL Error: ' . $error);
-            }
-
-            $result = json_decode($response, true);
-
-            return [
-                'status' => 'success',
-                'data' => $result
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
+            ],
+        ]);
+        
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        
+        if($err) {
+            throw new Exception('cURL Error: ' . $err);
+        }
+        
+        return json_decode($response);
+    }
+    
+    public function handle_webhook($signature_key, $body) {
+        $hashed = hash('sha512', $body . $this->server_key);
+        
+        if($hashed != $signature_key) {
+            throw new Exception('Invalid signature key');
+        }
+        
+        $notification = json_decode($body);
+        
+        switch($notification->transaction_status) {
+            case 'capture':
+            case 'settlement':
+                return 'completed';
+                break;
+            case 'pending':
+            case 'expire':
+                return 'failed';
+                break;
+            case 'cancel':
+                return 'cancelled';
+                break;
+            default:
+                return 'unknown';
         }
     }
-
-    public function handle_webhook($input) {
-        try {
-            $signature_key = hash('sha512', $input['order_id'] . $input['status_code'] . $input['gross_amount'] . $this->server_key);
-            
-            if ($signature_key != $input['signature_key']) {
-                throw new \Exception('Invalid signature');
-            }
-
-            return [
-                'status' => 'success',
-                'data' => $input
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
+    
+    public function is_production() {
+        return $this->production;
     }
-
-    public function generate_snap_token($data) {
-        try {
-            $headers = [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Authorization: Basic ' . base64_encode($this->server_key . ':')
-            ];
-
-            $payload = [
-                'transaction_details' => $data['transaction_details'],
-                'customer_details' => $data['customer_details'],
-                'item_details' => $data['item_details'],
-                'callbacks' => [
-                    'finish' => SITE_URL . '/orders/success/{order_id}'
-                ]
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->api_url . '/snap/token');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            if ($error) {
-                throw new \Exception('cURL Error: ' . $error);
-            }
-
-            $result = json_decode($response, true);
-
-            return [
-                'status' => 'success',
-                'token' => $result['token']
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
+    
+    public function get_client_key() {
+        return $this->client_key;
     }
-
-    public function create_snap_redirect_url($data) {
-        try {
-            $headers = [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Authorization: Basic ' . base64_encode($this->server_key . ':')
-            ];
-
-            $payload = [
-                'transaction_details' => $data['transaction_details'],
-                'customer_details' => $data['customer_details'],
-                'item_details' => $data['item_details'],
-                'callbacks' => [
-                    'finish' => SITE_URL . '/orders/success/{order_id}'
-                ]
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->api_url . '/snap');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            if ($error) {
-                throw new \Exception('cURL Error: ' . $error);
-            }
-
-            $result = json_decode($response, true);
-
-            return [
-                'status' => 'success',
-                'redirect_url' => $result['redirect_url'],
-                'token' => $result['token']
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
+    
+    public function get_api_url() {
+        return $this->api_url;
     }
+}
 
-    public function refund_transaction($order_id, $amount = null, $reason = null) {
-        try {
-            $headers = [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Authorization: Basic ' . base64_encode($this->server_key . ':')
-            ];
+// Helper functions
+function generate_midtrans_snap_token($order_data) {
+    $midtrans = new Midtrans();
+    return $midtrans->generate_snap_token($order_data);
+}
 
-            $payload = [
-                'transaction_id' => $order_id,
-                'amount' => $amount,
-                'reason' => $reason
-            ];
+function get_midtrans_transaction_status($order_id) {
+    $midtrans = new Midtrans();
+    return $midtrans->get_transaction_status($order_id);
+}
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $this->api_url . '/' . $order_id . '/refund');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+function handle_midtrans_webhook($signature_key, $body) {
+    $midtrans = new Midtrans();
+    return $midtrans->handle_webhook($signature_key, $body);
+}
 
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
+function is_midtrans_production() {
+    $midtrans = new Midtrans();
+    return $midtrans->is_production();
+}
 
-            if ($error) {
-                throw new \Exception('cURL Error: ' . $error);
-            }
-
-            $result = json_decode($response, true);
-
-            return [
-                'status' => 'success',
-                'data' => $result
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
-    }
-
+function get_midtrans_client_key() {
+    $midtrans = new Midtrans();
+    return $midtrans->get_client_key();
 }

@@ -34,6 +34,10 @@
                 <?php if(\Altum\Middlewares\Authentication::check()): ?>
 
                     <li class="nav-item"><a class="nav-link" href="<?= url('dashboard') ?>"> <?= $this->language->dashboard->menu ?></a></li>
+                    
+                    <li class="nav-item"><a class="nav-link" href="<?= url('products') ?>"> <?= $this->language->products->menu ?></a></li>
+                    
+                    <li class="nav-item"><a class="nav-link" href="<?= url('orders') ?>"> <?= $this->language->orders->menu ?></a></li>
 					
 					<li class="dropdown">
                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">

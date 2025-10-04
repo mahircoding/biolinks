@@ -109,6 +109,46 @@
             </div>
         </div>
 
+        <div class="col-12 col-md-6 col-xl-3 mb-3 mb-xl-0">
+            <div class="card border-0 h-100">
+                <div class="card-body d-flex">
+
+                    <div>
+                        <div class="card border-0 bg-success-200 text-success-700 mr-3">
+                            <div class="p-3 d-flex align-items-center justify-content-between">
+                                <i class="fa fa-fw fa-shopping-bag fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-title h4 m-0"><?= nr($data->products_total) ?></div>
+                        <small class="text-muted"><?= $this->language->dashboard->header->products ?></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3 mb-3 mb-xl-0">
+            <div class="card border-0 h-100">
+                <div class="card-body d-flex">
+
+                    <div>
+                        <div class="card border-0 bg-info-200 text-info-700 mr-3">
+                            <div class="p-3 d-flex align-items-center justify-content-between">
+                                <i class="fa fa-fw fa-chart-line fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card-title h4 m-0">Rp <?= number_format($data->products_revenue, 0, ',', '.') ?></div>
+                        <small class="text-muted"><?= $this->language->dashboard->header->revenue ?></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </header>
 
@@ -127,10 +167,51 @@
 	</div>
 	-->
     <div class="mt-4 d-flex justify-content-between">
+        <h2 class="h4 flex-grow-1"><?= $this->language->dashboard->header->quick_actions ?></h2>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <a href="<?= url('products') ?>" class="card border-0 h-100 text-decoration-none">
+                <div class="card-body d-flex">
+                    <div class="mr-3">
+                        <div class="card border-0 bg-primary-200 text-primary-700">
+                            <div class="p-3 d-flex align-items-center justify-content-center">
+                                <i class="fa fa-fw fa-shopping-bag fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card-title h5 m-0"><?= $this->language->dashboard->quick_actions->manage_products ?></div>
+                        <small class="text-muted"><?= $this->language->dashboard->quick_actions->manage_products_desc ?></small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 mb-3">
+            <a href="<?= url('orders') ?>" class="card border-0 h-100 text-decoration-none">
+                <div class="card-body d-flex">
+                    <div class="mr-3">
+                        <div class="card border-0 bg-success-200 text-success-700">
+                            <div class="p-3 d-flex align-items-center justify-content-center">
+                                <i class="fa fa-fw fa-receipt fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card-title h5 m-0"><?= $this->language->dashboard->quick_actions->view_orders ?></div>
+                        <small class="text-muted"><?= $this->language->dashboard->quick_actions->view_orders_desc ?></small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
         <h2 class="h4 flex-grow-1"><?= $this->language->dashboard->projects->header ?></h2>
 
         <div class="d-flex flex-wrap flex-row-reverse p-0">
-			<?php if($this->user->package_settings->projects_limit != -1 && $data->projects_result->num_rows >= $this->user->package_settings->projects_limit): ?>
+   <?php if($this->user->package_settings->projects_limit != -1 && $data->projects_result->num_rows >= $this->user->package_settings->projects_limit): ?>
                 <button type="button" data-confirm="<?= $this->language->project->error_message->projects_limit ?>"  class="btn btn-primary flex-end mb-1 ml-2 rounded-pill"><i class="fa fa-plus-circle"></i> <?= $this->language->dashboard->projects->create ?></button>
             <?php else: ?>
                 <button type="button" data-toggle="modal" data-target="#create_project" class="btn btn-primary flex-end mb-1 ml-2 rounded-pill"><i class="fa fa-plus-circle"></i> <?= $this->language->dashboard->projects->create ?></button>
