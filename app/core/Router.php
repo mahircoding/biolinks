@@ -467,7 +467,7 @@ class Router {
 			self::$path = self::$routes[self::$path]['alias']; 
 		}
 
-        if(!empty(self::$params[0]) && self::$path != 'user-products') {
+        if(!empty(self::$params[0])) {
 
             if(array_key_exists(self::$params[0], self::$routes[self::$path]) && file_exists(APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php')) {
 
