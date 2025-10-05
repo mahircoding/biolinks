@@ -413,6 +413,19 @@ class Router {
 
     ];
 
+    public static function handleDynamicRoutes() {
+        /* Dynamic routes */
+        if (isset(self::$params[0]) && is_numeric(self::$params[0]) && isset(self::$params[1])) {
+            self::$path = 'digital-product';
+            self::$controller_key = 'index';
+            self::$controller = 'DigitalProduct';
+
+            if (isset(self::$params[2]) && self::$params[2] == 'checkout') {
+                self::$method = 'checkout';
+            }
+        }
+    }
+
 
 
     public static function parse_url() {
@@ -450,6 +463,7 @@ class Router {
                 if(is_numeric(self::$params[0])) {
                     self::$path = 'user-products';
                     self::$controller_key = 'index';
+                    /* Don't unset params, keep user_id for controller */
                 }
             }
 
@@ -459,7 +473,7 @@ class Router {
 			self::$path = self::$routes[self::$path]['alias']; 
 		}
 
-        if(!empty(self::$params[0])) {
+        if(!empty(self::$params[0]) && self::$path != 'user-products') {
 
             if(array_key_exists(self::$params[0], self::$routes[self::$path]) && file_exists(APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php')) {
 
