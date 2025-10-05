@@ -34,25 +34,8 @@ class DigitalProduct extends Controller {
             $price_cents = (int) ($_POST['price_cents'] ?? 0);
             $currency = Database::clean_string($_POST['currency'] ?? 'USD');
 
-            $file_uploaded = (!empty($_FILES['file']['name']));
+            $access_url = Database::clean_string($_POST['access_url'] ?? '');
             $file_path = '';
-
-            if($file_uploaded) {
-                $file_name = $_FILES['file']['name'];
-                $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                $tmp = $_FILES['file']['tmp_name'];
-
-                if(!is_writable(UPLOADS_PATH . 'digital/')) {
-                    $_SESSION['error'][] = sprintf($this->language->global->error_message->directory_not_writable, UPLOADS_PATH . 'digital/');
-                }
-
-                if(empty($_SESSION['error'])) {
-                    if(!file_exists(UPLOADS_PATH . 'digital/')) @mkdir(UPLOADS_PATH . 'digital/', 0755, true);
-                    $new_name = md5(time() . rand()) . '.' . $ext;
-                    move_uploaded_file($tmp, UPLOADS_PATH . 'digital/' . $new_name);
-                    $file_path = 'digital/' . $new_name;
-                }
-            }
 
             if(empty($_SESSION['error'])) {
                 \Altum\Models\DigitalProduct::create([
@@ -62,7 +45,8 @@ class DigitalProduct extends Controller {
                     'description' => $description,
                     'price_cents' => $price_cents,
                     'currency' => $currency,
-                    'file_path' => $file_path
+                    'file_path' => $file_path,
+                    'access_url' => $access_url
                 ]);
 
                 redirect('digital-product');

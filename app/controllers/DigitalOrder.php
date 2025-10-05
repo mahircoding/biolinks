@@ -49,12 +49,14 @@ class DigitalOrder extends Controller {
             'download_expires_at' => $expires_at
         ]);
 
-        /* Email link */
-        $download_url = url('digital-order/download/' . $token);
+        /* Email link: use direct access_url if present, else token download link */
+        $download_url = !empty($product->access_url)
+            ? $product->access_url
+            : url('digital-order/download/' . $token);
 
         $content = '<p>Terima kasih atas pesanan Anda.</p>' .
                    '<p>Produk: <strong>' . $product->name . '</strong></p>' .
-                   '<p>Link unduhan Anda (berlaku s/d ' . $expires_at . '):<br />' .
+                   '<p>Akses produk Anda:<br />' .
                    '<a href="' . $download_url . '">' . $download_url . '</a></p>';
 
         send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
@@ -70,10 +72,17 @@ class DigitalOrder extends Controller {
         $order = DigitalOrderModel::find_by_token($token);
         if(!$order) redirect('notfound');
 
-        if(strtotime($order->download_expires_at) < time()) redirect('notfound');
-
         $product = DigitalProductModel::find_by_id($order->product_id);
         if(!$product) redirect('notfound');
+
+        /* If access_url set, redirect there (no expiry check) */
+        if(!empty($product->access_url)) {
+            header('Location: ' . $product->access_url);
+            exit;
+        }
+
+        /* For file downloads, keep expiry enforcement */
+        if(strtotime($order->download_expires_at) < time()) redirect('notfound');
 
         $full_path = UPLOADS_PATH . $product->file_path;
         if(!file_exists($full_path)) redirect('notfound');

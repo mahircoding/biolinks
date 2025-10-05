@@ -17,7 +17,8 @@ class DigitalProduct {
             `description` TEXT NULL,
             `price_cents` INT UNSIGNED NOT NULL DEFAULT 0,
             `currency` VARCHAR(8) NOT NULL DEFAULT 'USD',
-            `file_path` VARCHAR(512) NOT NULL,
+            `file_path` VARCHAR(512) NULL,
+            `access_url` VARCHAR(1024) NULL,
             `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             `updated_at` DATETIME NULL DEFAULT NULL,
             PRIMARY KEY (`product_id`),
@@ -25,15 +26,20 @@ class DigitalProduct {
             KEY `idx_user` (`user_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
-        return Database::$database->query($sql);
+        $ok = Database::$database->query($sql);
+
+        /* Ensure new column exists if upgrading from older schema */
+        @Database::$database->query("ALTER TABLE `" . self::$table . "` ADD COLUMN `access_url` VARCHAR(1024) NULL AFTER `file_path`");
+
+        return $ok;
     }
 
     public static function find_by_slug($slug) {
-        return Database::get(['product_id','user_id','name','slug','description','price_cents','currency','file_path'], self::$table, ['slug' => $slug]);
+        return Database::get(['product_id','user_id','name','slug','description','price_cents','currency','file_path','access_url'], self::$table, ['slug' => $slug]);
     }
 
     public static function find_by_id($product_id) {
-        return Database::get(['product_id','user_id','name','slug','description','price_cents','currency','file_path'], self::$table, ['product_id' => $product_id]);
+        return Database::get(['product_id','user_id','name','slug','description','price_cents','currency','file_path','access_url'], self::$table, ['product_id' => $product_id]);
     }
 
     public static function list_by_user($user_id) {

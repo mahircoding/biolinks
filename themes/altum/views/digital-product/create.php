@@ -38,8 +38,9 @@
             </div>
 
             <div class="form-group">
-                <label>Berkas Produk (ZIP/PDF/dll.)</label>
-                <input type="file" name="file" class="form-control" required />
+                <label>URL Akses Produk (eksternal)</label>
+                <input type="url" name="access_url" class="form-control" placeholder="https://contoh.com/akses-produk" required />
+                <small class="text-muted">Pembeli akan diarahkan ke URL ini setelah validasi token.</small>
             </div>
 
             <div class="mt-3">
