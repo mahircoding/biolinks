@@ -50,7 +50,8 @@
                 </div>
             </a>
         </li>
-        
+        </ul>
+
         <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalProductController']) ? 'active' : null ?>">
             <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalProductController' ? 'active' : null ?>" href="<?= url($url_admin.'/digital-products') ?>">
                 <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-box"></i></div>
@@ -68,7 +69,6 @@
                 </div>
             </a>
         </li>
-        </ul>
 
         <hr />
         <ul class="admin-sidebar-links">
@@ -151,7 +151,6 @@
                 </div>
             </a>
         </li>
-        </ul>
 
         <hr />
         <ul class="admin-sidebar-links">
