@@ -448,6 +448,7 @@ class Router {
     }
 
     public static function parse_controller() {
+        self::handleDynamicRoutes();
 
         /* Check for potential other paths than the default one (admin panel) */
         if(!empty(self::$params[0])) {
@@ -458,13 +459,6 @@ class Router {
                 unset(self::$params[0]);
 
                 self::$params = array_values(self::$params);
-            } else {
-                /* Check if it's a user_id for digital products */
-                if(is_numeric(self::$params[0])) {
-                    self::$path = 'user-products';
-                    self::$controller_key = 'index';
-                    /* Don't unset params, keep user_id for controller */
-                }
             }
 
         }
