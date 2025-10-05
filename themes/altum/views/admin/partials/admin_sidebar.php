@@ -51,6 +51,23 @@
             </a>
         </li>
         
+        <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalProductController']) ? 'active' : null ?>">
+            <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalProductController' ? 'active' : null ?>" href="<?= url($url_admin.'/digital-products') ?>">
+                <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-box"></i></div>
+                <div class="col">
+                    <span class="d-inline">Digital Products</span>
+                </div>
+            </a>
+        </li>
+
+        <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalOrderController']) ? 'active' : null ?>">
+            <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalOrderController' ? 'active' : null ?>" href="<?= url($url_admin.'/digital-orders') ?>">
+                <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-shopping-cart"></i></div>
+                <div class="col">
+                    <span class="d-inline">Digital Orders</span>
+                </div>
+            </a>
+        </li>
         </ul>
 
         <hr />
@@ -113,6 +130,24 @@
                 <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-wrench"></i></div>
                 <div class="col">
                     <span class="d-inline"><?= $this->language->admin_settings->menu ?></span>
+                </div>
+            </a>
+        </li>
+
+        <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalProductController']) ? 'active' : null ?>">
+            <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalProductController' ? 'active' : null ?>" href="<?= url($url_admin.'/digital-products') ?>">
+                <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-box"></i></div>
+                <div class="col">
+                    <span class="d-inline">Digital Products</span>
+                </div>
+            </a>
+        </li>
+
+        <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalOrderController']) ? 'active' : null ?>">
+            <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalOrderController' ? 'active' : null ?>" href="<?= url($url_admin.'/digital-orders') ?>">
+                <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-shopping-cart"></i></div>
+                <div class="col">
+                    <span class="d-inline">Digital Orders</span>
                 </div>
             </a>
         </li>
@@ -207,6 +242,24 @@
                 <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-box-open"></i></div>
                 <div class="col">
                     <span class="d-inline"><?= $this->language->admin_packages->menu ?></span>
+                </div>
+            </a>
+        </li>
+
+        <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalProductController']) ? 'active' : null ?>">
+            <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalProductController' ? 'active' : null ?>" href="<?= url('admin/digital-products') ?>">
+                <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-box"></i></div>
+                <div class="col">
+                    <span class="d-inline">Digital Products</span>
+                </div>
+            </a>
+        </li>
+
+        <li class="<?= in_array(\Altum\Routing\Router::$controller, ['DigitalOrderController']) ? 'active' : null ?>">
+            <a class="nav-link d-flex flex-row <?= \Altum\Routing\Router::$controller == 'DigitalOrderController' ? 'active' : null ?>" href="<?= url('admin/digital-orders') ?>">
+                <div class="col-1 d-flex align-items-center"><i class="fa fa-fw fa-sm fa-shopping-cart"></i></div>
+                <div class="col">
+                    <span class="d-inline">Digital Orders</span>
                 </div>
             </a>
         </li>
