@@ -52,6 +52,8 @@ require_once APP_PATH . 'models/Page.php';
 require_once APP_PATH . 'models/User.php';
 require_once APP_PATH . 'models/Settings.php';
 require_once APP_PATH . 'models/Domain.php';
+require_once APP_PATH . 'models/DigitalProduct.php';
+require_once APP_PATH . 'models/DigitalOrder.php';
 
 /* Load some helpers */
 require_once APP_PATH . 'helpers/Cache.php';
