@@ -71,6 +71,8 @@
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="<?= url('digital-product') ?>"><i class="fa fa-fw fa-sm fa-box-open mr-1"></i> Digital Product</a>
+                <a class="dropdown-item" href="<?= url('digital-order') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> Order</a>
                 <a class="dropdown-item" href="<?= url('account') ?>"><i class="fa fa-fw fa-sm fa-sm fa-wrench mr-1"></i> <?= $this->language->account->menu ?></a>
                 <a class="dropdown-item" href="<?= url('logout') ?>"><i class="fa fa-fw fa-sm fa-sm fa-sign-out-alt mr-1"></i> <?= $this->language->global->menu->logout ?></a>
             </div>
@@ -136,6 +138,8 @@
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="<?= url('digital-product') ?>"><i class="fa fa-fw fa-sm fa-box-open mr-1"></i> Digital Product</a>
+                <a class="dropdown-item" href="<?= url('digital-order') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> Order</a>
                 <a class="dropdown-item" href="<?= url('account') ?>"><i class="fa fa-fw fa-sm fa-sm fa-wrench mr-1"></i> <?= $this->language->account->menu ?></a>
                 <a class="dropdown-item" href="<?= url('logout') ?>"><i class="fa fa-fw fa-sm fa-sm fa-sign-out-alt mr-1"></i> <?= $this->language->global->menu->logout ?></a>
             </div>
@@ -270,6 +274,8 @@
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="<?= url('digital-product') ?>"><i class="fa fa-fw fa-sm fa-box-open mr-1"></i> Digital Product</a>
+                <a class="dropdown-item" href="<?= url('digital-order') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> Order</a>
                 <a class="dropdown-item" href="<?= url('account') ?>"><i class="fa fa-fw fa-sm fa-sm fa-wrench mr-1"></i> <?= $this->language->account->menu ?></a>
                 <a class="dropdown-item" href="<?= url('logout') ?>"><i class="fa fa-fw fa-sm fa-sm fa-sign-out-alt mr-1"></i> <?= $this->language->global->menu->logout ?></a>
             </div>

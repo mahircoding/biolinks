@@ -165,17 +165,17 @@ class DigitalOrder extends Controller {
         }
 
         /* For file downloads, keep expiry enforcement */
-        if(strtotime($order->download_expires_at) < time()) redirect('notfound');
+        // if(strtotime($order->download_expires_at) < time()) redirect('notfound');
 
-        $full_path = UPLOADS_PATH . $product->file_path;
-        if(!file_exists($full_path)) redirect('notfound');
+        // $full_path = UPLOADS_PATH . $product->file_path;
+        // if(!file_exists($full_path)) redirect('notfound');
 
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($full_path) . '"');
-        header('Content-Length: ' . filesize($full_path));
-        readfile($full_path);
-        exit;
+        // header('Content-Description: File Transfer');
+        // header('Content-Type: application/octet-stream');
+        // header('Content-Disposition: attachment; filename="' . basename($full_path) . '"');
+        // header('Content-Length: ' . filesize($full_path));
+        // readfile($full_path);
+        // exit;
     }
 }
 
