@@ -27,8 +27,8 @@
 
             <div class="form-group">
                 <label>Slug (untuk URL)</label>
-                <input type="text" name="slug" class="form-control" required />
-                <small class="text-muted">Contoh: ebook-laris</small>
+                <input type="text" name="slug" class="form-control" />
+                <small class="text-muted">Kosongkan untuk auto-generate dari nama produk</small>
             </div>
 
             <div class="form-group">

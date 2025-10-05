@@ -399,6 +399,16 @@ class Router {
         /* White Label Panel */
         'whitelabel' => [
             'alias' => 'admin'
+        ],
+
+        /* User Products */
+        'user-products' => [
+            'index' => [
+                'controller' => 'UserProducts',
+                'settings' => [
+                    'wrapper' => 'basic_wrapper'
+                ]
+            ]
         ]
 
     ];
@@ -435,6 +445,12 @@ class Router {
                 unset(self::$params[0]);
 
                 self::$params = array_values(self::$params);
+            } else {
+                /* Check if it's a user_id for digital products */
+                if(is_numeric(self::$params[0])) {
+                    self::$path = 'user-products';
+                    self::$controller_key = 'index';
+                }
             }
 
         }

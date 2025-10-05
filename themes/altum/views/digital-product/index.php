@@ -35,7 +35,7 @@
                         <input type="hidden" name="product_id" value="<?= (int)$product->product_id ?>" />
                         <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
                     </form>
-                    <a class="btn btn-sm btn-outline-secondary" target="_blank" href="digital-order/<?= $product->slug ?>">Lihat Halaman</a>
+                    <a class="btn btn-sm btn-outline-secondary" target="_blank" href="<?= url($this->user->user_id . '/' . $product->slug) ?>">Lihat Halaman</a>
                 </td>
             </tr>
         <?php endforeach ?>

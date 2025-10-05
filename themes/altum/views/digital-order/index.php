@@ -1,11 +1,5 @@
 <?php defined('ALTUMCODE') || die() ?>
 
-<header class="header pb-0">
-    <div class="container">
-        <?= $this->views['account_header'] ?>
-    </div>
-</header>
-
 <?php require THEME_PATH . 'views/partials/ads_header.php' ?>
 
 <section class="container pt-5">

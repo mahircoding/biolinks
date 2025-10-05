@@ -34,6 +34,22 @@ class DigitalProduct extends Controller {
 
             $name = Database::clean_string($_POST['name'] ?? '');
             $slug = Database::clean_string($_POST['slug'] ?? '');
+            
+            /* Auto-generate slug if empty */
+            if(empty($slug)) {
+                $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+                $slug = preg_replace('/-+/', '-', $slug);
+                $slug = trim($slug, '-');
+                
+                /* Ensure unique slug */
+                $original_slug = $slug;
+                $counter = 1;
+                while(Database::exists('product_id', \Altum\Models\DigitalProduct::$table, ['slug' => $slug])) {
+                    $slug = $original_slug . '-' . $counter;
+                    $counter++;
+                }
+            }
+            
             $description = Database::clean_string($_POST['description'] ?? '');
             $price_cents = (int) ($_POST['price_cents'] ?? 0);
             $currency = Database::clean_string($_POST['currency'] ?? 'USD');
