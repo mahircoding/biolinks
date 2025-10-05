@@ -20,6 +20,10 @@ class DigitalOrder extends Controller {
         $orders = [];
         while($row = $result->fetch_object()) $orders[] = $row;
 
+        /* Account header */
+        $menu = new \Altum\Views\View('partials/account_header', (array) $this);
+        $this->add_view_content('account_header', $menu->run());
+
         $view = new \Altum\Views\View('digital-order/index', (array) $this);
         $this->add_view_content('content', $view->run(['orders' => $orders]));
     }

@@ -17,6 +17,10 @@ class DigitalProduct extends Controller {
 
         $products = \Altum\Models\DigitalProduct::list_by_user($this->user->user_id);
 
+        /* Account header */
+        $menu = new \Altum\Views\View('partials/account_header', (array) $this);
+        $this->add_view_content('account_header', $menu->run());
+
         $view = new \Altum\Views\View('digital-product/index', (array) $this);
         $this->add_view_content('content', $view->run(['products' => $products]));
     }
@@ -52,6 +56,10 @@ class DigitalProduct extends Controller {
                 redirect('digital-product');
             }
         }
+
+        /* Account header */
+        $menu = new \Altum\Views\View('partials/account_header', (array) $this);
+        $this->add_view_content('account_header', $menu->run());
 
         $view = new \Altum\Views\View('digital-product/create', (array) $this);
         $this->add_view_content('content', $view->run());

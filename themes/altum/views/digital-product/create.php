@@ -1,8 +1,17 @@
 <?php defined('ALTUMCODE') || die() ?>
 
-<div class="d-flex">
-    <h1 class="h3">Tambah Produk Digital</h1>
-</div>
+<header class="header pb-0">
+    <div class="container">
+        <?= $this->views['account_header'] ?>
+    </div>
+</header>
+
+<?php require THEME_PATH . 'views/partials/ads_header.php' ?>
+
+<section class="container pt-5">
+    <div class="d-flex">
+        <h1 class="h3">Tambah Produk Digital</h1>
+    </div>
 
 <?php display_notifications() ?>
 
@@ -49,6 +58,9 @@
             </div>
         </form>
     </div>
+    </div>
 </div>
+
+</section>
 
 
