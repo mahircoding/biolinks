@@ -192,7 +192,7 @@ class Router {
 				]
 			],
 
-			'digital-order' => [
+            'digital-order' => [
 				'controller' => 'DigitalOrder',
 				'settings' => [
 					'wrapper' => 'basic_wrapper'

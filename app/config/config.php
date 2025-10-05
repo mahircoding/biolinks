@@ -9,6 +9,11 @@ define('BASE_DOMAIN', 'kiblatbio.link');
 define('BASE_IP', '103.163.139.126');
 define('WA_NUMBER', '6285784989876');
 
+/* Tripay configuration */
+if(!defined('TRIPAY_API_KEY')) define('TRIPAY_API_KEY', getenv('TRIPAY_API_KEY') ?: '');
+if(!defined('TRIPAY_PRIVATE_KEY')) define('TRIPAY_PRIVATE_KEY', getenv('TRIPAY_PRIVATE_KEY') ?: '');
+if(!defined('TRIPAY_MERCHANT_CODE')) define('TRIPAY_MERCHANT_CODE', getenv('TRIPAY_MERCHANT_CODE') ?: '');
+
 header("Access-Control-Allow-Origin: https://chatgpt." . BASE_DOMAIN);
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: X-Requested-With, Content-Type, Origin, Cache-Control, Pragma, Authorization, Accept, Accept-Encoding");
