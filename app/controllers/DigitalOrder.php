@@ -149,6 +149,29 @@ class DigitalOrderController extends Controller {
         $this->add_view_content('content', $view->run($data));
     }
 
+    // Public method for viewing order status
+    public function public_view() {
+        $order_id = isset($this->params[0]) ? (int) $this->params[0] : null;
+        
+        // Get order details
+        $order = (new DigitalOrderModel())->get_order($order_id);
+        if(!$order) {
+            redirect('notfound');
+        }
+
+        // Get product details
+        $product = (new DigitalProductModel())->get_product($order->product_id);
+
+        /* Prepare the View */
+        $data = [
+            'order' => $order,
+            'product' => $product
+        ];
+
+        $view = new \Altum\Views\View('digital-order/public-view', (array) $this);
+        $this->add_view_content('content', $view->run($data));
+    }
+
     // Public method for payment processing
     public function payment() {
         $order_id = isset($this->params[0]) ? (int) $this->params[0] : null;

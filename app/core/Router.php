@@ -247,6 +247,14 @@ class Router {
                 ]
             ],
 
+            'digital-order' => [
+                'controller' => 'DigitalOrderController',
+                'method' => 'public_view',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
             'digital-webhook-midtrans' => [
                 'controller' => 'DigitalOrderController',
                 'method' => 'midtrans_webhook',
