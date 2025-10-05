@@ -55,10 +55,7 @@
 								<?php endif ?>
 							<?php endif ?>
 							<div class="dropdown-divider"></div>
-							<a class="dropdown-item" href="<?= url('products') ?>"><i class="fa fa-fw fa-sm fa-shopping-bag mr-1"></i> <?= $this->language->products->menu ?></a>
-							<a class="dropdown-item" href="<?= url('orders') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> <?= $this->language->orders->menu ?></a>
-							<div class="dropdown-divider"></div>
-							<a class="dropdown-item" href="<?= url('account') ?>"><i class="fa fa-fw fa-sm fa-wrench mr-1"></i> <?= $this->language->account->menu ?></a>
+                            <a class="dropdown-item" href="<?= url('account') ?>"><i class="fa fa-fw fa-sm fa-wrench mr-1"></i> <?= $this->language->account->menu ?></a>
 
                             <?php if($this->settings->links->domains_is_enabled): ?>
                             <a class="dropdown-item" href="<?= url('domains') ?>"><i class="fa fa-fw fa-sm fa-anchor mr-1"></i> <?= $this->language->domains->menu ?></a>

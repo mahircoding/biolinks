@@ -3,7 +3,6 @@
 namespace Altum\Models;
 
 use Altum\Database\Database;
-use Altum\Models\Model;
 
 class Package extends Model {
 

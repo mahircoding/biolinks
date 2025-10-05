@@ -248,6 +248,13 @@ class AdminSettings extends Controller {
                         'webhook_secret'
                     ],
 
+                    'midtrans' => [
+                        'is_enabled',
+                        'server_key',
+                        'client_key',
+                        'environment'
+                    ],
+
                     /* Business */
                     'business' => [
                         'invoice_is_enabled',

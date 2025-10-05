@@ -183,167 +183,6 @@ class Router {
                 'controller' => 'Pay'
             ],
 
-            /* Digital Products */
-            'products' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/create' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/edit' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/catalog' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'products/view' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'orders' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'orders/create' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'orders/payment' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'orders/success' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'orders/callback' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'orders/webhook' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            /* Digital Products */
-            'products' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/create' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/edit' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'products/delete' => [
-                'controller' => 'Products',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'orders' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'orders/create' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'orders/payment' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'orders/success' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
-            'webhook-midtrans' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'webhook-duitku' => [
-                'controller' => 'Orders',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
 
             /* Webhooks */
             'webhook-paypal' => [
@@ -374,6 +213,46 @@ class Router {
 
             'cron' => [
                 'controller' => 'Cron'
+            ],
+
+            'digital-products' => [
+                'controller' => 'DigitalProductController',
+                'method' => 'public_index',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'digital-product' => [
+                'controller' => 'DigitalProductController',
+                'method' => 'public_view',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'digital-checkout' => [
+                'controller' => 'DigitalOrderController',
+                'method' => 'checkout',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'digital-payment' => [
+                'controller' => 'DigitalOrderController',
+                'method' => 'payment',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
+            'digital-webhook-midtrans' => [
+                'controller' => 'DigitalOrderController',
+                'method' => 'midtrans_webhook',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
             ],
         ],
 
@@ -499,6 +378,39 @@ class Router {
             'whitelabel-settings' => [
                 'controller' => 'WhiteLabelSettings'
             ],
+
+            'digital-products' => [
+                'controller' => 'DigitalProductController'
+            ],
+
+            'digital-product-create' => [
+                'controller' => 'DigitalProductController',
+                'method' => 'create'
+            ],
+
+            'digital-product-update' => [
+                'controller' => 'DigitalProductController',
+                'method' => 'update'
+            ],
+
+            'digital-product-delete' => [
+                'controller' => 'DigitalProductController',
+                'method' => 'delete'
+            ],
+
+            'digital-orders' => [
+                'controller' => 'DigitalOrderController'
+            ],
+
+            'digital-order-view' => [
+                'controller' => 'DigitalOrderController',
+                'method' => 'view'
+            ],
+
+            'digital-order-update-status' => [
+                'controller' => 'DigitalOrderController',
+                'method' => 'update_status'
+            ],
         ],
 		
 		 /* Ecommerce Panel */
@@ -514,22 +426,8 @@ class Router {
 		
 		's' => [
 			'index' => [
-		              'controller' => 'ShopIndex'
-		          ],
-		],
-		
-		'store' => [
-			'index' => [
-		              'controller' => 'Store'
-		          ],
-			
-			'products' => [
-		              'controller' => 'Store'
-		          ],
-			
-			'product' => [
-		              'controller' => 'Store'
-		          ],
+                'controller' => 'ShopIndex'
+            ],
 		],
 		
 		/* Super Agency Panel */
@@ -580,7 +478,7 @@ class Router {
         /* Check for potential other paths than the default one (admin panel) */
         if(!empty(self::$params[0])) {
 
-            if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p','store'])) {
+            if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p'])) {
                 self::$path = self::$params[0];
 
                 unset(self::$params[0]);

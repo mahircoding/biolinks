@@ -317,6 +317,39 @@
                                     <label><?= $this->language->admin_settings->payment->stripe_webhook_secret ?></label>
                                     <input type="text" name="stripe_webhook_secret" class="form-control" value="<?= $this->settings->stripe->webhook_secret ?>" />
                                 </div>
+
+                                <hr class="my-3">
+
+                                <h4><i class="fa fa-fw fa-money-bill-wave icon-stripe fa-sm mr-1 text-muted"></i> <?= 'Midtrans Settings' ?></h4>
+                                <p class="text-muted"><?= 'Configure your Midtrans payment gateway settings.' ?></p>
+
+                                <div class="form-group">
+                                    <label><?= 'Is Enabled' ?></label>
+
+                                    <select name="midtrans_is_enabled" class="form-control">
+                                        <option value="1" <?= isset($this->settings->midtrans->is_enabled) && $this->settings->midtrans->is_enabled ? 'selected' : null ?>><?= $this->language->global->yes ?></option>
+                                        <option value="0" <?= !isset($this->settings->midtrans->is_enabled) || !$this->settings->midtrans->is_enabled ? 'selected' : null ?>><?= $this->language->global->no ?></option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label><?= 'Server Key' ?></label>
+                                    <input type="text" name="midtrans_server_key" class="form-control" value="<?= isset($this->settings->midtrans->server_key) ? $this->settings->midtrans->server_key : '' ?>" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label><?= 'Client Key' ?></label>
+                                    <input type="text" name="midtrans_client_key" class="form-control" value="<?= isset($this->settings->midtrans->client_key) ? $this->settings->midtrans->client_key : '' ?>" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label><?= 'Environment' ?></label>
+
+                                    <select name="midtrans_environment" class="form-control">
+                                        <option value="development" <?= isset($this->settings->midtrans->environment) && $this->settings->midtrans->environment == 'development' ? 'selected' : null ?>>Development (Sandbox)</option>
+                                        <option value="production" <?= isset($this->settings->midtrans->environment) && $this->settings->midtrans->environment == 'production' ? 'selected' : null ?>>Production</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 

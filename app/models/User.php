@@ -3,7 +3,6 @@
 namespace Altum\Models;
 
 use Altum\Database\Database;
-use Altum\Models\Model;
 
 class User extends Model {
 
@@ -99,12 +98,6 @@ class User extends Model {
 
         Database::$database->query("UPDATE `users` SET `payment_subscription_id` = '' WHERE `user_id` = {$this->user->user_id}");
 
-    }
-
-    public function get_by_username($username) {
-        $query = "SELECT * FROM `users` WHERE `username` = ?";
-        $result = Database::$database->query($query, [$username]);
-        return $result ? $result->fetch_assoc() : null;
     }
 
 }
