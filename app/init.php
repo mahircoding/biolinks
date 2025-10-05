@@ -73,3 +73,4 @@ require_once APP_PATH . 'helpers/Validation.php';
 
 /* Autoload for vendor */
 require_once ROOT_PATH . 'vendor/autoload.php';
+

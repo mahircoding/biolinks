@@ -1,6 +1,6 @@
 <?php defined('ALTUMCODE') || die() ?>
 
-<?php $product = $this->view_content['product']; ?>
+<?php $product = $data->product; ?>
 
 <div class="container d-flex justify-content-center">
     <div class="col-md-8">

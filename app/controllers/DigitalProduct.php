@@ -18,8 +18,7 @@ class DigitalProduct extends Controller {
         $products = \Altum\Models\DigitalProduct::list_by_user($this->user->user_id);
 
         $view = new \Altum\Views\View('digital-product/index', (array) $this);
-        $view->add_view_content('products', $products);
-        $this->add_view_content('content', $view->run());
+        $this->add_view_content('content', $view->run(['products' => $products]));
     }
 
     public function create() {

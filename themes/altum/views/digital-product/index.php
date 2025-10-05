@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-        <?php foreach($this->view_content['products'] as $product): ?>
+        <?php foreach($data->products as $product): ?>
             <tr>
                 <td><?= $product->name ?></td>
                 <td><?= $product->slug ?></td>

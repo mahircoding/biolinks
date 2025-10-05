@@ -20,8 +20,7 @@ class DigitalOrder extends Controller {
         if(!$product) redirect('notfound');
 
         $view = new \Altum\Views\View('digital-order/public-view', (array) $this);
-        $view->add_view_content('product', $product);
-        $this->add_view_content('content', $view->run());
+        $this->add_view_content('content', $view->run(['product' => $product]));
     }
 
     public function checkout() {
@@ -61,8 +60,7 @@ class DigitalOrder extends Controller {
         send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
 
         $view = new \Altum\Views\View('digital-order/thank-you', (array) $this);
-        $view->add_view_content('email', $email);
-        $this->add_view_content('content', $view->run());
+        $this->add_view_content('content', $view->run(['email' => $email]));
     }
 
     public function download() {
