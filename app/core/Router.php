@@ -183,6 +183,22 @@ class Router {
                 'controller' => 'Pay'
             ],
 
+			/* Digital products & orders */
+			'digital-product' => [
+				'controller' => 'DigitalProduct',
+				'settings' => [
+					'menu_no_margin' => true,
+					'body_white' => false
+				]
+			],
+
+			'digital-order' => [
+				'controller' => 'DigitalOrder',
+				'settings' => [
+					'wrapper' => 'basic_wrapper'
+				]
+			],
+
 
             /* Webhooks */
             'webhook-paypal' => [
@@ -213,54 +229,6 @@ class Router {
 
             'cron' => [
                 'controller' => 'Cron'
-            ],
-
-            'digital-products' => [
-                'controller' => 'DigitalProductController',
-                'method' => 'public_index',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'digital-product' => [
-                'controller' => 'DigitalProductController',
-                'method' => 'public_view',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'digital-checkout' => [
-                'controller' => 'DigitalOrderController',
-                'method' => 'checkout',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'digital-payment' => [
-                'controller' => 'DigitalOrderController',
-                'method' => 'payment',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'digital-order' => [
-                'controller' => 'DigitalOrderController',
-                'method' => 'public_view',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
-            ],
-
-            'digital-webhook-midtrans' => [
-                'controller' => 'DigitalOrderController',
-                'method' => 'midtrans_webhook',
-                'settings' => [
-                    'no_authentication_check' => true
-                ]
             ],
         ],
 
@@ -385,39 +353,6 @@ class Router {
 
             'whitelabel-settings' => [
                 'controller' => 'WhiteLabelSettings'
-            ],
-
-            'digital-products' => [
-                'controller' => 'DigitalProductController'
-            ],
-
-            'digital-product-create' => [
-                'controller' => 'DigitalProductController',
-                'method' => 'create'
-            ],
-
-            'digital-product-update' => [
-                'controller' => 'DigitalProductController',
-                'method' => 'update'
-            ],
-
-            'digital-product-delete' => [
-                'controller' => 'DigitalProductController',
-                'method' => 'delete'
-            ],
-
-            'digital-orders' => [
-                'controller' => 'DigitalOrderController'
-            ],
-
-            'digital-order-view' => [
-                'controller' => 'DigitalOrderController',
-                'method' => 'view'
-            ],
-
-            'digital-order-update-status' => [
-                'controller' => 'DigitalOrderController',
-                'method' => 'update_status'
             ],
         ],
 		

@@ -4,55 +4,37 @@ namespace Altum\Models;
 
 use Altum\Database\Database;
 
-class DigitalOrder extends Model {
+class DigitalOrder {
 
-    public function get_order($order_id) {
-        return Database::get('*', 'digital_orders', ['order_id' => $order_id]);
+    public static $table = 'digital_orders';
+
+    public static function migrate() {
+        $sql = "CREATE TABLE IF NOT EXISTS `" . self::$table . "` (
+            `order_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `product_id` INT UNSIGNED NOT NULL,
+            `buyer_name` VARCHAR(255) NOT NULL,
+            `buyer_email` VARCHAR(255) NOT NULL,
+            `buyer_phone` VARCHAR(64) NULL,
+            `amount_cents` INT UNSIGNED NOT NULL,
+            `currency` VARCHAR(8) NOT NULL DEFAULT 'USD',
+            `download_token` VARCHAR(64) NOT NULL,
+            `download_expires_at` DATETIME NOT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`order_id`),
+            KEY `idx_product` (`product_id`),
+            UNIQUE KEY `uniq_token` (`download_token`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+        return Database::$database->query($sql);
     }
 
-    public function get_orders_by_user($user_id) {
-        $result = Database::$database->query("SELECT do.*, dp.name as product_name FROM `digital_orders` do JOIN `digital_products` dp ON do.product_id = dp.product_id WHERE do.user_id = {$user_id} ORDER BY do.date DESC");
-        $data = [];
-        
-        while($row = $result->fetch_object()) {
-            $data[] = $row;
-        }
-        
-        return $data;
+    public static function create($data) {
+        return Database::insert(self::$table, $data);
     }
 
-    public function get_orders_by_product($product_id) {
-        $result = Database::$database->query("SELECT * FROM `digital_orders` WHERE `product_id` = {$product_id} ORDER BY `date` DESC");
-        $data = [];
-        
-        while($row = $result->fetch_object()) {
-            $data[] = $row;
-        }
-        
-        return $data;
-    }
-
-    public function create_order($data) {
-        return Database::insert('digital_orders', $data);
-    }
-
-    public function update_order($order_id, $data) {
-        return Database::update('digital_orders', $data, ['order_id' => $order_id]);
-    }
-
-    public function delete_order($order_id) {
-        return Database::$database->query("DELETE FROM `digital_orders` WHERE `order_id` = {$order_id}");
-    }
-
-    public function get_all_orders($limit = null) {
-        $limit_query = $limit ? "LIMIT {$limit}" : "";
-        $result = Database::$database->query("SELECT do.*, dp.name as product_name, u.name as seller_name FROM `digital_orders` do JOIN `digital_products` dp ON do.product_id = dp.product_id JOIN `users` u ON do.user_id = u.user_id ORDER BY do.date DESC {$limit_query}");
-        $data = [];
-        
-        while($row = $result->fetch_object()) {
-            $data[] = $row;
-        }
-        
-        return $data;
+    public static function find_by_token($token) {
+        return Database::get(['order_id','product_id','buyer_name','buyer_email','buyer_phone','amount_cents','currency','download_token','download_expires_at','created_at'], self::$table, ['download_token' => $token]);
     }
 }
+
+

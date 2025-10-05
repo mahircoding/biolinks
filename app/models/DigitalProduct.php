@@ -4,55 +4,58 @@ namespace Altum\Models;
 
 use Altum\Database\Database;
 
-class DigitalProduct extends Model {
+class DigitalProduct {
 
-    public function get_product($product_id) {
-        return Database::get('*', 'digital_products', ['product_id' => $product_id]);
+    public static $table = 'digital_products';
+
+    public static function migrate() {
+        $sql = "CREATE TABLE IF NOT EXISTS `" . self::$table . "` (
+            `product_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `user_id` INT UNSIGNED NOT NULL,
+            `name` VARCHAR(255) NOT NULL,
+            `slug` VARCHAR(255) NOT NULL,
+            `description` TEXT NULL,
+            `price_cents` INT UNSIGNED NOT NULL DEFAULT 0,
+            `currency` VARCHAR(8) NOT NULL DEFAULT 'USD',
+            `file_path` VARCHAR(512) NOT NULL,
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME NULL DEFAULT NULL,
+            PRIMARY KEY (`product_id`),
+            UNIQUE KEY `uniq_slug` (`slug`),
+            KEY `idx_user` (`user_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+        return Database::$database->query($sql);
     }
 
-    public function get_products_by_user($user_id) {
-        $result = Database::$database->query("SELECT * FROM `digital_products` WHERE `user_id` = {$user_id} ORDER BY `date` DESC");
-        $data = [];
-        
-        while($row = $result->fetch_object()) {
-            $data[] = $row;
-        }
-        
-        return $data;
+    public static function find_by_slug($slug) {
+        return Database::get(['product_id','user_id','name','slug','description','price_cents','currency','file_path'], self::$table, ['slug' => $slug]);
     }
 
-    public function get_active_products_by_user($user_id) {
-        $result = Database::$database->query("SELECT * FROM `digital_products` WHERE `user_id` = {$user_id} AND `status` = 'active' ORDER BY `date` DESC");
-        $data = [];
-        
-        while($row = $result->fetch_object()) {
-            $data[] = $row;
-        }
-        
-        return $data;
+    public static function find_by_id($product_id) {
+        return Database::get(['product_id','user_id','name','slug','description','price_cents','currency','file_path'], self::$table, ['product_id' => $product_id]);
     }
 
-    public function create_product($data) {
-        return Database::insert('digital_products', $data);
+    public static function list_by_user($user_id) {
+        $result = Database::$database->query("SELECT * FROM `" . self::$table . "` WHERE `user_id` = '" . Database::clean_string($user_id) . "' ORDER BY `product_id` DESC");
+        $rows = [];
+        while($row = $result->fetch_object()) $rows[] = $row;
+        return $rows;
     }
 
-    public function update_product($product_id, $data) {
-        return Database::update('digital_products', $data, ['product_id' => $product_id]);
+    public static function create($data) {
+        return Database::insert(self::$table, $data);
     }
 
-    public function delete_product($product_id) {
-        return Database::$database->query("DELETE FROM `digital_products` WHERE `product_id` = {$product_id}");
+    public static function update_by_id($product_id, $data) {
+        return Database::update(self::$table, $data, ['product_id' => $product_id]);
     }
 
-    public function get_all_products($limit = null) {
-        $limit_query = $limit ? "LIMIT {$limit}" : "";
-        $result = Database::$database->query("SELECT dp.*, u.name as seller_name FROM `digital_products` dp JOIN `users` u ON dp.user_id = u.user_id WHERE dp.status = 'active' ORDER BY dp.date DESC {$limit_query}");
-        $data = [];
-        
-        while($row = $result->fetch_object()) {
-            $data[] = $row;
-        }
-        
-        return $data;
+    public static function delete_by_id($product_id, $user_id) {
+        $product_id = Database::clean_string($product_id);
+        $user_id = Database::clean_string($user_id);
+        return Database::$database->query("DELETE FROM `" . self::$table . "` WHERE `product_id` = '{$product_id}' AND `user_id` = '{$user_id}'");
     }
 }
+
+

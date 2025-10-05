@@ -1,11 +1,11 @@
 <?php
 /* Configuration of the site */
 define('DATABASE_SERVER',   'localhost');
-define('DATABASE_USERNAME', 'root');
-define('DATABASE_PASSWORD', '');
-define('DATABASE_NAME',     'kiblatbio');
+define('DATABASE_USERNAME', 'kibl_us_kiblatbio');
+define('DATABASE_PASSWORD', 'nkglCorHCoJ30Pd8');
+define('DATABASE_NAME',     'kibl_db_kiblatbio');
 
-define('BASE_DOMAIN', 'kiblatbio.test');
+define('BASE_DOMAIN', 'kiblatbio.link');
 define('BASE_IP', '103.163.139.126');
 define('WA_NUMBER', '6285784989876');
 

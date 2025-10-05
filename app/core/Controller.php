@@ -10,6 +10,10 @@ class Controller {
     use Paramsable;
 
     public $views = [];
+    public $user;
+    public $settings;
+    public $database;
+    public $language;
 
     public function __construct(Array $params = []) {
 
