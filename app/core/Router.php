@@ -199,6 +199,14 @@ class Router {
 				]
 			],
 
+            'digital-order-manage' => [
+                'controller' => 'DigitalOrder',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
 
             /* Webhooks */
             'webhook-paypal' => [

@@ -8,6 +8,22 @@ use Altum\Models\DigitalOrder as DigitalOrderModel;
 
 class DigitalOrder extends Controller {
 
+    public function manage() {
+        \Altum\Middlewares\Authentication::guard();
+
+        DigitalOrderModel::migrate();
+        \Altum\Models\DigitalProduct::migrate();
+
+        $user_id = (int)$this->user->user_id;
+        $sql = "SELECT o.*, p.name AS product_name FROM `" . DigitalOrderModel::$table . "` o INNER JOIN `" . \Altum\Models\DigitalProduct::$table . "` p ON p.product_id = o.product_id WHERE p.user_id = '{$user_id}' ORDER BY o.order_id DESC";
+        $result = Database::$database->query($sql);
+        $orders = [];
+        while($row = $result->fetch_object()) $orders[] = $row;
+
+        $view = new \Altum\Views\View('digital-order/index', (array) $this);
+        $this->add_view_content('content', $view->run(['orders' => $orders]));
+    }
+
     public function index() {
         /* Public product landing by slug: /digital-order/{slug} */
         $params = \Altum\Routing\Router::get_params();
