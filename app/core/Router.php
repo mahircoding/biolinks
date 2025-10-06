@@ -427,15 +427,15 @@ class Router {
             ],
             'view' => [
                 'controller' => 'UserProducts',
-                'settings' => [
-                    'wrapper' => 'basic_wrapper'
-                ]
+                // 'settings' => [
+                //     'wrapper' => 'basic_wrapper'
+                // ]
             ],
             'checkout' => [
                 'controller' => 'UserProducts',
-                'settings' => [
-                    'wrapper' => 'basic_wrapper'
-                ]
+                // 'settings' => [
+                //     'wrapper' => 'basic_wrapper'
+                // ]
             ]
         ]
 
