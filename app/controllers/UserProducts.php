@@ -192,8 +192,8 @@ class UserProducts extends Controller {
             // $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
             // $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product]));
         } else {
-            // $view = new \Altum\Views\View('user-products/checkout', (array) $this);
-            // $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));
+            $view = new \Altum\Views\View('user-products/checkout', (array) $this);
+            $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));
         }
     }
 }
