@@ -462,6 +462,7 @@ class Router {
                 if(is_numeric(self::$params[0])) {
                     self::$path = 'user-products';
                     self::$controller_key = 'index';
+                    /* Don't unset params[0] - UserProducts controller needs user_id */
                 }
             }
 
@@ -486,13 +487,13 @@ class Router {
                     /* Check if second param exists for product slug */
                     if(!empty(self::$params[1])) {
                         self::$controller_key = 'view';
-                        unset(self::$params[1]);
                         
                         /* Check if third param is 'checkout' */
                         if(!empty(self::$params[2]) && self::$params[2] == 'checkout') {
                             self::$controller_key = 'checkout';
                             unset(self::$params[2]);
                         }
+                        /* Don't unset any params - UserProducts controller needs them */
                     }
                 } else {
                     /* Try to check if the link exists via the cache */
