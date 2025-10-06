@@ -9,7 +9,7 @@
             <p><?= nl2br($product->description) ?></p>
         <?php endif ?>
         <div class="mb-4">
-            <strong>Harga:</strong> <?= 'Rp ' . number_format($product->price_cents, 0, ',', '.') ?>
+            <strong>Harga:</strong> Rp <?= number_format($product->price_cents, 0, ',', '.') ?>
         </div>
 
         <div class="card border-0 shadow-sm">

@@ -191,7 +191,7 @@
         <!-- Product Summary -->
         <div class="product-summary">
             <div class="product-name"><?= htmlspecialchars($data->product->name) ?></div>
-            <div class="product-price">Rp <?= number_format($data->product->price_cents / 100, 0, ',', '.') ?></div>
+            <div class="product-price">Rp <?= number_format($data->product->price_cents, 0, ',', '.') ?></div>
         </div>
 
         <!-- Bank Details -->

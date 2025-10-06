@@ -108,7 +108,7 @@ class UserProducts extends Controller {
                     /* Send bank transfer instructions via email */
                     $content = '<p>Terima kasih atas pesanan Anda.</p>' .
                                '<p>Produk: <strong>' . $product->name . '</strong></p>' .
-                               '<p>Harga: <strong>Rp ' . number_format($product->price_cents / 100, 0, ',', '.') . '</strong></p>' .
+                               '<p>Harga: <strong>Rp ' . number_format($product->price_cents, 0, ',', '.') . '</strong></p>' .
                                '<p>Silakan transfer ke rekening berikut:</p>' .
                                '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">' .
                                '<p><strong>Bank:</strong> ' . htmlspecialchars($selected_bank->bank_name) . '</p>' .
@@ -148,7 +148,7 @@ class UserProducts extends Controller {
                         ]
                     ],
                     'expired_time'  => time() + (24 * 60 * 60),
-                    'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . ((int) ceil($product->price_cents / 100)), $user->tripay_api_key_secret),
+                    'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . ((int) $product->price_cents), $user->tripay_api_key_secret),
                     'return_url'    => url($user_id . '/' . $product->slug),
                     'callback_url'  => url('digital-order/webhook')
                 ];

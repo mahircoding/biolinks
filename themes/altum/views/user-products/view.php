@@ -357,8 +357,7 @@
 
     <!-- Product Title -->
     <h1 class="product-title"><?= htmlspecialchars($data->product->name) ?></h1>
-    <h4 class="product-price"><?= 'Rp ' . number_format($data->product->price_cents, 0, ',', '.') ?>
-    </h4>
+    <h4 class="product-price">Rp <?= number_format($data->product->price_cents, 0, ',', '.') ?></h4>
 
     <!-- Description Section -->
     <div class="description-section">
