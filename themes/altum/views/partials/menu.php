@@ -41,6 +41,8 @@
                             <?= $this->user->name ?> <span class="caret"></span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="<?= url('digital-product') ?>"><i class="fa fa-fw fa-sm fa-box-open mr-1"></i> Digital Product</a>
+                            <a class="dropdown-item" href="<?= url('digital-order/manage') ?>"><i class="fa fa-fw fa-sm fa-receipt mr-1"></i> Order</a>
                             <?php if(\Altum\Middlewares\Authentication::is_admin()): ?>
 								<?php if($this->user->whitelabel=='Y'): ?>
 								<a class="dropdown-item" href="<?= url('whitelabel') ?>"><i class="fa fa-fw fa-sm fa-user-shield mr-1"></i> Whitelabel</a>

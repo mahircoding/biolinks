@@ -33,22 +33,42 @@ class DigitalProduct extends Controller {
             if(!Csrf::check()) redirect('digital-product');
 
             $name = Database::clean_string($_POST['name'] ?? '');
-            $slug = Database::clean_string($_POST['slug'] ?? '');
             
-            /* Auto-generate slug if empty */
-            if(empty($slug)) {
-                /* Generate unique alphanumeric slug */
-                do {
-                    $slug = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 8);
-                } while(Database::exists('product_id', \Altum\Models\DigitalProduct::$table, ['slug' => $slug]));
-            }
+            /* Auto-generate slug - always generate unique alphanumeric slug */
+            do {
+                $slug = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 8);
+            } while(Database::exists('product_id', \Altum\Models\DigitalProduct::$table, ['slug' => $slug]));
             
             $description = Database::clean_string($_POST['description'] ?? '');
             $price_cents = (int) ($_POST['price_cents'] ?? 0);
-            $currency = Database::clean_string($_POST['currency'] ?? 'USD');
+            $currency = 'IDR'; // Fixed to IDR
 
             $access_url = Database::clean_string($_POST['access_url'] ?? '');
             $file_path = '';
+            $image_path = '';
+
+            /* Handle image upload */
+            if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+                $max_size = 2 * 1024 * 1024; // 2MB
+                
+                if(in_array($_FILES['image']['type'], $allowed_types) && $_FILES['image']['size'] <= $max_size) {
+                    $upload_dir = 'uploads/digital-products/';
+                    if(!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+                    
+                    $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+                    $image_filename = 'product_' . time() . '_' . $slug . '.' . $file_extension;
+                    $image_path = $upload_dir . $image_filename;
+                    
+                    if(!move_uploaded_file($_FILES['image']['tmp_name'], $image_path)) {
+                        $_SESSION['error'][] = 'Gagal mengupload gambar';
+                    }
+                } else {
+                    $_SESSION['error'][] = 'Format gambar tidak didukung atau ukuran terlalu besar (maksimal 2MB)';
+                }
+            }
 
             if(empty($_SESSION['error'])) {
                 \Altum\Models\DigitalProduct::create([
@@ -59,7 +79,8 @@ class DigitalProduct extends Controller {
                     'price_cents' => $price_cents,
                     'currency' => $currency,
                     'file_path' => $file_path,
-                    'access_url' => $access_url
+                    'access_url' => $access_url,
+                    'image_path' => $image_path
                 ]);
 
                 redirect('digital-product');
