@@ -20,8 +20,8 @@ class UserProducts extends Controller {
         /* Get user's products */
         $products = \Altum\Models\DigitalProduct::list_by_user($user_id);
         
-        /* Get user info */
-        $user = Database::get(['user_id', 'name', 'email', 'phone'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         $view = new \Altum\Views\View('user-products/index', (array) $this);
@@ -41,8 +41,8 @@ class UserProducts extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
-        /* Get user info */
-        $user = Database::get(['user_id', 'name', 'email', 'phone'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         $view = new \Altum\Views\View('user-products/view', (array) $this);
@@ -63,8 +63,8 @@ class UserProducts extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
-        /* Get user info */
-        $user = Database::get(['user_id', 'name', 'email', 'phone'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         if(!empty($_POST)) {
@@ -88,14 +88,14 @@ class UserProducts extends Controller {
                 'status' => 'pending'
             ]);
 
-            /* If Tripay configured, create transaction and redirect to payment page */
-            if(defined('TRIPAY_API_KEY') && TRIPAY_API_KEY && defined('TRIPAY_PRIVATE_KEY') && TRIPAY_PRIVATE_KEY && defined('TRIPAY_MERCHANT_CODE') && TRIPAY_MERCHANT_CODE) {
+            /* If Tripay configured for this user, create transaction and redirect to payment page */
+            if(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
                 $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
                 $payload = [
                     'method'        => $method ?: 'QRIS',
                     'merchant_ref'  => $reference,
-                    'amount'        => (int) ceil($product->price_cents / 100),
+                    'amount'        => (int)$product->price_cents,
                     'customer_name' => $name,
                     'customer_email'=> $email,
                     'customer_phone'=> $phone,
@@ -103,13 +103,13 @@ class UserProducts extends Controller {
                         [
                             'sku'         => (string)$product->product_id,
                             'name'        => $product->name,
-                            'price'       => (int) ceil($product->price_cents / 100),
+                            'price'       => (int)$product->price_cents,
                             'quantity'    => 1,
                             'product_url' => url($user_id . '/' . $product->slug)
                         ]
                     ],
                     'expired_time'  => time() + (24 * 60 * 60),
-                    'signature'     => hash_hmac('sha256', TRIPAY_MERCHANT_CODE . $reference . ((int) ceil($product->price_cents / 100)), TRIPAY_PRIVATE_KEY),
+                    'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . ((int) ceil($product->price_cents / 100)), $user->tripay_api_key_secret),
                     'return_url'    => url($user_id . '/' . $product->slug),
                     'callback_url'  => url('digital-order/webhook')
                 ];
@@ -120,7 +120,7 @@ class UserProducts extends Controller {
                     CURLOPT_URL            => 'https://tripay.co.id/api/transaction/create',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_HEADER         => false,
-                    CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . TRIPAY_API_KEY ],
+                    CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $user->tripay_api_key_public ],
                     CURLOPT_FAILONERROR    => false,
                     CURLOPT_POST           => true,
                     CURLOPT_POSTFIELDS     => http_build_query($payload)
@@ -142,7 +142,7 @@ class UserProducts extends Controller {
                 }
             }
 
-            /* Fallback: no Tripay; show thank you & send immediate access */
+            /* Fallback: no Tripay configured for this user; show thank you & send immediate access */
             $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
             $content = '<p>Terima kasih atas pesanan Anda.</p>' .
                        '<p>Produk: <strong>' . $product->name . '</strong></p>' .

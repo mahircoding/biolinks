@@ -78,7 +78,7 @@ class DigitalOrder extends Controller {
             $payload = [
                 'method'        => $method ?: 'QRIS',
                 'merchant_ref'  => $reference,
-                'amount'        => (int) ceil($product->price_cents / 100),
+                'amount'        => (int)$product->price_cents,
                 'customer_name' => $name,
                 'customer_email'=> $email,
                 'customer_phone'=> $phone,
@@ -86,13 +86,13 @@ class DigitalOrder extends Controller {
                     [
                         'sku'         => (string)$product->product_id,
                         'name'        => $product->name,
-                        'price'       => (int) ceil($product->price_cents / 100),
+                        'price'       => (int)$product->price_cents,
                         'quantity'    => 1,
                         'product_url' => url('digital-order/' . $product->slug)
                     ]
                 ],
                 'expired_time'  => time() + (24 * 60 * 60),
-                'signature'     => hash_hmac('sha256', TRIPAY_MERCHANT_CODE . $reference . ((int) ceil($product->price_cents / 100)), TRIPAY_PRIVATE_KEY),
+                'signature'     => hash_hmac('sha256', TRIPAY_MERCHANT_CODE . $reference . ((int) $product->price_cents), TRIPAY_PRIVATE_KEY),
                 'return_url'    => url('digital-order/' . $product->slug),
                 'callback_url'  => url('digital-order/webhook')
             ];

@@ -208,6 +208,14 @@ class Router {
                 ]
             ],
 
+            'tripay-settings' => [
+                'controller' => 'TripaySettings',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
             'digital-order' => [
 				'controller' => 'DigitalOrder',
 				'settings' => [

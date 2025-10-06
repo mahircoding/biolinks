@@ -160,8 +160,7 @@
         <!-- Product Info -->
         <div class="product-info">
             <h2 class="product-name"><?= htmlspecialchars($data->product->name) ?></h2>
-            <p class="product-creator">Oleh: <?= htmlspecialchars($data->user->name) ?></p>
-            <div class="product-price">Rp <?= number_format($data->product->price_cents / 100, 0, ',', '.') ?></div>
+            <div class="product-price"><?= 'Rp ' . number_format($product->price_cents, 0, ',', '.') ?></div>
         </div>
 
         <!-- Checkout Form -->

@@ -176,7 +176,7 @@
                     <?php endif ?>
                     <div class="product-info">
                         <h3 class="product-name"><?= htmlspecialchars($product->name) ?></h3>
-                        <p class="product-price">Rp <?= number_format($product->price_cents / 100, 0, ',', '.') ?></p>
+                        <p class="product-price"><?= 'Rp ' . number_format($product->price_cents, 0, ',', '.') ?></p>
                     </div>
                 </a>
             <?php endforeach ?>

@@ -55,6 +55,7 @@ require_once APP_PATH . 'models/Domain.php';
 require_once APP_PATH . 'models/DigitalProduct.php';
 require_once APP_PATH . 'models/DigitalOrder.php';
 require_once APP_PATH . 'controllers/UserProducts.php';
+require_once APP_PATH . 'controllers/TripaySettings.php';
 
 /* Load some helpers */
 require_once APP_PATH . 'helpers/Cache.php';
