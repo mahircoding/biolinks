@@ -43,15 +43,15 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a href="<?= url('account-payments') ?>" class="nav-link <?= \Altum\Routing\Router::$controller_key == 'account-payments' ? 'active' : null ?>">
             <i class="fa fa-fw fa-sm fa-dollar-sign mr-1"></i> <?= $this->language->account_payments->menu ?>
         </a>
-    </li>
+    </li> -->
 
     <li class="nav-item">
         <a href="<?= url('tripay-settings') ?>" class="nav-link <?= \Altum\Routing\Router::$controller_key == 'tripay-settings' ? 'active' : null ?>">
-            <i class="fa fa-fw fa-sm fa-dollar-sign mr-1"></i> Tripay
+            <i class="fa fa-fw fa-sm fa-credit-card mr-1"></i> Tripay
         </a>
     </li>
 
