@@ -1,5 +1,65 @@
 <?php defined('ALTUMCODE') || die() ?>
 
+<style>
+/* Fix modal backdrop issues */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal {
+    z-index: 1050 !important;
+}
+
+.modal-dialog {
+    z-index: 1055 !important;
+}
+
+/* Ensure modal is clickable */
+.modal.show {
+    display: block !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+/* Fix modal backdrop click to close */
+.modal-backdrop {
+    pointer-events: auto !important;
+}
+
+/* Ensure modal content is above backdrop */
+.modal-content {
+    position: relative;
+    z-index: 1055;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+/* Ensure modal is properly positioned */
+.modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1050 !important;
+}
+
+/* Fix modal backdrop positioning */
+.modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 1040 !important;
+}
+</style>
+
 <?php require THEME_PATH . 'views/partials/ads_header.php' ?>
 
 <section class="container pt-5">
@@ -109,8 +169,16 @@ $(document).ready(function() {
         var modalId = $(this).data('target');
         console.log('Opening modal:', modalId);
         
+        // Remove any existing backdrops
+        $('.modal-backdrop').remove();
+        
         // Show modal
-        $(modalId).modal('show');
+        $(modalId).modal({
+            backdrop: true,
+            keyboard: true,
+            focus: true,
+            show: true
+        });
     });
     
     // Handle form submission - Simple form submit for now
@@ -130,9 +198,27 @@ $(document).ready(function() {
         // Form will submit normally and redirect back to manage page
     });
     
-    // Handle modal close
+    // Handle modal close and cleanup
     $('.modal').on('hidden.bs.modal', function() {
         console.log('Modal closed');
+        // Remove any lingering backdrops
+        $('.modal-backdrop').remove();
+        // Remove modal-open class from body
+        $('body').removeClass('modal-open');
+    });
+    
+    // Handle backdrop click to close modal
+    $('.modal').on('click', function(e) {
+        if (e.target === this) {
+            $(this).modal('hide');
+        }
+    });
+    
+    // Handle ESC key to close modal
+    $(document).on('keydown', function(e) {
+        if (e.keyCode === 27) { // ESC key
+            $('.modal.show').modal('hide');
+        }
     });
 });
 </script>
