@@ -26,19 +26,24 @@
             </div>
 
             <div class="form-group">
-                <label>Gambar Produk</label>
-                <input type="file" name="image" class="form-control-file" accept="image/*" />
-                <small class="text-muted">Upload gambar untuk produk Anda (opsional)</small>
+                <label>Slug (untuk URL)</label>
+                <input type="text" name="slug" class="form-control" />
+                <small class="text-muted">Kosongkan untuk auto-generate slug unik</small>
             </div>
 
             <div class="form-group">
                 <label>Deskripsi</label>
-                <textarea name="description" id="description" class="form-control" rows="5"></textarea>
+                <textarea name="description" class="form-control" rows="5"></textarea>
             </div>
 
             <div class="form-group">
                 <label>Harga (dalam sen, mis. 50000 = 500.00)</label>
                 <input type="number" name="price_cents" class="form-control" min="0" step="1" required />
+            </div>
+
+            <div class="form-group">
+                <label>Mata Uang</label>
+                <input type="text" name="currency" class="form-control" value="IDR" />
             </div>
 
             <div class="form-group">
@@ -57,15 +62,5 @@
 </div>
 
 </section>
-
-<script src="<?= SITE_URL . ASSETS_URL_PATH . 'js/libraries/tinymce/tinymce.min.js' ?>"></script>
-<script>
-    tinymce.init({
-        selector: '#description',
-        plugins: 'code preview autolink directionality visualblocks visualchars fullscreen image link media codesample table hr pagebreak nonbreaking toc advlist lists imagetools',
-        toolbar: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify | numlist bullist outdent | removeformat code',
-        height: 300
-    });
-</script>
 
 
