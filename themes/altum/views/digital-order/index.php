@@ -59,7 +59,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="digital-order/update-status" method="post">
+            <form action="<?= url('digital-order/update-status') ?>" method="post">
                 <div class="modal-body">
                     <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" />
                     <input type="hidden" name="order_id" value="<?= $order->order_id ?>" />
@@ -93,4 +93,47 @@
 </div>
 <?php endforeach ?>
 
+<script>
+$(document).ready(function() {
+    // Debug: Check if Bootstrap is loaded
+    if (typeof $.fn.modal === 'undefined') {
+        console.error('Bootstrap modal is not loaded!');
+        alert('Bootstrap tidak dimuat. Modal tidak akan berfungsi.');
+        return;
+    }
+    
+    console.log('Bootstrap modal loaded successfully');
+    
+    // Handle modal show event
+    $('[data-target^="#updateStatusModal"]').on('click', function() {
+        var modalId = $(this).data('target');
+        console.log('Opening modal:', modalId);
+        
+        // Show modal
+        $(modalId).modal('show');
+    });
+    
+    // Handle form submission - Simple form submit for now
+    $('form[action*="update-status"]').on('submit', function(e) {
+        var form = $(this);
+        var orderId = form.find('input[name="order_id"]').val();
+        var status = form.find('select[name="status"]').val();
+        
+        console.log('Submitting form for order:', orderId, 'Status:', status);
+        
+        // Show loading state
+        var submitBtn = form.find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        submitBtn.html('<i class="fa fa-spinner fa-spin"></i> Updating...').prop('disabled', true);
+        
+        // Allow normal form submission
+        // Form will submit normally and redirect back to manage page
+    });
+    
+    // Handle modal close
+    $('.modal').on('hidden.bs.modal', function() {
+        console.log('Modal closed');
+    });
+});
+</script>
 

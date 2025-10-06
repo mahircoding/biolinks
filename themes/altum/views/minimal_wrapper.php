@@ -15,13 +15,13 @@
     <?php endif ?>
 
     <!-- CSS -->
-    <!-- <link href="<?= SITE_URL ?>themes/altum/assets/css/fontawesome.min.css?v=<?= PRODUCT_CODE ?>" rel="stylesheet" media="screen">
+    <link href="<?= SITE_URL ?>themes/altum/assets/css/fontawesome.min.css?v=<?= PRODUCT_CODE ?>" rel="stylesheet" media="screen">
     <link href="<?= SITE_URL ?>themes/altum/assets/css/bootstrap.min.css?v=<?= PRODUCT_CODE ?>" rel="stylesheet" media="screen">
-    <link href="<?= SITE_URL ?>themes/altum/assets/css/custom.css?v=<?= PRODUCT_CODE ?>" rel="stylesheet" media="screen"> -->
+    <link href="<?= SITE_URL ?>themes/altum/assets/css/custom.css?v=<?= PRODUCT_CODE ?>" rel="stylesheet" media="screen">
     
-    <!-- <?php if($this->settings->custom_css): ?>
+    <?php if($this->settings->custom_css): ?>
         <style><?= $this->settings->custom_css ?></style>
-    <?php endif ?> -->
+    <?php endif ?>
 
     <!-- Custom CSS -->
     <style>
@@ -45,13 +45,13 @@
     </div>
 
     <!-- JS -->
-    <!-- <script src="<?= SITE_URL ?>themes/altum/assets/js/jquery.min.js?v=<?= PRODUCT_CODE ?>"></script>
+    <script src="<?= SITE_URL ?>themes/altum/assets/js/jquery.min.js?v=<?= PRODUCT_CODE ?>"></script>
     <script src="<?= SITE_URL ?>themes/altum/assets/js/bootstrap.bundle.min.js?v=<?= PRODUCT_CODE ?>"></script>
     <script src="<?= SITE_URL ?>themes/altum/assets/js/fontawesome.min.js?v=<?= PRODUCT_CODE ?>"></script>
-    <script src="<?= SITE_URL ?>themes/altum/assets/js/main.js?v=<?= PRODUCT_CODE ?>"></script> -->
+    <script src="<?= SITE_URL ?>themes/altum/assets/js/main.js?v=<?= PRODUCT_CODE ?>"></script>
     
-    <!-- <?php if($this->settings->custom_js): ?>
+    <?php if($this->settings->custom_js): ?>
         <script><?= $this->settings->custom_js ?></script>
-    <?php endif ?> -->
+    <?php endif ?>
 </body>
 </html>
