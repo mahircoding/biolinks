@@ -211,7 +211,8 @@ class Router {
             'digital-order' => [
 				'controller' => 'DigitalOrder',
 				'settings' => [
-					'wrapper' => 'basic_wrapper'
+                    'menu_no_margin' => true,
+                    'body_white' => false
 				]
 			],
 
@@ -427,15 +428,17 @@ class Router {
             ],
             'view' => [
                 'controller' => 'UserProducts',
-                // 'settings' => [
-                //     'wrapper' => 'basic_wrapper'
-                // ]
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
             ],
             'checkout' => [
                 'controller' => 'UserProducts',
-                // 'settings' => [
-                //     'wrapper' => 'basic_wrapper'
-                // ]
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
             ]
         ]
 

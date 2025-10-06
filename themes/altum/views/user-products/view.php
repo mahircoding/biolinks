@@ -397,9 +397,6 @@
         <a href="https://wa.me/6281234567890" class="whatsapp-btn">
             <i class="fa fa-whatsapp"></i>
         </a>
-        <a href="#" class="add-cart-btn">
-            <i class="fa fa-plus"></i>
-        </a>
         <a href="<?= url($data->user->user_id . '/' . $data->product->slug . '/checkout') ?>" class="buy-now-btn">
             DAPATKAN SEKARANG!
         </a>
