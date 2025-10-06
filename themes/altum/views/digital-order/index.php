@@ -1,62 +1,90 @@
 <?php defined('ALTUMCODE') || die() ?>
 
 <style>
-/* Fix modal backdrop issues */
-.modal-backdrop {
-    z-index: 1040 !important;
-}
-
-.modal {
-    z-index: 1050 !important;
-}
-
-.modal-dialog {
-    z-index: 1055 !important;
-}
-
-/* Ensure modal is clickable */
-.modal.show {
-    display: block !important;
-}
-
+/* Fix modal backdrop issues - More specific selectors to avoid conflicts */
+#updateStatusModal .modal-backdrop,
 .modal-backdrop.show {
-    opacity: 0.5 !important;
-}
-
-/* Fix modal backdrop click to close */
-.modal-backdrop {
+    z-index: 1040 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
     pointer-events: auto !important;
 }
 
-/* Ensure modal content is above backdrop */
-.modal-content {
-    position: relative;
-    z-index: 1055;
+#updateStatusModal.modal,
+.modal.show {
+    z-index: 1050 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+#updateStatusModal .modal-dialog {
+    z-index: 1055 !important;
+    position: relative !important;
+    margin: 1.75rem auto !important;
+}
+
+#updateStatusModal .modal-content {
+    position: relative !important;
+    z-index: 1055 !important;
+    background-color: #fff !important;
+    border-radius: 0.3rem !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Prevent body scroll when modal is open */
 body.modal-open {
     overflow: hidden !important;
+    padding-right: 0 !important;
 }
 
-/* Ensure modal is properly positioned */
-.modal {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+/* Custom modal backdrop for our specific modals */
+#updateStatusModal + .modal-backdrop {
+    z-index: 1040 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure our modals work properly */
+[id^="updateStatusModal"] {
     z-index: 1050 !important;
 }
 
-/* Fix modal backdrop positioning */
-.modal-backdrop {
+[id^="updateStatusModal"] .modal-dialog {
+    z-index: 1055 !important;
+}
+
+/* Override any conflicting modal backdrop styles */
+body .modal-backdrop {
+    z-index: 1040 !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 1040 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure modal is above backdrop */
+body .modal {
+    z-index: 1050 !important;
+}
+
+body .modal.show {
+    display: block !important;
+}
+
+/* Fix any padding issues */
+body.modal-open {
+    padding-right: 0 !important;
+    overflow: hidden !important;
 }
 </style>
 
@@ -169,16 +197,25 @@ $(document).ready(function() {
         var modalId = $(this).data('target');
         console.log('Opening modal:', modalId);
         
-        // Remove any existing backdrops
+        // Remove any existing backdrops and reset body
         $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+        $('body').css('padding-right', '');
         
-        // Show modal
+        // Show modal with custom options
         $(modalId).modal({
-            backdrop: true,
-            keyboard: true,
-            focus: true,
-            show: true
+            backdrop: 'static',  // Prevent backdrop click to close initially
+            keyboard: true,      // Allow ESC key
+            focus: true,         // Auto focus
+            show: true           // Show immediately
         });
+        
+        // Add custom backdrop click handler
+        setTimeout(function() {
+            $('.modal-backdrop').off('click').on('click', function() {
+                $(modalId).modal('hide');
+            });
+        }, 100);
     });
     
     // Handle form submission - Simple form submit for now
@@ -199,16 +236,18 @@ $(document).ready(function() {
     });
     
     // Handle modal close and cleanup
-    $('.modal').on('hidden.bs.modal', function() {
+    $('[id^="updateStatusModal"]').on('hidden.bs.modal', function() {
         console.log('Modal closed');
         // Remove any lingering backdrops
         $('.modal-backdrop').remove();
         // Remove modal-open class from body
         $('body').removeClass('modal-open');
+        // Reset body padding
+        $('body').css('padding-right', '');
     });
     
-    // Handle backdrop click to close modal
-    $('.modal').on('click', function(e) {
+    // Handle modal click to close (click outside modal content)
+    $('[id^="updateStatusModal"]').on('click', function(e) {
         if (e.target === this) {
             $(this).modal('hide');
         }
@@ -217,8 +256,14 @@ $(document).ready(function() {
     // Handle ESC key to close modal
     $(document).on('keydown', function(e) {
         if (e.keyCode === 27) { // ESC key
-            $('.modal.show').modal('hide');
+            $('[id^="updateStatusModal"].show').modal('hide');
         }
+    });
+    
+    // Force cleanup on page unload
+    $(window).on('beforeunload', function() {
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
     });
 });
 </script>
