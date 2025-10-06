@@ -413,19 +413,6 @@ class Router {
 
     ];
 
-    public static function handleDynamicRoutes() {
-        /* Dynamic routes */
-        if (isset(self::$params[0]) && is_numeric(self::$params[0]) && isset(self::$params[1])) {
-            self::$path = 'digital-product';
-            self::$controller_key = 'index';
-            self::$controller = 'DigitalProduct';
-
-            if (isset(self::$params[2]) && self::$params[2] == 'checkout') {
-                self::$method = 'checkout';
-            }
-        }
-    }
-
 
 
     public static function parse_url() {
@@ -448,7 +435,6 @@ class Router {
     }
 
     public static function parse_controller() {
-        self::handleDynamicRoutes();
 
         /* Check for potential other paths than the default one (admin panel) */
         if(!empty(self::$params[0])) {
@@ -459,6 +445,12 @@ class Router {
                 unset(self::$params[0]);
 
                 self::$params = array_values(self::$params);
+            } else {
+                /* Check if it's a user_id for digital products */
+                if(is_numeric(self::$params[0])) {
+                    self::$path = 'user-products';
+                    self::$controller_key = 'index';
+                }
             }
 
         }
@@ -477,38 +469,53 @@ class Router {
 
             } else {
 
-                /* Try to check if the link exists via the cache */
-                $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);
-
-                /* Set cache if not existing */
-                if(!$cache_instance->get()) {
-
-                    /* Get data from the database */
-                    $link_url = Database::simple_get('url', 'links', ['url' => self::$params[0]]);
-
-                    \Altum\Cache::$adapter->save($cache_instance->set($link_url)->expiresAfter(86400));
-
+                /* Special handling for user-products path */
+                if(self::$path == 'user-products') {
+                    /* Check if second param exists for product slug */
+                    if(!empty(self::$params[1])) {
+                        self::$controller_key = 'view';
+                        unset(self::$params[1]);
+                        
+                        /* Check if third param is 'checkout' */
+                        if(!empty(self::$params[2]) && self::$params[2] == 'checkout') {
+                            self::$controller_key = 'checkout';
+                            unset(self::$params[2]);
+                        }
+                    }
                 } else {
+                    /* Try to check if the link exists via the cache */
+                    $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);
 
-                    /* Get cache */
-                    $link_url = $cache_instance->get();
+                    /* Set cache if not existing */
+                    if(!$cache_instance->get()) {
 
-                }
+                        /* Get data from the database */
+                        $link_url = Database::simple_get('url', 'links', ['url' => self::$params[0]]);
 
-                /* Check if there is any link available in the database */
-                if($link_url) {
-                    self::$params[0] = Database::clean_string(self::$params[0]);
+                        \Altum\Cache::$adapter->save($cache_instance->set($link_url)->expiresAfter(86400));
 
-                    self::$controller_key = 'link';
-                    self::$controller = 'Link';
-                    self::$path = 'link';
+                    } else {
 
-                } else {
+                        /* Get cache */
+                        $link_url = $cache_instance->get();
 
-                    /* Not found controller */
-                    self::$path = '';
-                    self::$controller_key = 'notfound';
+                    }
 
+                    /* Check if there is any link available in the database */
+                    if($link_url) {
+                        self::$params[0] = Database::clean_string(self::$params[0]);
+
+                        self::$controller_key = 'link';
+                        self::$controller = 'Link';
+                        self::$path = 'link';
+
+                    } else {
+
+                        /* Not found controller */
+                        self::$path = '';
+                        self::$controller_key = 'notfound';
+
+                    }
                 }
 
             }

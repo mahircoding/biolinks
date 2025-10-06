@@ -30,8 +30,8 @@ class DigitalOrder extends Controller {
 
     public function index() {
         /* Public product landing by slug: /digital-order/{slug} */
-        $user_id = isset(\Altum\Routing\Router::$params[0]) ? Database::clean_string(\Altum\Routing\Router::$params[0]) : '';
-        $slug = isset(\Altum\Routing\Router::$params[1]) ? Database::clean_string(\Altum\Routing\Router::$params[1]) : '';
+        $params = \Altum\Routing\Router::get_params();
+        $slug = isset($params[0]) ? Database::clean_string($params[0]) : '';
 
         DigitalProductModel::migrate();
         DigitalOrderModel::migrate();

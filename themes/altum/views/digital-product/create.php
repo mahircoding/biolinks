@@ -28,7 +28,7 @@
             <div class="form-group">
                 <label>Slug (untuk URL)</label>
                 <input type="text" name="slug" class="form-control" />
-                <small class="text-muted">Kosongkan untuk auto-generate dari nama produk</small>
+                <small class="text-muted">Kosongkan untuk auto-generate slug unik</small>
             </div>
 
             <div class="form-group">

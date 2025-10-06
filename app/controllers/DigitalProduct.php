@@ -35,10 +35,10 @@ class DigitalProduct extends Controller {
             $name = Database::clean_string($_POST['name'] ?? '');
             $slug = Database::clean_string($_POST['slug'] ?? '');
             
-            /* Auto-generate unique alphanumeric slug if empty */
+            /* Auto-generate slug if empty */
             if(empty($slug)) {
+                /* Generate unique alphanumeric slug */
                 do {
-                    /* Generate random 8-character alphanumeric slug */
                     $slug = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 8);
                 } while(Database::exists('product_id', \Altum\Models\DigitalProduct::$table, ['slug' => $slug]));
             }
@@ -87,3 +87,5 @@ class DigitalProduct extends Controller {
         redirect('digital-product');
     }
 }
+
+
