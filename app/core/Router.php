@@ -183,30 +183,6 @@ class Router {
                 'controller' => 'Pay'
             ],
 
-			/* Digital products & orders */
-			'digital-product' => [
-				'controller' => 'DigitalProduct',
-				'settings' => [
-					'menu_no_margin' => true,
-					'body_white' => false
-				]
-			],
-
-            'digital-order' => [
-				'controller' => 'DigitalOrder',
-				'settings' => [
-					'wrapper' => 'basic_wrapper'
-				]
-			],
-
-            'digital-order-manage' => [
-                'controller' => 'DigitalOrder',
-                'settings' => [
-                    'menu_no_margin' => true,
-                    'body_white' => false
-                ]
-            ],
-
 
             /* Webhooks */
             'webhook-paypal' => [
@@ -399,28 +375,6 @@ class Router {
         /* White Label Panel */
         'whitelabel' => [
             'alias' => 'admin'
-        ],
-
-        /* User Products */
-        'user-products' => [
-            'index' => [
-                'controller' => 'UserProducts',
-                'settings' => [
-                    'wrapper' => 'basic_wrapper'
-                ]
-            ],
-            'view' => [
-                'controller' => 'UserProducts',
-                'settings' => [
-                    'wrapper' => 'basic_wrapper'
-                ]
-            ],
-            'checkout' => [
-                'controller' => 'UserProducts',
-                'settings' => [
-                    'wrapper' => 'basic_wrapper'
-                ]
-            ]
         ]
 
     ];
@@ -451,67 +405,30 @@ class Router {
         /* Check for potential other paths than the default one (admin panel) */
         if(!empty(self::$params[0])) {
 
-            /* Check for special paths first (admin, agency, etc.) */
             if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p'])) {
                 self::$path = self::$params[0];
 
                 unset(self::$params[0]);
+
                 self::$params = array_values(self::$params);
-            } 
-            /* Check if it's a numeric user_id for digital products - ONLY if no other path matched */
-            else if(is_numeric(self::$params[0])) {
-                /* Verify it looks like a valid user_id (positive integer) */
-                $potential_user_id = intval(self::$params[0]);
-                if($potential_user_id > 0) {
-                    self::$path = 'user-products';
-                    /* Keep params[0] as is - controller needs the user_id */
-                    /* Don't call array_values yet - preserve parameter structure */
-                }
             }
+
         }
 		
-		/* Handle route aliases */
-		if(isset(self::$routes[self::$path]['alias']) && self::$routes[self::$path]['alias']) {
+		if(isset(self::$routes[self::$path]['alias'])&&self::$routes[self::$path]['alias']) {
 			self::$path = self::$routes[self::$path]['alias']; 
 		}
 
-        /* Now parse the actual controller */
         if(!empty(self::$params[0])) {
 
-            /* Special handling for user-products path */
-            if(self::$path == 'user-products') {
-                /* Default to index (user product list) */
-                self::$controller_key = 'index';
-                
-                /* Check if we have product slug in params[1] */
-                if(isset(self::$params[1]) && !empty(self::$params[1])) {
-                    /* Product detail view */
-                    self::$controller_key = 'view';
-                    
-                    /* Check if params[2] is 'checkout' */
-                    if(isset(self::$params[2]) && self::$params[2] === 'checkout') {
-                        self::$controller_key = 'checkout';
-                    }
-                }
-                /* Keep all params intact - controller needs them */
-            } 
-            /* Check if controller exists in routes */
-            else if(array_key_exists(self::$params[0], self::$routes[self::$path])) {
-                /* Verify the controller file actually exists */
-                $controller_file = APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php';
-                
-                if(file_exists($controller_file)) {
-                    self::$controller_key = self::$params[0];
-                    unset(self::$params[0]);
-                    self::$params = array_values(self::$params);
-                } else {
-                    /* Controller file not found, treat as 404 */
-                    self::$path = '';
-                    self::$controller_key = 'notfound';
-                }
-            } 
-            /* Check if it's a custom link URL */
-            else {
+            if(array_key_exists(self::$params[0], self::$routes[self::$path]) && file_exists(APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php')) {
+
+                self::$controller_key = self::$params[0];
+
+                unset(self::$params[0]);
+
+            } else {
+
                 /* Try to check if the link exists via the cache */
                 $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);
 
@@ -545,6 +462,7 @@ class Router {
                     self::$controller_key = 'notfound';
 
                 }
+
             }
 
         }
@@ -578,12 +496,8 @@ class Router {
 
         $method = self::$method;
 
-        /* For user-products path, use the controller_key we already determined */
-        if(self::$path == 'user-products') {
-            $method = self::$controller_key;
-        }
         /* Make sure to check the class method if set in the url */
-        else if(isset(self::get_params()[0]) && method_exists($controller, self::get_params()[0])) {
+        if(isset(self::get_params()[0]) && method_exists($controller, self::get_params()[0])) {
 
             /* Make sure the method is not private */
             $reflection = new \ReflectionMethod($controller, self::get_params()[0]);
@@ -591,7 +505,6 @@ class Router {
                 $method = self::get_params()[0];
 
                 unset(self::$params[0]);
-                self::$params = array_values(self::$params);
             }
 
         }
