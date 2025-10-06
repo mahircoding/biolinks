@@ -451,84 +451,100 @@ class Router {
         /* Check for potential other paths than the default one (admin panel) */
         if(!empty(self::$params[0])) {
 
+            /* Check for special paths first (admin, agency, etc.) */
             if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p'])) {
                 self::$path = self::$params[0];
 
                 unset(self::$params[0]);
-
                 self::$params = array_values(self::$params);
-            } else {
-                /* Check if it's a user_id for digital products */
-                if(is_numeric(self::$params[0])) {
+            } 
+            /* Check if it's a numeric user_id for digital products - ONLY if no other path matched */
+            else if(is_numeric(self::$params[0])) {
+                /* Verify it looks like a valid user_id (positive integer) */
+                $potential_user_id = intval(self::$params[0]);
+                if($potential_user_id > 0) {
                     self::$path = 'user-products';
-                    self::$controller_key = 'index';
-                    /* Don't unset params[0] - UserProducts controller needs user_id */
-                    /* Also don't call array_values - we need to preserve the original parameter order */
+                    /* Keep params[0] as is - controller needs the user_id */
+                    /* Don't call array_values yet - preserve parameter structure */
                 }
             }
-
         }
 		
-		if(isset(self::$routes[self::$path]['alias'])&&self::$routes[self::$path]['alias']) {
+		/* Handle route aliases */
+		if(isset(self::$routes[self::$path]['alias']) && self::$routes[self::$path]['alias']) {
 			self::$path = self::$routes[self::$path]['alias']; 
 		}
 
+        /* Now parse the actual controller */
         if(!empty(self::$params[0])) {
 
-            /* Special handling for user-products path - check this first */
+            /* Special handling for user-products path */
             if(self::$path == 'user-products') {
-                /* Check if second param exists for product slug */
+                /* Default to index (user product list) */
+                self::$controller_key = 'index';
+                
+                /* Check if we have product slug in params[1] */
                 if(isset(self::$params[1]) && !empty(self::$params[1])) {
+                    /* Product detail view */
                     self::$controller_key = 'view';
                     
-                    /* Check if third param is 'checkout' */
-                    if(isset(self::$params[2]) && !empty(self::$params[2]) && self::$params[2] == 'checkout') {
+                    /* Check if params[2] is 'checkout' */
+                    if(isset(self::$params[2]) && self::$params[2] === 'checkout') {
                         self::$controller_key = 'checkout';
-                        unset(self::$params[2]);
                     }
-                    /* Don't unset any params - UserProducts controller needs them */
                 }
-            } else if(array_key_exists(self::$params[0], self::$routes[self::$path]) && file_exists(APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php')) {
+                /* Keep all params intact - controller needs them */
+            } 
+            /* Check if controller exists in routes */
+            else if(array_key_exists(self::$params[0], self::$routes[self::$path])) {
+                /* Verify the controller file actually exists */
+                $controller_file = APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php';
+                
+                if(file_exists($controller_file)) {
+                    self::$controller_key = self::$params[0];
+                    unset(self::$params[0]);
+                    self::$params = array_values(self::$params);
+                } else {
+                    /* Controller file not found, treat as 404 */
+                    self::$path = '';
+                    self::$controller_key = 'notfound';
+                }
+            } 
+            /* Check if it's a custom link URL */
+            else {
+                /* Try to check if the link exists via the cache */
+                $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);
 
-                self::$controller_key = self::$params[0];
+                /* Set cache if not existing */
+                if(!$cache_instance->get()) {
 
-                unset(self::$params[0]);
+                    /* Get data from the database */
+                    $link_url = Database::simple_get('url', 'links', ['url' => self::$params[0]]);
 
-            } else {
-                    /* Try to check if the link exists via the cache */
-                    $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);
+                    \Altum\Cache::$adapter->save($cache_instance->set($link_url)->expiresAfter(86400));
 
-                    /* Set cache if not existing */
-                    if(!$cache_instance->get()) {
+                } else {
 
-                        /* Get data from the database */
-                        $link_url = Database::simple_get('url', 'links', ['url' => self::$params[0]]);
+                    /* Get cache */
+                    $link_url = $cache_instance->get();
 
-                        \Altum\Cache::$adapter->save($cache_instance->set($link_url)->expiresAfter(86400));
+                }
 
-                    } else {
+                /* Check if there is any link available in the database */
+                if($link_url) {
+                    self::$params[0] = Database::clean_string(self::$params[0]);
 
-                        /* Get cache */
-                        $link_url = $cache_instance->get();
+                    self::$controller_key = 'link';
+                    self::$controller = 'Link';
+                    self::$path = 'link';
 
-                    }
+                } else {
 
-                    /* Check if there is any link available in the database */
-                    if($link_url) {
-                        self::$params[0] = Database::clean_string(self::$params[0]);
+                    /* Not found controller */
+                    self::$path = '';
+                    self::$controller_key = 'notfound';
 
-                        self::$controller_key = 'link';
-                        self::$controller = 'Link';
-                        self::$path = 'link';
-
-                    } else {
-
-                        /* Not found controller */
-                        self::$path = '';
-                        self::$controller_key = 'notfound';
-
-                    }
-
+                }
             }
 
         }
@@ -571,6 +587,7 @@ class Router {
                 $method = self::get_params()[0];
 
                 unset(self::$params[0]);
+                self::$params = array_values(self::$params);
             }
 
         }
