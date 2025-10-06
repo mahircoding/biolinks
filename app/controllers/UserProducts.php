@@ -189,11 +189,11 @@ class UserProducts extends Controller {
                        '<a href="' . $download_url . '">' . $download_url . '</a></p>';
             send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
 
-            $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
-            $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product]));
+            // $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
+            // $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product]));
         } else {
-            $view = new \Altum\Views\View('user-products/checkout', (array) $this);
-            $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));
+            // $view = new \Altum\Views\View('user-products/checkout', (array) $this);
+            // $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));
         }
     }
 }
