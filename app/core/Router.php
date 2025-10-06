@@ -423,7 +423,9 @@ class Router {
             'index' => [
                 'controller' => 'UserProducts',
                 'settings' => [
-                    'wrapper' => 'basic_wrapper'
+                    'wrapper' => 'minimal_wrapper',
+                    'menu_no_margin' => true,
+                    'body_white' => false
                 ]
             ],
             'view' => [
@@ -437,6 +439,7 @@ class Router {
             'checkout' => [
                 'controller' => 'UserProducts',
                 'settings' => [
+                    'wrapper' => 'minimal_wrapper',
                     'menu_no_margin' => true,
                     'body_white' => false
                 ]
