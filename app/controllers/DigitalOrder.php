@@ -56,6 +56,10 @@ class DigitalOrder extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product) redirect('notfound');
 
+        /* Get product owner's Tripay settings */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $product->user_id]);
+        if(!$user) redirect('notfound');
+
         $token = bin2hex(random_bytes(16));
         $expires_at = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 3); /* 3 days */
 
@@ -72,7 +76,7 @@ class DigitalOrder extends Controller {
         ]);
 
         /* If Tripay configured, create transaction and redirect to payment page */
-        if(defined('TRIPAY_API_KEY') && TRIPAY_API_KEY && defined('TRIPAY_PRIVATE_KEY') && TRIPAY_PRIVATE_KEY && defined('TRIPAY_MERCHANT_CODE') && TRIPAY_MERCHANT_CODE) {
+        if(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
             $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
             $payload = [
@@ -92,7 +96,7 @@ class DigitalOrder extends Controller {
                     ]
                 ],
                 'expired_time'  => time() + (24 * 60 * 60),
-                'signature'     => hash_hmac('sha256', TRIPAY_MERCHANT_CODE . $reference . ((int) $product->price_cents), TRIPAY_PRIVATE_KEY),
+                'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . ((int) $product->price_cents), $user->tripay_api_key_secret),
                 'return_url'    => url('digital-order/' . $product->slug),
                 'callback_url'  => url('digital-order/webhook')
             ];
@@ -100,10 +104,10 @@ class DigitalOrder extends Controller {
             $ch = curl_init();
             curl_setopt_array($ch, [
                 CURLOPT_FRESH_CONNECT  => true,
-                CURLOPT_URL            => 'https://tripay.co.id/api/transaction/create',
+                CURLOPT_URL            => 'https://tripay.co.id/api-sandbox/transaction/create',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER         => false,
-                CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . TRIPAY_API_KEY ],
+                CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $user->tripay_api_key_public ],
                 CURLOPT_FAILONERROR    => false,
                 CURLOPT_POST           => true,
                 CURLOPT_POSTFIELDS     => http_build_query($payload)
@@ -143,25 +147,30 @@ class DigitalOrder extends Controller {
         $payload = json_decode($json);
         if(!$payload) die('INVALID');
 
-        $signature = hash_hmac('sha256', $payload->reference . $payload->status . $payload->total_amount, TRIPAY_PRIVATE_KEY);
+        /* Get order first to find the product owner */
+        $order = DigitalOrderModel::find_by_reference($payload->reference);
+        if(!$order) die('ORDER_NOT_FOUND');
+
+        $product = DigitalProductModel::find_by_id($order->product_id);
+        if(!$product) die('PRODUCT_NOT_FOUND');
+
+        /* Get product owner's Tripay settings for signature verification */
+        $user = Database::get(['tripay_api_key_secret'], 'users', ['user_id' => $product->user_id]);
+        if(!$user) die('USER_NOT_FOUND');
+
+        $signature = hash_hmac('sha256', $payload->reference . $payload->status . $payload->total_amount, $user->tripay_api_key_secret);
         $header_signature = $_SERVER['HTTP_X_CALLBACK_SIGNATURE'] ?? '';
         if($signature !== $header_signature) die('INVALID_SIGNATURE');
 
         if(($payload->status ?? '') === 'PAID') {
-            $order = DigitalOrderModel::find_by_reference($payload->reference);
-            if($order) {
-                DigitalOrderModel::mark_paid($order->order_id, $payload->payment_method ?? '');
+            DigitalOrderModel::mark_paid($order->order_id, $payload->payment_method ?? '');
 
-                $product = DigitalProductModel::find_by_id($order->product_id);
-                if($product) {
-                    $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $order->download_token);
-                    $content = '<p>Terima kasih, pembayaran Anda sudah diterima.</p>' .
-                               '<p>Produk: <strong>' . $product->name . '</strong></p>' .
-                               '<p>Akses produk Anda:<br />' .
-                               '<a href="' . $download_url . '">' . $download_url . '</a></p>';
-                    send_mail($this->settings, $order->buyer_email, 'Pembayaran Sukses - Akses Produk', $content, false);
-                }
-            }
+            $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $order->download_token);
+            $content = '<p>Terima kasih, pembayaran Anda sudah diterima.</p>' .
+                       '<p>Produk: <strong>' . $product->name . '</strong></p>' .
+                       '<p>Akses produk Anda:<br />' .
+                       '<a href="' . $download_url . '">' . $download_url . '</a></p>';
+            send_mail($this->settings, $order->buyer_email, 'Pembayaran Sukses - Akses Produk', $content, false);
         }
 
         echo 'OK';
