@@ -2,30 +2,35 @@
 
 <style>
 .checkout-page {
-    background: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 504px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 480px;
     margin: 0 auto;
     position: relative;
 }
 
 .header-section {
-    background: #f8f9fa;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     padding: 20px;
     text-align: center;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .back-btn {
     position: absolute;
     left: 20px;
-    top: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     width: 40px;
     height: 40px;
-    border-radius: 8px;
+    border-radius: 50%;
     border: none;
-    background: #f5f5f5;
+    background: rgba(0, 0, 0, 0.1);
     color: #333;
     display: flex;
     align-items: center;
@@ -35,56 +40,74 @@
 }
 
 .back-btn:hover {
-    background: #e0e0e0;
+    background: rgba(0, 0, 0, 0.2);
     color: #333;
     text-decoration: none;
 }
 
 .page-title {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     color: #1a1a1a;
     margin: 0;
-    padding-top: 10px;
 }
 
 .checkout-content {
-    padding: 20px;
+    padding: 0;
 }
 
-.product-info {
-    background: #f8f9fa;
+.product-card {
+    background: white;
+    margin: 20px;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
+    margin-bottom: 16px;
 }
 
 .product-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
     margin-bottom: 8px;
+    line-height: 1.3;
 }
 
 .product-creator {
     font-size: 14px;
     color: #666;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
 }
 
 .product-price {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     color: #4caf50;
     margin: 0;
+    text-align: center;
+    background: linear-gradient(135deg, #4caf50, #45a049);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .checkout-form {
     background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 20px 20px;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .form-group {
@@ -101,44 +124,55 @@
 
 .form-control {
     width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
+    padding: 16px;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
     font-size: 16px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
     box-sizing: border-box;
+    background: #fafafa;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #4caf50;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .submit-btn {
     width: 100%;
-    background: #4caf50;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    padding: 16px;
-    border-radius: 8px;
+    padding: 18px;
+    border-radius: 12px;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
 }
 
 .submit-btn:hover {
-    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
 }
 
 /* Payment Methods Styles */
 .payment-methods {
     max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px;
-    background: #f8f9fa;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fafafa;
 }
 
 .payment-category {
@@ -151,11 +185,11 @@
 
 .payment-category-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid #e0e0e0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -177,45 +211,50 @@
 
 .payment-label {
     display: block;
-    padding: 12px 16px;
+    padding: 16px;
     background: white;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .payment-label:hover {
-    border-color: #4caf50;
-    background: #f8fff8;
+    border-color: #667eea;
+    background: #f8f9ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
 .payment-radio:checked + .payment-label {
-    border-color: #4caf50;
-    background: #e8f5e8;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    border-color: #667eea;
+    background: linear-gradient(135deg, #f8f9ff, #e8f0ff);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    transform: translateY(-1px);
 }
 
 .payment-logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 12px;
     color: white;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .payment-name {
-    font-weight: 500;
+    font-weight: 600;
     color: #333;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 /* Bank Transfer Styles */
@@ -226,9 +265,9 @@
 }
 
 .bank-name {
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .bank-details {
@@ -238,60 +277,86 @@
 }
 
 .account-name {
-    font-size: 12px;
+    font-size: 13px;
     color: #666;
 }
 
 .account-number {
-    font-size: 12px;
+    font-size: 13px;
     color: #888;
-    font-family: monospace;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-weight: 600;
 }
 
 /* Payment Logo Colors */
 .qris-logo {
-    background: #000;
+    background: linear-gradient(135deg, #000, #333);
 }
 
 .shopeepay-logo {
-    background: #ee4d2d;
+    background: linear-gradient(135deg, #ee4d2d, #ff6b35);
 }
 
 .ovo-logo {
-    background: #4c2882;
+    background: linear-gradient(135deg, #4c2882, #6a4c93);
 }
 
 .dana-logo {
-    background: #118eea;
+    background: linear-gradient(135deg, #118eea, #36a2eb);
 }
 
 .bca-logo {
-    background: #1e3a8a;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
 }
 
 .mandiri-logo {
-    background: #f59e0b;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
 }
 
 .bri-logo {
-    background: #059669;
+    background: linear-gradient(135deg, #059669, #10b981);
 }
 
 .bni-logo {
-    background: #dc2626;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
     .checkout-content {
-        padding: 15px;
+        padding: 0;
     }
     
     .header-section {
-        padding: 15px;
+        padding: 16px;
     }
     
     .page-title {
-        font-size: 20px;
+        font-size: 18px;
+    }
+    
+    .product-card {
+        margin: 16px;
+        padding: 20px;
+    }
+    
+    .checkout-form {
+        margin: 0 16px 16px;
+        padding: 20px;
     }
     
     .payment-methods {
@@ -299,12 +364,12 @@
     }
     
     .payment-label {
-        padding: 10px 12px;
+        padding: 14px;
     }
     
     .payment-logo {
-        width: 35px;
-        height: 35px;
+        width: 40px;
+        height: 40px;
         font-size: 11px;
     }
 }
@@ -321,9 +386,18 @@
 
     <!-- Checkout Content -->
     <div class="checkout-content">
-        <!-- Product Info -->
-        <div class="product-info">
+        <!-- Product Card -->
+        <div class="product-card">
+            <?php if(!empty($data->product->image_path)): ?>
+                <img src="<?= UPLOADS_URL_PATH . $data->product->image_path ?>" alt="<?= htmlspecialchars($data->product->name) ?>" class="product-image">
+            <?php else: ?>
+                <div class="product-image" style="background: linear-gradient(135deg, #f0f0f0, #e0e0e0); display: flex; align-items: center; justify-content: center; color: #999; font-size: 48px;">
+                    <i class="fa fa-image"></i>
+                </div>
+            <?php endif ?>
+            
             <h2 class="product-name"><?= htmlspecialchars($data->product->name) ?></h2>
+            <div class="product-creator">Oleh: <?= htmlspecialchars($data->user->name) ?></div>
             <div class="product-price">Rp <?= number_format($data->product->price_cents, 0, ',', '.') ?></div>
         </div>
 
@@ -449,8 +523,118 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="submit-btn">Proses Pembayaran</button>
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="fa fa-credit-card mr-2"></i>
+                    <span class="btn-text">Proses Pembayaran</span>
+                    <span class="loading" style="display: none;"></span>
+                </button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const loading = submitBtn.querySelector('.loading');
+    
+    // Payment method selection animation
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Remove active class from all labels
+            document.querySelectorAll('.payment-label').forEach(label => {
+                label.classList.remove('active');
+            });
+            
+            // Add active class to selected label
+            if (this.checked) {
+                this.nextElementSibling.classList.add('active');
+            }
+        });
+    });
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        // Check if payment method is selected
+        const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+        if (!selectedPayment) {
+            e.preventDefault();
+            alert('Silakan pilih metode pembayaran terlebih dahulu.');
+            return;
+        }
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        btnText.style.display = 'none';
+        loading.style.display = 'inline-block';
+        
+        // Add loading class for animation
+        submitBtn.classList.add('loading-state');
+    });
+    
+    // Smooth scroll for payment methods
+    const paymentMethods = document.querySelector('.payment-methods');
+    if (paymentMethods) {
+        paymentMethods.style.scrollBehavior = 'smooth';
+    }
+    
+    // Add ripple effect to payment options
+    document.querySelectorAll('.payment-label').forEach(label => {
+        label.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(102, 126, 234, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            `;
+            
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
+
+// Add ripple animation CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    .payment-label.active {
+        border-color: #667eea !important;
+        background: linear-gradient(135deg, #f8f9ff, #e8f0ff) !important;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2) !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    .submit-btn.loading-state {
+        opacity: 0.8;
+        cursor: not-allowed;
+    }
+`;
+document.head.appendChild(style);
+</script>
