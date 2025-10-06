@@ -97,7 +97,7 @@ class DigitalOrder extends Controller {
                 ],
                 'expired_time'  => time() + (24 * 60 * 60),
                 'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . ((int) $product->price_cents), $user->tripay_api_key_secret),
-                'return_url'    => url('digital-order/' . $product->slug),
+                'return_url'    => url($product->user_id . '/' . $product->slug),
                 'callback_url'  => url('digital-order/webhook')
             ];
 
