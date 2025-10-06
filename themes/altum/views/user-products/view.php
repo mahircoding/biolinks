@@ -61,9 +61,16 @@
     justify-content: center;
 }
 
+.product-price {
+    font-size: 15px;
+    font-weight: 500;
+    color: #4caf50;
+    margin: 0;
+}
+
 .product-title {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: #1a1a1a;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -335,6 +342,7 @@
 
     <!-- Product Title -->
     <h1 class="product-title"><?= htmlspecialchars($data->product->name) ?></h1>
+    <h4 class="product-price"><?= htmlspecialchars($data->product->price_cents) ?></h4>
 
     <!-- Product Banner -->
     <div class="product-banner">
