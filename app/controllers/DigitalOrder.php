@@ -28,6 +28,63 @@ class DigitalOrder extends Controller {
         $this->add_view_content('content', $view->run(['orders' => $orders]));
     }
 
+    public function update_status() {
+        \Altum\Middlewares\Authentication::guard();
+
+        if(empty($_POST)) redirect('digital-order/manage');
+
+        $order_id = (int)($_POST['order_id'] ?? 0);
+        $status = Database::clean_string($_POST['status'] ?? '');
+        $channel = Database::clean_string($_POST['channel'] ?? '');
+
+        if(!$order_id || !$status) {
+            $_SESSION['error'][] = 'Data tidak valid.';
+            redirect('digital-order/manage');
+        }
+
+        // Validasi status yang diizinkan
+        $allowed_statuses = ['pending', 'paid', 'cancelled', 'refunded'];
+        if(!in_array($status, $allowed_statuses)) {
+            $_SESSION['error'][] = 'Status tidak valid.';
+            redirect('digital-order/manage');
+        }
+
+        // Cek apakah order ada dan milik user ini
+        $order = DigitalOrderModel::find_by_id($order_id);
+        if(!$order) {
+            $_SESSION['error'][] = 'Order tidak ditemukan.';
+            redirect('digital-order/manage');
+        }
+
+        // Cek apakah order milik user ini (melalui product owner)
+        $product = DigitalProductModel::find_by_id($order->product_id);
+        if(!$product || $product->user_id != $this->user->user_id) {
+            $_SESSION['error'][] = 'Anda tidak memiliki akses ke order ini.';
+            redirect('digital-order/manage');
+        }
+
+        // Update status
+        $result = DigitalOrderModel::update_status($order_id, $status, $channel);
+        
+        if($result) {
+            $_SESSION['success'][] = 'Status order berhasil diupdate.';
+            
+            // Jika status diubah ke paid, kirim email akses produk
+            if($status === 'paid') {
+                $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $order->download_token);
+                $content = '<p>Terima kasih, pembayaran Anda sudah diterima.</p>' .
+                           '<p>Produk: <strong>' . $product->name . '</strong></p>' .
+                           '<p>Akses produk Anda:<br />' .
+                           '<a href="' . $download_url . '">' . $download_url . '</a></p>';
+                send_mail($this->settings, $order->buyer_email, 'Pembayaran Sukses - Akses Produk', $content, false);
+            }
+        } else {
+            $_SESSION['error'][] = 'Gagal mengupdate status order.';
+        }
+
+        redirect('digital-order/manage');
+    }
+
     public function index() {
         /* Public product landing by slug: /digital-order/{slug} */
         $params = \Altum\Routing\Router::get_params();

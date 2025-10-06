@@ -59,6 +59,24 @@ class DigitalOrder {
             'paid_at' => date('Y-m-d H:i:s')
         ], [ 'order_id' => $order_id ]);
     }
+
+    public static function update_status($order_id, $status, $channel = null) {
+        $update_data = ['status' => $status];
+        
+        if($channel) {
+            $update_data['payment_channel'] = $channel;
+        }
+        
+        if($status === 'paid') {
+            $update_data['paid_at'] = date('Y-m-d H:i:s');
+        }
+        
+        return Database::update(self::$table, $update_data, ['order_id' => $order_id]);
+    }
+
+    public static function find_by_id($order_id) {
+        return Database::get(['order_id','product_id','buyer_name','buyer_email','buyer_phone','amount_cents','currency','download_token','download_expires_at','status','tripay_reference','payment_channel','paid_at','created_at'], self::$table, ['order_id' => $order_id]);
+    }
 }
 
 

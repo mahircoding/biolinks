@@ -232,6 +232,15 @@ class Router {
                 ]
             ],
 
+            'digital-order-update-status' => [
+                'controller' => 'DigitalOrder',
+                'method' => 'update_status',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
 
             /* Webhooks */
             'webhook-paypal' => [
