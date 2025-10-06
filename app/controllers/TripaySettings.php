@@ -1,8 +1,12 @@
-<?php defined('ALTUMCODE') || die() ?>
-
 <?php
 
-class TripaySettings extends \Altum\Controllers\Controller {
+namespace Altum\Controllers;
+
+use Altum\Database\Database;
+use Altum\Middlewares\Authentication;
+use Altum\Middlewares\Csrf;
+
+class TripaySettings extends Controller {
 
     public function index() {
         Authentication::guard();
