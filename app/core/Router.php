@@ -429,6 +429,7 @@ class Router {
             'view' => [
                 'controller' => 'UserProducts',
                 'settings' => [
+                    'wrapper' => 'minimal_wrapper',
                     'menu_no_margin' => true,
                     'body_white' => false
                 ]

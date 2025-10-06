@@ -69,21 +69,26 @@ class Controller {
         }
 
         if(Router::$path == 'user-products') {
-            /* Get the top menu custom pages */
-            $pages = (new Page(['database' => $this->database]))->get_pages('top');
+            /* Check if using minimal wrapper */
+            if(Router::$controller_settings['wrapper'] == 'minimal_wrapper') {
+                $wrapper = new \Altum\Views\View('minimal_wrapper', (array) $this);
+            } else {
+                /* Get the top menu custom pages */
+                $pages = (new Page(['database' => $this->database]))->get_pages('top');
 
-            /* Establish the menu view */
-            $menu = new \Altum\Views\View('partials/menu', (array) $this);
-            $this->add_view_content('menu', $menu->run([ 'pages' => $pages ]));
+                /* Establish the menu view */
+                $menu = new \Altum\Views\View('partials/menu', (array) $this);
+                $this->add_view_content('menu', $menu->run([ 'pages' => $pages ]));
 
-            /* Get the footer */
-            $pages = (new Page(['database' => $this->database]))->get_pages('bottom');
+                /* Get the footer */
+                $pages = (new Page(['database' => $this->database]))->get_pages('bottom');
 
-            /* Establish the footer view */
-            $footer = new \Altum\Views\View('partials/footer', (array) $this);
-            $this->add_view_content('footer', $footer->run([ 'pages' => $pages ]));
+                /* Establish the footer view */
+                $footer = new \Altum\Views\View('partials/footer', (array) $this);
+                $this->add_view_content('footer', $footer->run([ 'pages' => $pages ]));
 
-            $wrapper = new \Altum\Views\View(Router::$controller_settings['wrapper'], (array) $this);
+                $wrapper = new \Altum\Views\View(Router::$controller_settings['wrapper'], (array) $this);
+            }
         }
 
         echo $wrapper->run();
