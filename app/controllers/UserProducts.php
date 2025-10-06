@@ -20,8 +20,8 @@ class UserProducts extends Controller {
         /* Get user's products */
         $products = \Altum\Models\DigitalProduct::list_by_user($user_id);
         
-        /* Get user info including Tripay settings */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings and bank account */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         $view = new \Altum\Views\View('user-products/index', (array) $this);
@@ -41,8 +41,8 @@ class UserProducts extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
-        /* Get user info including Tripay settings */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings and bank account */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         $view = new \Altum\Views\View('user-products/view', (array) $this);
@@ -63,15 +63,15 @@ class UserProducts extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
-        /* Get user info including Tripay settings */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings and bank account */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         if(!empty($_POST)) {
             $name = Database::clean_string($_POST['name'] ?? '');
             $email = Database::clean_string($_POST['email'] ?? '');
             $phone = Database::clean_string($_POST['phone'] ?? '');
-            $method = Database::clean_string($_POST['method'] ?? '');
+            $payment_method = Database::clean_string($_POST['payment_method'] ?? '');
 
             $token = bin2hex(random_bytes(16));
             $expires_at = date('Y-m-d H:i:s', time() + 60 * 60 * 24 * 3);
@@ -88,12 +88,51 @@ class UserProducts extends Controller {
                 'status' => 'pending'
             ]);
 
+            /* Check payment method and process accordingly */
+            if(strpos($payment_method, 'bank_transfer_') === 0) {
+                /* Bank Transfer Payment */
+                $bank_name = str_replace('bank_transfer_', '', $payment_method);
+                $bank_accounts = json_decode($user->bank_account);
+                $selected_bank = null;
+                
+                if($bank_accounts) {
+                    foreach($bank_accounts as $bank) {
+                        if($bank->bank_name === $bank_name) {
+                            $selected_bank = $bank;
+                            break;
+                        }
+                    }
+                }
+                
+                if($selected_bank) {
+                    /* Send bank transfer instructions via email */
+                    $content = '<p>Terima kasih atas pesanan Anda.</p>' .
+                               '<p>Produk: <strong>' . $product->name . '</strong></p>' .
+                               '<p>Harga: <strong>Rp ' . number_format($product->price_cents / 100, 0, ',', '.') . '</strong></p>' .
+                               '<p>Silakan transfer ke rekening berikut:</p>' .
+                               '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">' .
+                               '<p><strong>Bank:</strong> ' . htmlspecialchars($selected_bank->bank_name) . '</p>' .
+                               '<p><strong>Nama Rekening:</strong> ' . htmlspecialchars($selected_bank->account_name) . '</p>' .
+                               '<p><strong>Nomor Rekening:</strong> ' . htmlspecialchars($selected_bank->account_number) . '</p>' .
+                               '</div>' .
+                               '<p>Setelah transfer, produk akan dikirim ke email Anda.</p>';
+                    
+                    send_mail($this->settings, $email, 'Instruksi Pembayaran - {{WEBSITE_TITLE}}', $content, false);
+                    
+                    /* Update order status */
+                    Database::update(DigitalOrderModel::$table, ['status' => 'pending_payment'], ['download_token' => $token]);
+                    
+                    $view = new \Altum\Views\View('user-products/bank-transfer-instructions', (array) $this);
+                    $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email]));
+                    return;
+                }
+            }
             /* If Tripay configured for this user, create transaction and redirect to payment page */
-            if(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
+            elseif(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
                 $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
                 $payload = [
-                    'method'        => $method ?: 'QRIS',
+                    'method'        => $payment_method ?: 'QRIS',
                     'merchant_ref'  => $reference,
                     'amount'        => (int)$product->price_cents,
                     'customer_name' => $name,
