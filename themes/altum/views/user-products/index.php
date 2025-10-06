@@ -101,7 +101,7 @@
 
 .product-name {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: #333;
     margin: 0 0 8px 0;
     line-height: 1.3;
@@ -112,9 +112,9 @@
 }
 
 .product-price {
-    font-size: 16px;
-    font-weight: 700;
-    color: #4caf50;
+    font-size: 14px;
+    font-weight: 500;
+    color: #38b2ac;
     margin: 0;
 }
 

@@ -5,7 +5,7 @@
 #updateStatusModal .modal-backdrop,
 .modal-backdrop.show {
     z-index: 1040 !important;
-    position: fixed !important;
+    position: relative !important;
     top: 0 !important;
     left: 0 !important;
     width: 100vw !important;
@@ -17,7 +17,7 @@
 #updateStatusModal.modal,
 .modal.show {
     z-index: 1050 !important;
-    position: fixed !important;
+    position: relative !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
@@ -63,7 +63,7 @@ body.modal-open {
 /* Override any conflicting modal backdrop styles */
 body .modal-backdrop {
     z-index: 1040 !important;
-    position: fixed !important;
+    position: relative !important;
     top: 0 !important;
     left: 0 !important;
     width: 100vw !important;
