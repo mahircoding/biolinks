@@ -341,10 +341,6 @@
         </div>
     </div>
 
-    <!-- Product Title -->
-    <h1 class="product-title"><?= htmlspecialchars($data->product->name) ?></h1>
-    <h4 class="product-price"><?= htmlspecialchars($data->product->price_cents) ?></h4>
-
     <!-- Product Banner -->
     <div class="product-banner">
         <?php if(!empty($data->product->image_path)): ?>
@@ -358,6 +354,10 @@
             </div>
         <?php endif ?>
     </div>
+
+    <!-- Product Title -->
+    <h1 class="product-title"><?= htmlspecialchars($data->product->name) ?></h1>
+    <h4 class="product-price"><?= 'Rp ' . number_format($data->$product->price_cents / 100, 0, ',', '.') ?></h4>
 
     <!-- Description Section -->
     <div class="description-section">
@@ -380,7 +380,7 @@
             </svg>
         </a>
         <a href="<?= url($data->user->user_id . '/' . $data->product->slug . '/checkout') ?>" class="btn btn-primary">
-            DAPATKAN SEKARANG!
+            ORDER SEKARANG!
         </a>
     </div>
 </div>
