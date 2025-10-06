@@ -463,6 +463,7 @@ class Router {
                     self::$path = 'user-products';
                     self::$controller_key = 'index';
                     /* Don't unset params[0] - UserProducts controller needs user_id */
+                    /* Also don't call array_values - we need to preserve the original parameter order */
                 }
             }
 
@@ -477,11 +478,11 @@ class Router {
             /* Special handling for user-products path - check this first */
             if(self::$path == 'user-products') {
                 /* Check if second param exists for product slug */
-                if(!empty(self::$params[1])) {
+                if(isset(self::$params[1]) && !empty(self::$params[1])) {
                     self::$controller_key = 'view';
                     
                     /* Check if third param is 'checkout' */
-                    if(!empty(self::$params[2]) && self::$params[2] == 'checkout') {
+                    if(isset(self::$params[2]) && !empty(self::$params[2]) && self::$params[2] == 'checkout') {
                         self::$controller_key = 'checkout';
                         unset(self::$params[2]);
                     }
