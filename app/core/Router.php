@@ -578,8 +578,12 @@ class Router {
 
         $method = self::$method;
 
+        /* For user-products path, use the controller_key we already determined */
+        if(self::$path == 'user-products') {
+            $method = self::$controller_key;
+        }
         /* Make sure to check the class method if set in the url */
-        if(isset(self::get_params()[0]) && method_exists($controller, self::get_params()[0])) {
+        else if(isset(self::get_params()[0]) && method_exists($controller, self::get_params()[0])) {
 
             /* Make sure the method is not private */
             $reflection = new \ReflectionMethod($controller, self::get_params()[0]);
