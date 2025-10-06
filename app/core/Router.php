@@ -474,28 +474,26 @@ class Router {
 
         if(!empty(self::$params[0])) {
 
-            if(array_key_exists(self::$params[0], self::$routes[self::$path]) && file_exists(APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php')) {
+            /* Special handling for user-products path - check this first */
+            if(self::$path == 'user-products') {
+                /* Check if second param exists for product slug */
+                if(!empty(self::$params[1])) {
+                    self::$controller_key = 'view';
+                    
+                    /* Check if third param is 'checkout' */
+                    if(!empty(self::$params[2]) && self::$params[2] == 'checkout') {
+                        self::$controller_key = 'checkout';
+                        unset(self::$params[2]);
+                    }
+                    /* Don't unset any params - UserProducts controller needs them */
+                }
+            } else if(array_key_exists(self::$params[0], self::$routes[self::$path]) && file_exists(APP_PATH . 'controllers/' . (self::$path != '' ? self::$path . '/' : null) . self::$routes[self::$path][self::$params[0]]['controller'] . '.php')) {
 
                 self::$controller_key = self::$params[0];
 
                 unset(self::$params[0]);
 
             } else {
-
-                /* Special handling for user-products path */
-                if(self::$path == 'user-products') {
-                    /* Check if second param exists for product slug */
-                    if(!empty(self::$params[1])) {
-                        self::$controller_key = 'view';
-                        
-                        /* Check if third param is 'checkout' */
-                        if(!empty(self::$params[2]) && self::$params[2] == 'checkout') {
-                            self::$controller_key = 'checkout';
-                            unset(self::$params[2]);
-                        }
-                        /* Don't unset any params - UserProducts controller needs them */
-                    }
-                } else {
                     /* Try to check if the link exists via the cache */
                     $cache_instance = \Altum\Cache::$adapter->getItem('available_links_' . self::$params[0]);
 
@@ -529,7 +527,6 @@ class Router {
                         self::$controller_key = 'notfound';
 
                     }
-                }
 
             }
 
