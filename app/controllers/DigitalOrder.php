@@ -31,8 +31,6 @@ class DigitalOrder extends Controller {
     public function update_status() {
         \Altum\Middlewares\Authentication::guard();
 
-        // Debug: Log POST data
-        error_log("Update Status POST Data: " . print_r($_POST, true));
 
         if(empty($_POST)) redirect('digital-order/manage');
 

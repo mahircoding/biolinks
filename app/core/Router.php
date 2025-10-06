@@ -618,8 +618,12 @@ class Router {
 
         $method = self::$method;
 
+        /* Check if method is defined in route definition */
+        if(isset(self::$routes[self::$path][self::$controller_key]['method'])) {
+            $method = self::$routes[self::$path][self::$controller_key]['method'];
+        }
         /* For user-products path, use the controller_key we already determined */
-        if(self::$path == 'user-products') {
+        else if(self::$path == 'user-products') {
             $method = self::$controller_key;
         }
         /* Make sure to check the class method if set in the url */

@@ -147,7 +147,7 @@ body.modal-open {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="<?= url('digital-order/update-status') ?>" method="post">
+            <form action="<?= url('digital-order-update-status') ?>" method="post">
                 <div class="modal-body">
                     <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" />
                     <input type="hidden" name="order_id" value="<?= $order->order_id ?>" />
