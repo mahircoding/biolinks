@@ -39,7 +39,7 @@
 
             <div class="form-group">
                 <label>Deskripsi</label>
-                <textarea name="description" id="description" class="form-control" rows="8"><?= htmlspecialchars($data->product->description) ?></textarea>
+                <textarea name="description" id="description" class="form-control" rows="8"><?= $data->product->description ?></textarea>
             </div>
 
             <div class="row">

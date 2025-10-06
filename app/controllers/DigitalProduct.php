@@ -39,7 +39,9 @@ class DigitalProduct extends Controller {
                 $slug = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 8);
             } while(Database::exists('product_id', \Altum\Models\DigitalProduct::$table, ['slug' => $slug]));
             
-            $description = Database::clean_string($_POST['description'] ?? '');
+            $description = $_POST['description'] ?? '';
+            // Basic sanitization for CKEditor content - allow safe HTML tags
+            $description = strip_tags($description, '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img>');
             $price_cents = (int) ($_POST['price_cents'] ?? 0);
             $currency = 'IDR'; // Fixed to IDR
 
@@ -113,7 +115,9 @@ class DigitalProduct extends Controller {
             if(!Csrf::check()) redirect('digital-product');
 
             $name = Database::clean_string($_POST['name'] ?? '');
-            $description = Database::clean_string($_POST['description'] ?? '');
+            $description = $_POST['description'] ?? '';
+            // Basic sanitization for CKEditor content - allow safe HTML tags
+            $description = strip_tags($description, '<p><br><strong><b><em><i><u><ul><ol><li><h1><h2><h3><h4><h5><h6><a><img>');
             $price_cents = (int) ($_POST['price_cents'] ?? 0);
             $currency = 'IDR'; // Fixed to IDR
             $access_url = Database::clean_string($_POST['access_url'] ?? '');
