@@ -2,7 +2,7 @@
 
 <style>
 .checkout-page {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffff;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     max-width: 480px;
@@ -61,9 +61,7 @@
     margin: 20px;
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgb(188 188 188 / 20%);
 }
 
 .product-image {
@@ -105,9 +103,7 @@
     margin: 0 20px 20px;
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgb(188 188 188 / 20%);
 }
 
 .form-group {
@@ -389,7 +385,7 @@
         <!-- Product Card -->
         <div class="product-card">
             <?php if(!empty($data->product->image_path)): ?>
-                <img src="<?= UPLOADS_URL_PATH . $data->product->image_path ?>" alt="<?= htmlspecialchars($data->product->name) ?>" class="product-image">
+                <img src="<?= url($data->product->image_path) ?>" alt="<?= htmlspecialchars($data->product->name) ?>" class="product-image">
             <?php else: ?>
                 <div class="product-image" style="background: linear-gradient(135deg, #f0f0f0, #e0e0e0); display: flex; align-items: center; justify-content: center; color: #999; font-size: 48px;">
                     <i class="fa fa-image"></i>
