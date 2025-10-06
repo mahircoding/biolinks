@@ -113,9 +113,11 @@ class DigitalOrder extends Controller {
                 CURLOPT_POSTFIELDS     => http_build_query($payload)
             ]);
             $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
             $json = @json_decode($response);
+            
             if(isset($json->success) && $json->success && isset($json->data->reference)) {
                 /* Save reference */
                 Database::update(DigitalOrderModel::$table, [
@@ -126,19 +128,17 @@ class DigitalOrder extends Controller {
                 /* Redirect to payment url */
                 header('Location: ' . $json->data->checkout_url);
                 exit;
+            } else {
+                // Tripay failed, show error message
+                $error_message = isset($json->message) ? $json->message : 'Gagal membuat transaksi Tripay';
+                $_SESSION['error'][] = 'Pembayaran gagal: ' . $error_message;
+                redirect('digital-order/' . $product->slug);
             }
         }
 
-        /* Fallback: no Tripay; show thank you & send immediate access */
-        $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
-        $content = '<p>Terima kasih atas pesanan Anda.</p>' .
-                   '<p>Produk: <strong>' . $product->name . '</strong></p>' .
-                   '<p>Akses produk Anda:<br />' .
-                   '<a href="' . $download_url . '">' . $download_url . '</a></p>';
-        send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
-
-        $view = new \Altum\Views\View('digital-order/thank-you', (array) $this);
-        $this->add_view_content('content', $view->run(['email' => $email]));
+        /* Fallback: no Tripay configured; show error message */
+        $_SESSION['error'][] = 'Metode pembayaran tidak tersedia. Silakan hubungi penjual.';
+        redirect('digital-order/' . $product->slug);
     }
 
     public function webhook() {
