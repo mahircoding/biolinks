@@ -62,17 +62,18 @@
 }
 
 .product-price {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
-    color: #4caf50;
-    margin: 0;
+    color: #38b2ac;
+    margin: 20px 0;
+    padding: 0 20px;
+    line-height: 1.2;
 }
 
 .product-title {
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 500;
     color: #1a1a1a;
-    text-transform: uppercase;
     letter-spacing: 1px;
     margin: 20px 0;
     padding: 0 20px;
