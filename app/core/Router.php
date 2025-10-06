@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 namespace Altum\Routing;
 
 use Altum\Database\Database;
