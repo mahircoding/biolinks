@@ -21,7 +21,7 @@ class UserProducts extends Controller {
         $products = \Altum\Models\DigitalProduct::list_by_user($user_id);
         
         /* Get user info */
-        $user = Database::get(['user_id', 'name', 'email'], 'users', ['user_id' => $user_id]);
+        $user = Database::get(['user_id', 'name', 'email', 'phone'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         $view = new \Altum\Views\View('user-products/index', (array) $this);
@@ -42,7 +42,7 @@ class UserProducts extends Controller {
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
         /* Get user info */
-        $user = Database::get(['user_id', 'name', 'email'], 'users', ['user_id' => $user_id]);
+        $user = Database::get(['user_id', 'name', 'email', 'phone'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         $view = new \Altum\Views\View('user-products/view', (array) $this);
@@ -64,7 +64,7 @@ class UserProducts extends Controller {
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
         /* Get user info */
-        $user = Database::get(['user_id', 'name', 'email'], 'users', ['user_id' => $user_id]);
+        $user = Database::get(['user_id', 'name', 'email', 'phone'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         if(!empty($_POST)) {
