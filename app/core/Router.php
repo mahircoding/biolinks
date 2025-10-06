@@ -1,5 +1,7 @@
 <?php
 
+<?php
+
 namespace Altum\Routing;
 
 use Altum\Database\Database;
@@ -404,6 +406,18 @@ class Router {
         /* User Products */
         'user-products' => [
             'index' => [
+                'controller' => 'UserProducts',
+                'settings' => [
+                    'wrapper' => 'basic_wrapper'
+                ]
+            ],
+            'view' => [
+                'controller' => 'UserProducts',
+                'settings' => [
+                    'wrapper' => 'basic_wrapper'
+                ]
+            ],
+            'checkout' => [
                 'controller' => 'UserProducts',
                 'settings' => [
                     'wrapper' => 'basic_wrapper'

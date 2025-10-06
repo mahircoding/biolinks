@@ -28,7 +28,12 @@ class App {
         Router::parse_controller();
 
         /* Create a new instance of the controller */
-        $controller = Router::get_controller(Router::$controller, Router::$path);
+        $path = Router::$path;
+        /* Special case: user-products controller is in main controllers directory */
+        if($path == 'user-products') {
+            $path = '';
+        }
+        $controller = Router::get_controller(Router::$controller, $path);
 
         /* Process the method and get it */
         $method = Router::parse_method($controller);
