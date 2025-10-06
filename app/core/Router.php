@@ -192,6 +192,22 @@ class Router {
 				]
 			],
 
+            'digital-product-create' => [
+                'controller' => 'DigitalProduct',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
+            'digital-product-edit' => [
+                'controller' => 'DigitalProduct',
+                'settings' => [
+                    'menu_no_margin' => true,
+                    'body_white' => false
+                ]
+            ],
+
             'digital-order' => [
 				'controller' => 'DigitalOrder',
 				'settings' => [

@@ -10,7 +10,7 @@
 
 <section class="container pt-5">
     <div class="d-flex">
-        <h1 class="h3">Tambah Produk Digital</h1>
+        <h1 class="h3">Edit Produk Digital</h1>
     </div>
 
 <?php display_notifications() ?>
@@ -22,25 +22,31 @@
 
             <div class="form-group">
                 <label>Nama Produk</label>
-                <input type="text" name="name" class="form-control" required />
+                <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($data->product->name) ?>" required />
             </div>
 
             <div class="form-group">
                 <label>Gambar Produk</label>
+                <?php if(!empty($data->product->image_path)): ?>
+                    <div class="mb-2">
+                        <img src="<?= url($data->product->image_path) ?>" alt="Current image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                        <br><small class="text-muted">Gambar saat ini</small>
+                    </div>
+                <?php endif ?>
                 <input type="file" name="image" class="form-control" accept="image/*" />
-                <small class="text-muted">Format: JPG, PNG, GIF. Maksimal 2MB</small>
+                <small class="text-muted">Format: JPG, PNG, GIF. Maksimal 2MB. Kosongkan jika tidak ingin mengubah gambar.</small>
             </div>
 
             <div class="form-group">
                 <label>Deskripsi</label>
-                <textarea name="description" id="description" class="form-control" rows="8" placeholder="Masukkan deskripsi produk..."></textarea>
+                <textarea name="description" id="description" class="form-control" rows="8"><?= htmlspecialchars($data->product->description) ?></textarea>
             </div>
 
             <div class="row">
                 <div class="col-md-8">
                     <div class="form-group">
                         <label>Harga (Rupiah)</label>
-                        <input type="number" name="price_cents" class="form-control" min="0" step="100" placeholder="50000" required />
+                        <input type="number" name="price_cents" class="form-control" min="0" step="100" value="<?= (int)$data->product->price_cents ?>" required />
                         <small class="text-muted">Masukkan harga dalam rupiah (contoh: 50000 = Rp 50.000)</small>
                     </div>
                 </div>
@@ -54,12 +60,18 @@
 
             <div class="form-group">
                 <label>URL Akses Produk (eksternal)</label>
-                <input type="url" name="access_url" class="form-control" placeholder="https://contoh.com/akses-produk" required />
+                <input type="url" name="access_url" class="form-control" value="<?= htmlspecialchars($data->product->access_url) ?>" placeholder="https://contoh.com/akses-produk" required />
                 <small class="text-muted">Pembeli akan diarahkan ke URL ini setelah validasi token.</small>
             </div>
 
+            <div class="form-group">
+                <label>Slug (untuk URL)</label>
+                <input type="text" class="form-control" value="<?= htmlspecialchars($data->product->slug) ?>" readonly />
+                <small class="text-muted">Slug tidak dapat diubah setelah produk dibuat.</small>
+            </div>
+
             <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                <button type="submit" class="btn btn-primary">Update Produk</button>
                 <a href="digital-product" class="btn btn-light">Batal</a>
             </div>
         </form>
@@ -89,4 +101,3 @@ ClassicEditor
         console.error( error );
     } );
 </script>
-

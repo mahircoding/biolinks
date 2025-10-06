@@ -41,6 +41,7 @@
                 </td>
                 <td><?= 'Rp ' . number_format($product->price_cents / 100, 0, ',', '.') ?></td>
                 <td class="text-right">
+                    <a href="digital-product/edit/<?= (int)$product->product_id ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                     <form action="digital-product/delete" method="post" class="d-inline">
                         <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" />
                         <input type="hidden" name="product_id" value="<?= (int)$product->product_id ?>" />
