@@ -34,6 +34,7 @@
         .minimal-content {
             min-height: 100vh;
             width: 100%;
+            background-color: #72cfca4f;
         }
     </style>
 </head>
