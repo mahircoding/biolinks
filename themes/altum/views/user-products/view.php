@@ -2,7 +2,7 @@
 
 <style>
 .product-detail-page {
-    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    background: #ffff;
     min-height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-width: 504px;
@@ -232,6 +232,9 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    max-width: 504px;
+    margin: 0 auto;
+    justify-content: center;
 }
 
 .whatsapp-btn, .add-cart-btn {
@@ -321,17 +324,10 @@
 <div class="product-detail-page">
     <!-- Header Actions -->
     <div class="header-actions">
-        <a href="javascript:history.back()" class="action-btn">
+        <a href="<?= url($data->user->user_id) ?>" class="action-btn">
             <i class="fa fa-arrow-left"></i>
         </a>
         <div>
-            <a href="#" class="action-btn">
-                <i class="fa fa-share"></i>
-            </a>
-            <a href="#" class="action-btn cart-btn">
-                <i class="fa fa-shopping-cart"></i>
-                <span class="cart-badge">0</span>
-            </a>
         </div>
     </div>
 
@@ -350,44 +346,10 @@
                 </div>
             </div>
         <?php endif ?>
-        
-        <!-- Materials Section -->
-        <div class="materials-section">
-            <div class="materials-title">Materi:</div>
-            <ul class="materials-list">
-                <li>Konten berkualitas tinggi</li>
-                <li>Akses seumur hidup</li>
-                <li>Update gratis</li>
-                <li>Support 24/7</li>
-                <li>Garansi uang kembali</li>
-                <li>Komunitas eksklusif</li>
-            </ul>
-            <div class="zoom-access">
-                Akses video rekaman zoom
-            </div>
-        </div>
-
-        <!-- Instructor Section -->
-        <div class="instructor-section">
-            <div class="instructor-title">Mentor</div>
-            <div class="instructor-name"><?= htmlspecialchars($data->user->name) ?></div>
-            <div class="instructor-role">Digital Creator</div>
-        </div>
     </div>
 
     <!-- Description Section -->
     <div class="description-section">
-        <div class="description-text">
-            Produk digital berkualitas tinggi yang akan membantu Anda mencapai tujuan. 
-            Dapatkan akses seumur hidup dan update gratis untuk konten terbaru.
-        </div>
-        <div class="description-text">
-            Bergabunglah dengan ribuan pelanggan yang telah merasakan manfaat dari produk ini. 
-            Dapatkan hasil maksimal dengan panduan step-by-step yang mudah diikuti.
-        </div>
-        
-        <div class="learn-about">Anda akan diajak belajar tentang:</div>
-        
         <?php if(!empty($data->product->description)): ?>
             <div class="description-text">
                 <?= $data->product->description ?>
@@ -406,7 +368,7 @@
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
             </svg>
         </a>
-        <a href="<?= url($data->user->user_id . '/' . $data->product->slug . '/checkout') ?>" class="buy-now-btn">
+        <a href="<?= url($data->user->user_id . '/' . $data->product->slug . '/checkout') ?>" class="btn btn-primary">
             DAPATKAN SEKARANG!
         </a>
     </div>
