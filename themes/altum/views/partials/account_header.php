@@ -48,12 +48,13 @@
             <i class="fa fa-fw fa-sm fa-dollar-sign mr-1"></i> <?= $this->language->account_payments->menu ?>
         </a>
     </li> -->
-
+    <?php if($this->user->type == 1 || $this->user->addon_digital_products == '1') :?>
     <li class="nav-item">
         <a href="<?= url('tripay-settings') ?>" class="nav-link <?= \Altum\Routing\Router::$controller_key == 'tripay-settings' ? 'active' : null ?>">
             <i class="fa fa-fw fa-sm fa-credit-card mr-1"></i> Tripay
         </a>
     </li>
+    <?php endif; ?>
 
     <li class="nav-item">
         <a href="<?= url('account-logs') ?>" class="nav-link <?= \Altum\Routing\Router::$controller_key == 'account-logs' ? 'active' : null ?>">

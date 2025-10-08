@@ -251,6 +251,13 @@ class Router {
                 'controller' => 'WebhookStripe'
             ],
 
+            'tripay-callback' => [
+                'controller' => 'TripayCallback',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+
             /* Ajax */
             'project-ajax' => [
                 'controller' => 'ProjectAjax'
