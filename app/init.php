@@ -72,6 +72,7 @@ require_once APP_PATH . 'helpers/email.php';
 require_once APP_PATH . 'helpers/notifications.php';
 require_once APP_PATH . 'helpers/others.php';
 require_once APP_PATH . 'helpers/Validation.php';
+require_once APP_PATH . 'helpers/FacebookPixel.php';
 
 /* Autoload for vendor */
 require_once ROOT_PATH . 'vendor/autoload.php';
