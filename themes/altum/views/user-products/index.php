@@ -1,5 +1,13 @@
 <?php defined('ALTUMCODE') || die() ?>
 
+<?php
+/* Facebook Pixel tracking for product listing */
+$pixel_id = $data->user->facebook_pixel_id ?? null;
+if ($pixel_id) {
+    echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
+}
+?>
+
 <style>
 .products-page {
     background: #ffffff;

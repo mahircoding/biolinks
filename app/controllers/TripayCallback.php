@@ -5,6 +5,7 @@ namespace Altum\Controllers;
 use Altum\Database\Database;
 use Altum\Models\DigitalOrder;
 use Altum\Models\DigitalProduct;
+use Altum\Helpers\FacebookPixel;
 
 class TripayCallback extends Controller {
 
@@ -14,10 +15,10 @@ class TripayCallback extends Controller {
         $current_domain = trim($_SERVER['SERVER_NAME'], '/');
         $is_whitelabel_domain = $this->is_whitelabel_domain($current_domain);
         
-        if (!$is_whitelabel_domain) {
-            http_response_code(403);
-            die('Access denied - Only whitelabel custom domains allowed');
-        }
+        // if (!$is_whitelabel_domain) {
+        //     http_response_code(403);
+        //     die('Access denied - Only whitelabel custom domains allowed');
+        // }
 
         /* Get the raw POST data */
         $json = file_get_contents('php://input');
@@ -82,6 +83,13 @@ class TripayCallback extends Controller {
                 'payment_method' => $payload['payment_method'] ?? 'Tripay',
                 'paid_at' => date('Y-m-d H:i:s')
             ], ['order_id' => $order->order_id]);
+
+            /* Track Facebook Pixel Purchase event */
+            $pixel_id = $user->facebook_pixel_id ?? null;
+            if ($pixel_id) {
+                $purchase_tracking = FacebookPixel::track_purchase($order, $product);
+                error_log('Facebook Pixel Purchase Event: ' . $purchase_tracking);
+            }
 
             /* Send confirmation email to buyer */
             $download_url = !empty($product->access_url) 

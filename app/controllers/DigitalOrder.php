@@ -5,6 +5,7 @@ namespace Altum\Controllers;
 use Altum\Database\Database;
 use Altum\Models\DigitalProduct as DigitalProductModel;
 use Altum\Models\DigitalOrder as DigitalOrderModel;
+use Altum\Helpers\FacebookPixel;
 
 class DigitalOrder extends Controller {
 

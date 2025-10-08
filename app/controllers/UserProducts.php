@@ -5,6 +5,7 @@ namespace Altum\Controllers;
 use Altum\Database\Database;
 use Altum\Models\DigitalProduct as DigitalProductModel;
 use Altum\Models\DigitalOrder as DigitalOrderModel;
+use Altum\Helpers\FacebookPixel;
 
 class UserProducts extends Controller {
 
@@ -20,9 +21,12 @@ class UserProducts extends Controller {
         /* Get user's products */
         $products = \Altum\Models\DigitalProduct::list_by_user($user_id);
         
-        /* Get user info including Tripay settings and bank account */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings, bank account, and Facebook Pixel */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account', 'facebook_pixel_id'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
+
+        /* Set Facebook Pixel ID for tracking */
+        FacebookPixel::set_user_pixel_id($user->facebook_pixel_id);
 
         $view = new \Altum\Views\View('user-products/index', (array) $this);
         $this->add_view_content('content', $view->run(['products' => $products, 'user' => $user]));
@@ -41,9 +45,12 @@ class UserProducts extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
-        /* Get user info including Tripay settings and bank account */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings, bank account, and Facebook Pixel */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account', 'facebook_pixel_id'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
+
+        /* Set Facebook Pixel ID for tracking */
+        FacebookPixel::set_user_pixel_id($user->facebook_pixel_id);
 
         $view = new \Altum\Views\View('user-products/view', (array) $this);
         $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));

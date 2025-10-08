@@ -19,7 +19,7 @@ class TripaySettings extends Controller {
         $this->add_view_content('account_header', $menu->run());
 
         /* Get user's current Tripay settings */
-        $tripay_settings = Database::get(['tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $this->user->user_id]);
+        $tripay_settings = Database::get(['tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'facebook_pixel_id'], 'users', ['user_id' => $this->user->user_id]);
 
         if(!empty($_POST)) {
             if(!Csrf::check()) redirect('tripay-settings');
@@ -27,12 +27,14 @@ class TripaySettings extends Controller {
             $tripay_merchant_code = Database::clean_string($_POST['tripay_merchant_code'] ?? '');
             $tripay_api_key_public = Database::clean_string($_POST['tripay_api_key_public'] ?? '');
             $tripay_api_key_secret = Database::clean_string($_POST['tripay_api_key_secret'] ?? '');
+            $facebook_pixel_id = Database::clean_string($_POST['facebook_pixel_id'] ?? '');
 
             if(empty($_SESSION['error'])) {
                 Database::update('users', [
                     'tripay_merchant_code' => $tripay_merchant_code,
                     'tripay_api_key_public' => $tripay_api_key_public,
-                    'tripay_api_key_secret' => $tripay_api_key_secret
+                    'tripay_api_key_secret' => $tripay_api_key_secret,
+                    'facebook_pixel_id' => $facebook_pixel_id
                 ], ['user_id' => $this->user->user_id]);
 
                 $_SESSION['success'][] = 'Tripay settings berhasil disimpan!';
@@ -53,6 +55,7 @@ class TripaySettings extends Controller {
         /* Add addon status columns to users table if they don't exist */
         @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_digital_products` TINYINT(1) NOT NULL DEFAULT 0 AFTER `tripay_api_key_secret`");
         @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_tripay` TINYINT(1) NOT NULL DEFAULT 0 AFTER `addon_digital_products`");
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `facebook_pixel_id` VARCHAR(50) NULL AFTER `addon_tripay`");
     }
 
 }

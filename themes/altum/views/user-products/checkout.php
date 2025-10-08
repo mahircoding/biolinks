@@ -1,5 +1,14 @@
 <?php defined('ALTUMCODE') || die() ?>
 
+<?php
+/* Facebook Pixel tracking for checkout */
+$pixel_id = $data->user->facebook_pixel_id ?? null;
+if ($pixel_id) {
+    echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
+    echo \Altum\Helpers\FacebookPixel::track_initiate_checkout($data->product);
+}
+?>
+
 <style>
 .checkout-page {
     background: #ffff;
