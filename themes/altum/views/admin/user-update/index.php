@@ -198,7 +198,7 @@
 			</div>
 			<?php }?>
 
-			<?php if(($this->user->type == 1 || $this->user->whitelabel) && ($this->user->addon_tripay == '1')){?> 
+			<?php if($this->user->type == 1 && (empty($this->user->whitelabel) && empty($this->user->superagency) && empty($this->user->agency) && empty($this->user->subagency))){?>
 			<h2 class="h4 mt-5">Tripay Package</h2>
             <p class="text-muted">Change and update the Tripay Payment Gateway package of the user.</p>
 			
@@ -211,7 +211,7 @@
 			</div>
 			<?php }?>
 
-			<?php if($this->user->type == 1 || $this->user->addon_digital_products == '1'){?>
+			<?php if($this->user->type == 1 && (empty($this->user->whitelabel) && empty($this->user->superagency) && empty($this->user->agency) && empty($this->user->subagency))){?>
 			<h2 class="h4 mt-5">Digital Products Package</h2>
             <p class="text-muted">Change and update the digital products package of the user.</p>
 			
