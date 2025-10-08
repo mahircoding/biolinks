@@ -164,6 +164,23 @@ if ($pixel_id) {
     color: #4caf50;
 }
 
+.order-info {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.order-number, .order-date {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.order-number strong, .order-date strong {
+    color: #333;
+    font-weight: 600;
+}
+
 @media (max-width: 768px) {
     .instructions-content {
         padding: 15px;
@@ -201,6 +218,16 @@ if ($pixel_id) {
         <div class="product-summary">
             <div class="product-name"><?= htmlspecialchars($data->product->name) ?></div>
             <div class="product-price">Rp <?= number_format($data->product->price_cents, 0, ',', '.') ?></div>
+            <?php if(isset($data->order) && $data->order): ?>
+                <div class="order-info">
+                    <div class="order-number">
+                        <strong>Nomor Order:</strong> #<?= $data->order->order_id ?>
+                    </div>
+                    <div class="order-date">
+                        <strong>Tanggal Order:</strong> <?= date('d/m/Y H:i', strtotime($data->order->created_at)) ?>
+                    </div>
+                </div>
+            <?php endif ?>
         </div>
 
         <!-- Bank Details -->

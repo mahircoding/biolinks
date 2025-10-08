@@ -162,8 +162,11 @@ class UserProducts extends Controller {
                     /* Update order status */
                     Database::update(DigitalOrderModel::$table, ['status' => 'pending_payment'], ['download_token' => $token]);
                     
+                    /* Get order data for display */
+                    $order = Database::get(['order_id', 'download_token', 'created_at'], DigitalOrderModel::$table, ['download_token' => $token]);
+                    
                     $view = new \Altum\Views\View('user-products/bank-transfer-instructions', (array) $this);
-                    $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email]));
+                    $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email, 'order' => $order]));
                     return;
                 }
             }
