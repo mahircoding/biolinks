@@ -39,7 +39,7 @@ class TripayCallback extends Controller {
         }
 
         /* Get order by reference */
-        $order = Database::get('*', 'digital_orders', ['tripay_reference' => $payload['merchant_ref']]);
+        $order = Database::get('*', 'digital_orders', ['order_id' => $payload['merchant_ref']]);
         
         if (!$order) {
             http_response_code(404);
