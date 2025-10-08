@@ -70,9 +70,14 @@ class UserProducts extends Controller {
         $product = DigitalProductModel::find_by_slug($slug);
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
-        /* Get user info including Tripay settings and bank account */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account'], 'users', ['user_id' => $user_id]);
+        /* Get user info including Tripay settings, bank account, and Facebook Pixel */
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account', 'facebook_pixel_id'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
+
+        // Debug: Log Facebook Pixel ID
+        if (isset($_GET['debug'])) {
+            error_log("DEBUG UserProducts checkout: user_id = $user_id, facebook_pixel_id = " . ($user->facebook_pixel_id ?? 'NULL'));
+        }
 
         if(!empty($_POST)) {
             /* Input validation */

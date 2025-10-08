@@ -3,9 +3,24 @@
 <?php
 /* Facebook Pixel tracking for checkout */
 $pixel_id = $data->user->facebook_pixel_id ?? null;
+
+// Debug: Check if pixel_id is available
+if (isset($_GET['debug'])) {
+    echo "<!-- DEBUG: pixel_id = " . ($pixel_id ?: 'NULL') . " -->";
+    echo "<!-- DEBUG: user data available = " . (isset($data->user) ? 'YES' : 'NO') . " -->";
+    if (isset($data->user)) {
+        echo "<!-- DEBUG: user->facebook_pixel_id = " . ($data->user->facebook_pixel_id ?? 'NULL') . " -->";
+    }
+}
+
 if ($pixel_id) {
     echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
     echo \Altum\Helpers\FacebookPixel::track_initiate_checkout($data->product);
+} else {
+    // Debug: Show when no pixel_id
+    if (isset($_GET['debug'])) {
+        echo "<!-- DEBUG: No Facebook Pixel ID found -->";
+    }
 }
 ?>
 
