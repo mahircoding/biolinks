@@ -49,6 +49,10 @@ class TripaySettings extends Controller {
         @Database::$database->query("ALTER TABLE `users` ADD COLUMN `tripay_merchant_code` VARCHAR(255) NULL AFTER `phone`");
         @Database::$database->query("ALTER TABLE `users` ADD COLUMN `tripay_api_key_public` VARCHAR(255) NULL AFTER `tripay_merchant_code`");
         @Database::$database->query("ALTER TABLE `users` ADD COLUMN `tripay_api_key_secret` VARCHAR(255) NULL AFTER `tripay_api_key_public`");
+        
+        /* Add addon status columns to users table if they don't exist */
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_digital_products` TINYINT(1) NOT NULL DEFAULT 0 AFTER `tripay_api_key_secret`");
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_tripay` TINYINT(1) NOT NULL DEFAULT 0 AFTER `addon_digital_products`");
     }
 
 }

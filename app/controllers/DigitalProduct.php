@@ -14,6 +14,9 @@ class DigitalProduct extends Controller {
 
         /* Auto migrate tables once */
         DigitalProductModel::migrate();
+        
+        /* Migrate addon status columns to users table */
+        $this->migrate_addon_columns();
 
         $products = \Altum\Models\DigitalProduct::list_by_user($this->user->user_id);
 
@@ -185,6 +188,12 @@ class DigitalProduct extends Controller {
             \Altum\Models\DigitalProduct::delete_by_id($product_id, $this->user->user_id);
         }
         redirect('digital-product');
+    }
+
+    private function migrate_addon_columns() {
+        /* Add addon status columns to users table if they don't exist */
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_digital_products` TINYINT(1) NOT NULL DEFAULT 0 AFTER `tripay_api_key_secret`");
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_tripay` TINYINT(1) NOT NULL DEFAULT 0 AFTER `addon_digital_products`");
     }
 }
 

@@ -13,6 +13,9 @@ class DigitalOrder extends Controller {
 
         DigitalOrderModel::migrate();
         \Altum\Models\DigitalProduct::migrate();
+        
+        /* Migrate addon status columns to users table */
+        $this->migrate_addon_columns();
 
         $user_id = (int)$this->user->user_id;
         $sql = "SELECT o.*, p.name AS product_name FROM `" . DigitalOrderModel::$table . "` o INNER JOIN `" . \Altum\Models\DigitalProduct::$table . "` p ON p.product_id = o.product_id WHERE p.user_id = '{$user_id}' ORDER BY o.order_id DESC";
@@ -84,6 +87,12 @@ class DigitalOrder extends Controller {
         }
 
         redirect('digital-order/manage');
+    }
+
+    private function migrate_addon_columns() {
+        /* Add addon status columns to users table if they don't exist */
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_digital_products` TINYINT(1) NOT NULL DEFAULT 0 AFTER `tripay_api_key_secret`");
+        @Database::$database->query("ALTER TABLE `users` ADD COLUMN `addon_tripay` TINYINT(1) NOT NULL DEFAULT 0 AFTER `addon_digital_products`");
     }
 
     public function index() {
