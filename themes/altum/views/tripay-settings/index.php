@@ -38,12 +38,6 @@
                     <small class="text-muted">API Key Secret dari dashboard Tripay Anda (akan disembunyikan untuk keamanan)</small>
                 </div>
 
-                <div class="form-group">
-                    <label>Facebook Pixel ID</label>
-                    <input type="text" name="facebook_pixel_id" class="form-control" value="<?= htmlspecialchars($data->tripay_settings->facebook_pixel_id ?? '') ?>" placeholder="Masukkan Facebook Pixel ID" />
-                    <small class="text-muted">Facebook Pixel ID untuk tracking produk digital (opsional)</small>
-                </div>
-
                 <?php if($this->user->whitelabel): ?>
                 <div class="alert alert-info">
                     <i class="fa fa-info-circle mr-2"></i>
