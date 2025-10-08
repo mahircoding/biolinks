@@ -38,6 +38,12 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="facebook_pixel_id">Facebook Pixel ID</label>
+                    <input type="text" id="facebook_pixel_id" name="facebook_pixel_id" class="form-control" value="<?= $this->user->facebook_pixel_id ?>" placeholder="Masukkan Facebook Pixel ID" />
+                    <small class="text-muted">Facebook Pixel ID untuk tracking produk digital (opsional)</small>
+                </div>
+
+                <div class="form-group">
                     <label for="timezone"><?= $this->language->account->settings->timezone ?></label>
                     <select id="timezone" name="timezone" class="form-control">
                         <?php foreach(DateTimeZone::listIdentifiers() as $timezone) echo '<option value="' . $timezone . '" ' . ($this->user->timezone == $timezone ? 'selected' : null) . '>' . $timezone . '</option>' ?>

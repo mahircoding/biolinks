@@ -165,6 +165,7 @@ class Account extends Controller {
             $_POST['country']		    = filter_var($_POST['country'], FILTER_SANITIZE_STRING);
 			$_POST['my_city']		    = filter_var($_POST['my_city'], FILTER_SANITIZE_STRING);
 			$_POST['timezone']          = in_array($_POST['timezone'], \DateTimeZone::listIdentifiers()) ? Database::clean_string($_POST['timezone']) : $this->settings->default_timezone;
+			$_POST['facebook_pixel_id'] = Database::clean_string($_POST['facebook_pixel_id'] ?? '');
             $_POST['twofa_is_enabled']  = (bool) $_POST['twofa_is_enabled'];
             $_POST['twofa_token']       = trim(filter_var($_POST['twofa_token'], FILTER_SANITIZE_STRING));
             $twofa_secret               = $_POST['twofa_is_enabled'] ? $this->user->twofa_secret : null;
@@ -359,10 +360,11 @@ class Account extends Controller {
 																		 `currency` = ?,
 																		 `twofa_secret` = ?,
 																		 `shipping` = ?,
-																		 `sales_page` = ? 
+																		 `sales_page` = ?,
+																		 `facebook_pixel_id` = ?
 																		 WHERE `user_id` = {$this->user->user_id}");
                 
-				$stmt->bind_param('sssssssss', $_POST['email'],
+				$stmt->bind_param('ssssssssss', $_POST['email'],
 											  $_POST['phone'], 
 											  $_POST['name'], 
 											  $_POST['timezone'], 
@@ -370,7 +372,8 @@ class Account extends Controller {
 											  $city_code->cty_symbol,
 											  $twofa_secret,
 											  json_encode($shipping),
-											  $sales_settings);
+											  $sales_settings,
+											  $_POST['facebook_pixel_id']);
                 $stmt->execute();
                 $stmt->close();
 				

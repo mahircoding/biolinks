@@ -1,5 +1,14 @@
 <?php defined('ALTUMCODE') || die() ?>
 
+<?php
+/* Facebook Pixel tracking for purchase completion */
+$pixel_id = $data->user->facebook_pixel_id ?? null;
+if ($pixel_id) {
+    echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
+    echo \Altum\Helpers\FacebookPixel::track_purchase($data->order, $data->product);
+}
+?>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
