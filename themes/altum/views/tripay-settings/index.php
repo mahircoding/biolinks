@@ -38,14 +38,12 @@
                     <small class="text-muted">API Key Secret dari dashboard Tripay Anda (akan disembunyikan untuk keamanan)</small>
                 </div>
 
-                <?php if($this->user->whitelabel): ?>
                 <div class="alert alert-info">
                     <i class="fa fa-info-circle mr-2"></i>
                     <strong>Callback URL:</strong><br>
                     <code><?= url('tripay-callback') ?></code><br>
                     <small>Gunakan URL ini sebagai callback URL di dashboard Tripay Anda.</small>
                 </div>
-                <?php endif; ?>
 
                 <div class="alert alert-info">
                     <i class="fa fa-info-circle mr-2"></i>
