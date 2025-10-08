@@ -181,6 +181,46 @@ if ($pixel_id) {
     font-weight: 600;
 }
 
+/* Action Buttons */
+.action-buttons {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px 0;
+}
+
+.back-to-product-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #f8f9fa;
+    color: #333;
+    text-decoration: none;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-to-product-btn:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+    color: #333;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-to-product-btn i {
+    font-size: 12px;
+}
+
+.back-to-product-btn span {
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
     .instructions-content {
         padding: 15px;
@@ -192,6 +232,19 @@ if ($pixel_id) {
     
     .page-title {
         font-size: 20px;
+    }
+    
+    .action-buttons {
+        margin-top: 20px;
+        padding: 15px 0;
+    }
+    
+    .back-to-product-btn {
+        padding: 10px 20px;
+        font-size: 13px;
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
     }
 }
 </style>
@@ -266,9 +319,10 @@ if ($pixel_id) {
         </div>
 
         <!-- Action Buttons -->
-        <div style="text-align: center; margin-top: 30px;">
-            <a href="<?= url($data->user->user_id . '/' . $data->product->slug) ?>" class="btn btn-outline-primary">
-                <i class="fa fa-arrow-left mr-2"></i>Kembali ke Produk
+        <div class="action-buttons">
+            <a href="<?= url($data->user->user_id . '/' . $data->product->slug) ?>" class="back-to-product-btn">
+                <i class="fa fa-arrow-left"></i>
+                <span>Kembali ke Produk</span>
             </a>
         </div>
     </div>
