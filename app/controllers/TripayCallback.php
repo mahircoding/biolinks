@@ -63,14 +63,12 @@ class TripayCallback extends Controller {
         }
 
         /* Verify signature */
-        $expected_signature = hash_hmac('sha256', 
-            $payload['reference'] . $payload['status'] . $payload['total_amount'], 
-            $user->tripay_api_key_secret
+        $expected_signature = hash_hmac('sha256', $json, $user->tripay_api_key_secret
         );
         
         $received_signature = $_SERVER['HTTP_X_CALLBACK_SIGNATURE'] ?? '';
         
-        if (!hash_equals($expected_signature, $received_signature)) {
+        if ($received_signature !== $expected_signature) {
             http_response_code(401);
             die('INVALID_SIGNATURE');
         }

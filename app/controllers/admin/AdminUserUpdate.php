@@ -382,6 +382,16 @@ class AdminUserUpdate extends Controller {
                     $stmt->close();
                 }
 
+				$stmt = Database::$database->prepare("UPDATE `users` SET `addon_digital_products` = ?  WHERE `user_id` = " . $user->user_id);
+				$stmt->bind_param('s', $_POST['addon_digital_products']);
+				$stmt->execute();
+				$stmt->close();
+
+				$stmt = Database::$database->prepare("UPDATE `users` SET `addon_tripay` = ?  WHERE `user_id` = " . $user->user_id);
+				$stmt->bind_param('s', $_POST['addon_tripay']);
+				$stmt->execute();
+				$stmt->close();
+
                 $_SESSION['success'][] = $this->language->global->success_message->basic;
 
                 redirect('admin/user-update/' . $user->user_id);

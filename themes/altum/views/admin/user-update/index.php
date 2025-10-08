@@ -204,7 +204,7 @@
 			
 			<div class="form-group">
                 <label>Tripay Status</label>
-				<select class="form-control" name="ro_status">
+				<select class="form-control" name="addon_tripay">
 				<option value="0"<?= $data->user->addon_tripay==0 ? ' selected' : null ?>>Disabled</option>
 				<option value="1"<?= $data->user->addon_tripay==1 ? ' selected' : null ?>>Enabled</option>
 				</select>
@@ -217,7 +217,7 @@
 			
 			<div class="form-group">
                 <label>Digital Products Status</label>
-				<select class="form-control" name="ro_status">
+				<select class="form-control" name="addon_digital_products">
 				<option value="0"<?= $data->user->addon_digital_products==0 ? ' selected' : null ?>>Disabled</option>
 				<option value="1"<?= $data->user->addon_digital_products==1 ? ' selected' : null ?>>Enabled</option>
 				</select>
