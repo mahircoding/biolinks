@@ -149,7 +149,7 @@ class DigitalOrder extends Controller {
         ]);
 
         /* If Tripay configured and addon enabled, create transaction and redirect to payment page */
-        // if(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
+        if(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
             $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
             $payload = [
@@ -161,7 +161,7 @@ class DigitalOrder extends Controller {
                 'customer_phone'=> $phone,
                 'order_items'   => [
                     [
-                        'sku'         => (string)$product->product_id,
+                        // 'sku'         => (string)$product->product_id,
                         'name'        => $product->name,
                         'price'       => (int)$product->price_cents,
                         'quantity'    => 1,
@@ -207,7 +207,7 @@ class DigitalOrder extends Controller {
                 $_SESSION['error'][] = 'Pembayaran gagal: ' . $error_message;
                 redirect('digital-order/' . $product->slug);
             }
-        // }
+        }
 
         /* Fallback: no Tripay configured; show error message */
         $_SESSION['error'][] = 'Metode pembayaran tidak tersedia. Silakan hubungi penjual.';
@@ -221,7 +221,7 @@ class DigitalOrder extends Controller {
         if(!$payload) die('INVALID');
 
         /* Get order first to find the product owner */
-        $order = DigitalOrderModel::find_by_reference($payload->reference);
+        $order = DigitalOrderModel::find_by_reference($payload->merchant_ref);
         if(!$order) die('ORDER_NOT_FOUND');
 
         $product = DigitalProductModel::find_by_id($order->product_id);
