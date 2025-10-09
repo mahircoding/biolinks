@@ -149,7 +149,7 @@ class DigitalOrder extends Controller {
         ]);
 
         /* If Tripay configured and addon enabled, create transaction and redirect to payment page */
-        if(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
+        // if(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
             $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
             $payload = [
@@ -171,7 +171,7 @@ class DigitalOrder extends Controller {
                 'expired_time'  => time() + (24 * 60 * 60),
                 'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . ((int) $product->price_cents), $user->tripay_api_key_secret),
                 'return_url'    => url($product->user_id . '/' . $product->slug),
-                'callback_url'  => url('digital-order/webhook')
+                'callback_url'  => url('tripay-callback')
             ];
 
             $ch = curl_init();
@@ -207,7 +207,7 @@ class DigitalOrder extends Controller {
                 $_SESSION['error'][] = 'Pembayaran gagal: ' . $error_message;
                 redirect('digital-order/' . $product->slug);
             }
-        }
+        // }
 
         /* Fallback: no Tripay configured; show error message */
         $_SESSION['error'][] = 'Metode pembayaran tidak tersedia. Silakan hubungi penjual.';
