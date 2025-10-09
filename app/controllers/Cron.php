@@ -3,6 +3,7 @@
 namespace Altum\Controllers;
 
 use Altum\Database\Database;
+use Altum\Models\DigitalOrder;
 
 class Cron extends Controller {
 
@@ -14,6 +15,12 @@ class Cron extends Controller {
         /* Make sure the key is correct */
         if(!isset($_GET['key']) || (isset($_GET['key']) && $_GET['key'] != $this->settings->cron->key)) {
             die();
+        }
+
+        /* Check for expired orders */
+        $expired_count = DigitalOrder::mark_expired_orders();
+        if($expired_count > 0) {
+            error_log("Cron: Marked $expired_count orders as expired");
         }
 
         die();

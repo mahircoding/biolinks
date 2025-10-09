@@ -63,8 +63,7 @@ class TripayCallback extends Controller {
         }
 
         /* Verify signature */
-        $expected_signature = hash_hmac('sha256', $json, $user->tripay_api_key_secret
-        );
+        $expected_signature = hash_hmac('sha256', $json, $user->tripay_api_key_secret);
         
         $received_signature = $_SERVER['HTTP_X_CALLBACK_SIGNATURE'] ?? '';
         
@@ -76,11 +75,14 @@ class TripayCallback extends Controller {
         /* Process payment status */
         if ($payload['status'] === 'PAID') {
             /* Update order status to paid */
-            Database::update('digital_orders', [
+            $update_result = Database::update('digital_orders', [
                 'status' => 'paid',
-                'payment_method' => $payload['payment_method'] ?? 'Tripay',
+                'payment_channel' => $payload['payment_method'] ?? 'Tripay',
                 'paid_at' => date('Y-m-d H:i:s')
             ], ['order_id' => $order->order_id]);
+            
+            /* Log update result */
+            error_log('Order status update result: ' . ($update_result ? 'SUCCESS' : 'FAILED') . ' for order: ' . $order->order_id);
 
             /* Track Facebook Pixel Purchase event */
             $pixel_id = $user->facebook_pixel_id ?? null;

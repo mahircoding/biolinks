@@ -159,7 +159,7 @@ class UserProducts extends Controller {
                         error_log('Email send failed: ' . $e->getMessage());
                     }
                     
-                    /* Update order status */
+                    /* Update order status to pending_payment for bank transfer */
                     Database::update(DigitalOrderModel::$table, ['status' => 'pending_payment'], ['download_token' => $token]);
                     
                     /* Get order data for display */

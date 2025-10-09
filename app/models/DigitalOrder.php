@@ -77,6 +77,35 @@ class DigitalOrder {
     public static function find_by_id($order_id) {
         return Database::get(['order_id','product_id','buyer_name','buyer_email','buyer_phone','amount_cents','currency','download_token','download_expires_at','status','tripay_reference','payment_channel','paid_at','created_at'], self::$table, ['order_id' => $order_id]);
     }
+    
+    public static function get_valid_statuses() {
+        return ['pending', 'pending_payment', 'paid', 'expired', 'cancelled', 'refunded'];
+    }
+    
+    public static function is_pending($order) {
+        return in_array($order->status, ['pending', 'pending_payment']);
+    }
+    
+    public static function is_paid($order) {
+        return $order->status === 'paid';
+    }
+    
+    public static function mark_expired_orders() {
+        /* Mark orders as expired if they are pending and past expiration time */
+        $expired_orders = Database::get_all('*', self::$table, [
+            'status' => ['pending', 'pending_payment'],
+            'download_expires_at' => ['<', date('Y-m-d H:i:s')]
+        ]);
+        
+        $count = 0;
+        foreach($expired_orders as $order) {
+            if(Database::update(self::$table, ['status' => 'expired'], ['order_id' => $order->order_id])) {
+                $count++;
+            }
+        }
+        
+        return $count;
+    }
 }
 
 
