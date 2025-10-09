@@ -182,7 +182,7 @@ class UserProducts extends Controller {
 
                 $payload = [
                     'method'        => $payment_method ?: 'QRIS',
-                    'merchant_ref'  => $order_id,
+                    'merchant_ref'  => $reference,
                     'amount'        => $amount_cents,
                     'customer_name' => $name,
                     'customer_email'=> $email,
