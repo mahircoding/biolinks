@@ -183,7 +183,7 @@
         </div>
 
         <div class="action-buttons">
-            <a href="https://wa.me/6282262235255&text=Upgrade+Paket" class="btn-upgrade">
+            <a href="https://api.whatsapp.com/send?phone=6282262235255&text=Upgrade+Paket" class="btn-upgrade">
                 <i class="fa fa-arrow-up mr-2"></i>
                 Upgrade Paket
             </a>
