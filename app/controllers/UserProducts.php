@@ -177,7 +177,7 @@ class UserProducts extends Controller {
                 }
             }
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
-            elseif(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
+            elseif(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
                 $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
                 $payload = [
