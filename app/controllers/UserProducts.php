@@ -199,13 +199,13 @@ class UserProducts extends Controller {
                     'expired_time'  => time() + (24 * 60 * 60),
                     'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . $amount_cents, $user->tripay_api_key_secret),
                     'return_url'    => url($user_id . '/' . $product->slug),
-                    'callback_url'  => url('digital-order/webhook')
+                    'callback_url'  => url('tripay-callback')
                 ];
 
                 $ch = curl_init();
                 curl_setopt_array($ch, [
                     CURLOPT_FRESH_CONNECT  => true,
-                    CURLOPT_URL            => 'https://tripay.co.id/api-sandbox/transaction/create',
+                    CURLOPT_URL            => 'https://tripay.co.id/api/transaction/create',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_HEADER         => false,
                     CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $user->tripay_api_key_public ],
@@ -255,7 +255,7 @@ class UserProducts extends Controller {
             /* Update order to completed */
             Database::update(DigitalOrderModel::$table, ['status' => 'completed'], ['download_token' => $token]);
 
-            $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
+            // $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
             $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product, 'download_url' => $download_url]));
         } else {
             $view = new \Altum\Views\View('user-products/checkout', (array) $this);
