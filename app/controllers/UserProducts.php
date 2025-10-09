@@ -178,7 +178,7 @@ class UserProducts extends Controller {
             }
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
             else {
-                $reference = 'DOP-' . time() . '-' . rand(1000,9999);
+                $reference = 'KBIO-' . time() . '-' . rand(1000,9999);
 
                 $payload = [
                     'method'        => $payment_method ?: 'QRIS',
@@ -189,7 +189,7 @@ class UserProducts extends Controller {
                     'customer_phone'=> $phone,
                     'order_items'   => [
                         [
-                            'sku'         => (string)$product->product_id,
+                            // 'sku'         => (string)$product->product_id,
                             'name'        => $product->name,
                             'price'       => $amount_cents,
                             'quantity'    => 1,
@@ -199,7 +199,7 @@ class UserProducts extends Controller {
                     'expired_time'  => time() + (24 * 60 * 60),
                     'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . $amount_cents, $user->tripay_api_key_secret),
                     'return_url'    => url($user_id . '/' . $product->slug),
-                    'callback_url'  => url('digital-order/webhook')
+                    'callback_url'  => url('tripay-callback')
                 ];
 
                 $ch = curl_init();
