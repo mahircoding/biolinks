@@ -14,6 +14,11 @@ class TripaySettings extends Controller {
         /* Migrate Tripay columns to users table */
         $this->migrate_tripay_columns();
 
+        /* Check if user has digital products addon enabled */
+        if (empty($this->user->addon_digital_products)) {
+            redirect('digital-product');
+        }
+
         /* Account header */
         $menu = new \Altum\Views\View('partials/account_header', (array) $this);
         $this->add_view_content('account_header', $menu->run());

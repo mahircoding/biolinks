@@ -18,6 +18,11 @@ class DigitalOrder extends Controller {
         /* Migrate addon status columns to users table */
         $this->migrate_addon_columns();
 
+        /* Check if user has digital products addon enabled */
+        if (empty($this->user->addon_digital_products)) {
+            redirect('digital-product');
+        }
+
         $user_id = (int)$this->user->user_id;
         $sql = "SELECT o.*, p.name AS product_name FROM `" . DigitalOrderModel::$table . "` o INNER JOIN `" . \Altum\Models\DigitalProduct::$table . "` p ON p.product_id = o.product_id WHERE p.user_id = '{$user_id}' ORDER BY o.order_id DESC";
         $result = Database::$database->query($sql);

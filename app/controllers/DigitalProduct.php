@@ -18,6 +18,17 @@ class DigitalProduct extends Controller {
         /* Migrate addon status columns to users table */
         $this->migrate_addon_columns();
 
+        /* Check if user has digital products addon enabled */
+        if (empty($this->user->addon_digital_products)) {
+            /* Account header */
+            $menu = new \Altum\Views\View('partials/account_header', (array) $this);
+            $this->add_view_content('account_header', $menu->run());
+
+            $view = new \Altum\Views\View('digital-product/restricted', (array) $this);
+            $this->add_view_content('content', $view->run());
+            return;
+        }
+
         $products = \Altum\Models\DigitalProduct::list_by_user($this->user->user_id);
 
         /* Account header */
@@ -31,6 +42,11 @@ class DigitalProduct extends Controller {
     public function create() {
         Authentication::guard();
         DigitalProductModel::migrate();
+
+        /* Check if user has digital products addon enabled */
+        if (empty($this->user->addon_digital_products)) {
+            redirect('digital-product');
+        }
 
         if(!empty($_POST)) {
             if(!Csrf::check()) redirect('digital-product');
@@ -103,6 +119,11 @@ class DigitalProduct extends Controller {
     public function edit() {
         Authentication::guard();
         DigitalProductModel::migrate();
+
+        /* Check if user has digital products addon enabled */
+        if (empty($this->user->addon_digital_products)) {
+            redirect('digital-product');
+        }
 
         $params = \Altum\Routing\Router::get_params();
         $product_id = isset($params[0]) ? (int)$params[0] : 0;
@@ -179,6 +200,11 @@ class DigitalProduct extends Controller {
     public function delete() {
         Authentication::guard();
         if(!Csrf::check()) redirect('digital-product');
+
+        /* Check if user has digital products addon enabled */
+        if (empty($this->user->addon_digital_products)) {
+            redirect('digital-product');
+        }
 
         $product_id = (int) ($_POST['product_id'] ?? 0);
         $product = \Altum\Models\DigitalProduct::find_by_id($product_id);
