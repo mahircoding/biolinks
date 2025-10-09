@@ -74,7 +74,7 @@ class UserProducts extends Controller {
         $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account', 'facebook_pixel_id', 'addon_tripay'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
-        // Debug: Log Facebook Pixel ID
+        // Debug: Log user data
         if (isset($_GET['debug'])) {
             error_log("DEBUG UserProducts checkout: user_id = $user_id, facebook_pixel_id = " . ($user->facebook_pixel_id ?? 'NULL'));
         }
@@ -165,8 +165,14 @@ class UserProducts extends Controller {
                     /* Get order data for display */
                     $order = Database::get(['order_id', 'download_token', 'created_at', 'amount_cents'], DigitalOrderModel::$table, ['download_token' => $token]);
                     
+                    // Debug: Log order data
+                    if (isset($_GET['debug'])) {
+                        error_log("DEBUG UserProducts bank transfer: order = " . json_encode($order));
+                        error_log("DEBUG UserProducts bank transfer: user pixel_id = " . ($user->facebook_pixel_id ?? 'NULL'));
+                    }
+                    
                     $view = new \Altum\Views\View('user-products/bank-transfer-instructions', (array) $this);
-                    $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email, 'order' => $order]));
+                    $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email, 'order' => $order, 'user' => $user]));
                     return;
                 }
             }

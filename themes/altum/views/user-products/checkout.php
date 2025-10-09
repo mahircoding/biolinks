@@ -14,7 +14,13 @@ if (isset($_GET['debug'])) {
 }
 
 if ($pixel_id) {
-    echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
+    // Add Facebook Pixel base code to head section
+    $this->add_view_content('facebook_pixel_head', \Altum\Helpers\FacebookPixel::get_base_code($pixel_id));
+    
+    // Set pixel ID for tracking methods
+    \Altum\Helpers\FacebookPixel::set_user_pixel_id($pixel_id);
+    
+    // Track events in body
     echo \Altum\Helpers\FacebookPixel::track_initiate_checkout($data->product);
 } else {
     // Debug: Show when no pixel_id

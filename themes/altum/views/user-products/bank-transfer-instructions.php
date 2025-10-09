@@ -2,25 +2,32 @@
 
 <?php
 /* Facebook Pixel tracking for bank transfer instructions */
-$pixel_id = $data->user->facebook_pixel_id ?? null;
 
-// Debug: Check if pixel_id is available
+// Debug: Check all available data
 if (isset($_GET['debug'])) {
-    echo "<!-- DEBUG: pixel_id = " . ($pixel_id ?: 'NULL') . " -->";
+    echo "<!-- DEBUG: All data keys = " . implode(', ', array_keys($data)) . " -->";
     echo "<!-- DEBUG: user data available = " . (isset($data->user) ? 'YES' : 'NO') . " -->";
     if (isset($data->user)) {
+        echo "<!-- DEBUG: user object keys = " . implode(', ', array_keys((array)$data->user)) . " -->";
         echo "<!-- DEBUG: user->facebook_pixel_id = " . ($data->user->facebook_pixel_id ?? 'NULL') . " -->";
     }
     echo "<!-- DEBUG: product data available = " . (isset($data->product) ? 'YES' : 'NO') . " -->";
     echo "<!-- DEBUG: order data available = " . (isset($data->order) ? 'YES' : 'NO') . " -->";
+    if (isset($data->order)) {
+        echo "<!-- DEBUG: order object keys = " . implode(', ', array_keys((array)$data->order)) . " -->";
+    }
 }
 
+$pixel_id = $data->user->facebook_pixel_id ?? null;
+
 if ($pixel_id) {
-    echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
+    // Add Facebook Pixel base code to head section
+    $this->add_view_content('facebook_pixel_head', \Altum\Helpers\FacebookPixel::get_base_code($pixel_id));
     
     // Set pixel ID for tracking methods
     \Altum\Helpers\FacebookPixel::set_user_pixel_id($pixel_id);
     
+    // Track events in body
     echo \Altum\Helpers\FacebookPixel::track_initiate_checkout($data->product);
     
     /* Track Purchase event for bank transfer orders */
