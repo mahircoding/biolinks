@@ -179,6 +179,9 @@ class UserProducts extends Controller {
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
             else {
                 $reference = 'KBIO-' . $order->order_id;
+                echo $order;
+
+                echo json_encode($order);
 
                 $payload = [
                     'method'        => $payment_method ?: 'QRIS',
@@ -230,7 +233,7 @@ class UserProducts extends Controller {
                         'payment_channel' => $json->data->payment_method ?? $payment_method
                     ], [ 'download_token' => $token ]);
 
-                    echo $order;
+                    
 
                     /* Redirect to payment url - use direct header redirect for external URLs */
                     // header('Location: ' . $json->data->checkout_url);
