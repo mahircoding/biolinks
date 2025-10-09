@@ -177,7 +177,7 @@ class DigitalOrder extends Controller {
             $ch = curl_init();
             curl_setopt_array($ch, [
                 CURLOPT_FRESH_CONNECT  => true,
-                CURLOPT_URL            => 'https://tripay.co.id/api-sandbox/transaction/create',
+                CURLOPT_URL            => 'https://tripay.co.id/api/transaction/create',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER         => false,
                 CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $user->tripay_api_key_public ],
