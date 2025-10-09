@@ -38,8 +38,20 @@ class TripayCallback extends Controller {
             die('MISSING_REQUIRED_FIELDS');
         }
 
-        /* Get order by reference */
-        $order = Database::get('*', 'digital_orders', ['order_id' => $payload['merchant_ref']]);
+        /* Extract order_id from merchant_ref (format: KBIO-{order_id}) */
+        $merchant_ref = $payload['merchant_ref'];
+        if (strpos($merchant_ref, 'KBIO-') === 0) {
+            $order_id = (int)str_replace('KBIO-', '', $merchant_ref);
+        } else {
+            /* Fallback: try to use merchant_ref as order_id directly */
+            $order_id = (int)$merchant_ref;
+        }
+        
+        /* Log for debugging */
+        error_log("TripayCallback: merchant_ref = $merchant_ref, extracted order_id = $order_id");
+        
+        /* Get order by order_id */
+        $order = Database::get('*', 'digital_orders', ['order_id' => $order_id]);
         
         if (!$order) {
             http_response_code(404);

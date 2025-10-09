@@ -178,7 +178,7 @@ class UserProducts extends Controller {
             }
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
             else {
-                $reference = 'KBIO-' . time() . '-' . rand(1000,9999);
+                $reference = 'KBIO-' . $order_id;
 
                 $payload = [
                     'method'        => $payment_method ?: 'QRIS',
