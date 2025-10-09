@@ -178,6 +178,7 @@ class UserProducts extends Controller {
             }
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
             else {
+                $order = Database::get(['order_id', 'download_token', 'created_at', 'amount_cents'], DigitalOrderModel::$table, ['download_token' => $token]);
                 $reference = 'KBIO-' . $order->order_id;
                 echo $order;
 
