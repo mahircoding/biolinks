@@ -6,6 +6,11 @@ $pixel_id = $data->user->facebook_pixel_id ?? null;
 if ($pixel_id) {
     echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
     echo \Altum\Helpers\FacebookPixel::track_initiate_checkout($data->product);
+    
+    /* Track Purchase event for bank transfer orders */
+    if(isset($data->order) && $data->order) {
+        echo \Altum\Helpers\FacebookPixel::track_purchase($data->order, $data->product);
+    }
 }
 ?>
 
