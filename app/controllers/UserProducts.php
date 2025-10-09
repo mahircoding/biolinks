@@ -125,59 +125,59 @@ class UserProducts extends Controller {
             ]);
 
             /* Check payment method and process accordingly */
-            if(strpos($payment_method, 'bank_transfer_') === 0) {
-                /* Bank Transfer Payment */
-                $bank_name = str_replace('bank_transfer_', '', $payment_method);
-                $bank_accounts = @json_decode($user->bank_account);
-                $selected_bank = null;
+            // if(strpos($payment_method, 'bank_transfer_') === 0) {
+            //     /* Bank Transfer Payment */
+            //     $bank_name = str_replace('bank_transfer_', '', $payment_method);
+            //     $bank_accounts = @json_decode($user->bank_account);
+            //     $selected_bank = null;
                 
-                if($bank_accounts && is_array($bank_accounts)) {
-                    foreach($bank_accounts as $bank) {
-                        if(isset($bank->bank_name) && $bank->bank_name === $bank_name) {
-                            $selected_bank = $bank;
-                            break;
-                        }
-                    }
-                }
+            //     if($bank_accounts && is_array($bank_accounts)) {
+            //         foreach($bank_accounts as $bank) {
+            //             if(isset($bank->bank_name) && $bank->bank_name === $bank_name) {
+            //                 $selected_bank = $bank;
+            //                 break;
+            //             }
+            //         }
+            //     }
                 
-                if($selected_bank) {
-                    /* Send bank transfer instructions via email */
-                    $content = '<p>Terima kasih atas pesanan Anda.</p>' .
-                               '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
-                               '<p>Harga: <strong>Rp ' . number_format($amount_cents, 0, ',', '.') . '</strong></p>' .
-                               '<p>Silakan transfer ke rekening berikut:</p>' .
-                               '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">' .
-                               '<p><strong>Bank:</strong> ' . htmlspecialchars($selected_bank->bank_name) . '</p>' .
-                               '<p><strong>Nama Rekening:</strong> ' . htmlspecialchars($selected_bank->account_name) . '</p>' .
-                               '<p><strong>Nomor Rekening:</strong> ' . htmlspecialchars($selected_bank->account_number) . '</p>' .
-                               '</div>' .
-                               '<p>Setelah transfer dikonfirmasi, produk akan dikirim ke email Anda.</p>';
+            //     if($selected_bank) {
+            //         /* Send bank transfer instructions via email */
+            //         $content = '<p>Terima kasih atas pesanan Anda.</p>' .
+            //                    '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
+            //                    '<p>Harga: <strong>Rp ' . number_format($amount_cents, 0, ',', '.') . '</strong></p>' .
+            //                    '<p>Silakan transfer ke rekening berikut:</p>' .
+            //                    '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">' .
+            //                    '<p><strong>Bank:</strong> ' . htmlspecialchars($selected_bank->bank_name) . '</p>' .
+            //                    '<p><strong>Nama Rekening:</strong> ' . htmlspecialchars($selected_bank->account_name) . '</p>' .
+            //                    '<p><strong>Nomor Rekening:</strong> ' . htmlspecialchars($selected_bank->account_number) . '</p>' .
+            //                    '</div>' .
+            //                    '<p>Setelah transfer dikonfirmasi, produk akan dikirim ke email Anda.</p>';
                     
-                    try {
-                        send_mail($this->settings, $email, 'Instruksi Pembayaran - {{WEBSITE_TITLE}}', $content, false);
-                    } catch(\Exception $e) {
-                        error_log('Email send failed: ' . $e->getMessage());
-                    }
+            //         try {
+            //             send_mail($this->settings, $email, 'Instruksi Pembayaran - {{WEBSITE_TITLE}}', $content, false);
+            //         } catch(\Exception $e) {
+            //             error_log('Email send failed: ' . $e->getMessage());
+            //         }
                     
-                    /* Update order status to pending_payment for bank transfer */
-                    Database::update(DigitalOrderModel::$table, ['status' => 'pending_payment'], ['download_token' => $token]);
+            //         /* Update order status to pending_payment for bank transfer */
+            //         Database::update(DigitalOrderModel::$table, ['status' => 'pending_payment'], ['download_token' => $token]);
                     
-                    /* Get order data for display */
-                    $order = Database::get(['order_id', 'download_token', 'created_at', 'amount_cents'], DigitalOrderModel::$table, ['download_token' => $token]);
+            //         /* Get order data for display */
+            //         $order = Database::get(['order_id', 'download_token', 'created_at', 'amount_cents'], DigitalOrderModel::$table, ['download_token' => $token]);
                     
-                    // Debug: Log order data
-                    if (isset($_GET['debug'])) {
-                        error_log("DEBUG UserProducts bank transfer: order = " . json_encode($order));
-                        error_log("DEBUG UserProducts bank transfer: user pixel_id = " . ($user->facebook_pixel_id ?? 'NULL'));
-                    }
+            //         // Debug: Log order data
+            //         if (isset($_GET['debug'])) {
+            //             error_log("DEBUG UserProducts bank transfer: order = " . json_encode($order));
+            //             error_log("DEBUG UserProducts bank transfer: user pixel_id = " . ($user->facebook_pixel_id ?? 'NULL'));
+            //         }
                     
-                    $view = new \Altum\Views\View('user-products/bank-transfer-instructions', (array) $this);
-                    $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email, 'order' => $order, 'user' => $user]));
-                    return;
-                }
-            }
-            /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
-            else {
+            //         $view = new \Altum\Views\View('user-products/bank-transfer-instructions', (array) $this);
+            //         $this->add_view_content('content', $view->run(['bank' => $selected_bank, 'product' => $product, 'email' => $email, 'order' => $order, 'user' => $user]));
+            //         return;
+            //     }
+            // }
+            // /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
+            // else {
                 $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
                 $payload = [
@@ -237,7 +237,7 @@ class UserProducts extends Controller {
                 } else {
                     error_log('Tripay API Error: ' . $response);
                 }
-            }
+            // }
 
             /* Fallback: no payment gateway configured; show thank you & send immediate access */
             // $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
