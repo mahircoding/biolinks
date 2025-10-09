@@ -71,7 +71,7 @@ class UserProducts extends Controller {
         if(!$product || (int)$product->user_id !== $user_id) redirect('notfound');
 
         /* Get user info including Tripay settings, bank account, and Facebook Pixel */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account', 'facebook_pixel_id'], 'users', ['user_id' => $user_id]);
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'bank_account', 'facebook_pixel_id', 'addon_tripay'], 'users', ['user_id' => $user_id]);
         if(!$user) redirect('notfound');
 
         // Debug: Log Facebook Pixel ID
@@ -170,8 +170,8 @@ class UserProducts extends Controller {
                     return;
                 }
             }
-            /* If Tripay configured for this user, create transaction and redirect to payment page */
-            elseif(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
+            /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
+            elseif(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
                 $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
                 $payload = [

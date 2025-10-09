@@ -19,6 +19,17 @@ class TripaySettings extends Controller {
             redirect('digital-product');
         }
 
+        /* Check if user has Tripay addon enabled */
+        if (empty($this->user->addon_tripay)) {
+            /* Account header */
+            $menu = new \Altum\Views\View('partials/account_header', (array) $this);
+            $this->add_view_content('account_header', $menu->run());
+
+            $view = new \Altum\Views\View('tripay-settings/restricted', (array) $this);
+            $this->add_view_content('content', $view->run());
+            return;
+        }
+
         /* Account header */
         $menu = new \Altum\Views\View('partials/account_header', (array) $this);
         $this->add_view_content('account_header', $menu->run());

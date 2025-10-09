@@ -130,7 +130,7 @@ class DigitalOrder extends Controller {
         if(!$product) redirect('notfound');
 
         /* Get product owner's Tripay settings */
-        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret'], 'users', ['user_id' => $product->user_id]);
+        $user = Database::get(['user_id', 'name', 'email', 'phone', 'tripay_merchant_code', 'tripay_api_key_public', 'tripay_api_key_secret', 'addon_tripay'], 'users', ['user_id' => $product->user_id]);
         if(!$user) redirect('notfound');
 
         $token = bin2hex(random_bytes(16));
@@ -148,8 +148,8 @@ class DigitalOrder extends Controller {
             'status' => 'pending'
         ]);
 
-        /* If Tripay configured, create transaction and redirect to payment page */
-        if(!empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
+        /* If Tripay configured and addon enabled, create transaction and redirect to payment page */
+        if(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)){
             $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
             $payload = [
