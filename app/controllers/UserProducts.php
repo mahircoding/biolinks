@@ -230,10 +230,12 @@ class UserProducts extends Controller {
                         'payment_channel' => $json->data->payment_method ?? $payment_method
                     ], [ 'download_token' => $token ]);
 
+                    echo $order;
+
                     /* Redirect to payment url - use direct header redirect for external URLs */
-                    header('Location: ' . $json->data->checkout_url);
-                    die();
-                    return;
+                    // header('Location: ' . $json->data->checkout_url);
+                    // die();
+                    // return;
                 } else {
                     error_log('Tripay API Error: ' . $response);
                 }
