@@ -180,7 +180,7 @@ class UserProducts extends Controller {
             else {
                 $order = Database::get(['order_id', 'download_token', 'created_at', 'amount_cents'], DigitalOrderModel::$table, ['download_token' => $token]);
                 $reference = 'KBIO-' . $order->order_id;
-                echo $order;
+                echo $reference;
 
                 echo json_encode($order);
 
