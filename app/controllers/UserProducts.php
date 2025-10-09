@@ -178,15 +178,12 @@ class UserProducts extends Controller {
             }
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
             else {
-                $order = Database::get(['order_id', 'download_token', 'created_at', 'amount_cents'], DigitalOrderModel::$table, ['download_token' => $token]);
+                $order = Database::get(['order_id']);
                 $reference = 'KBIO-' . $order->order_id;
-                echo $reference;
-
-                echo json_encode($order);
 
                 $payload = [
                     'method'        => $payment_method ?: 'QRIS',
-                    'merchant_ref'  => $reference ,
+                    'merchant_ref'  => $reference,
                     'amount'        => $amount_cents,
                     'customer_name' => $name,
                     'customer_email'=> $email,
@@ -234,12 +231,10 @@ class UserProducts extends Controller {
                         'payment_channel' => $json->data->payment_method ?? $payment_method
                     ], [ 'download_token' => $token ]);
 
-                    
-
                     /* Redirect to payment url - use direct header redirect for external URLs */
-                    // header('Location: ' . $json->data->checkout_url);
-                    // die();
-                    // return;
+                    header('Location: ' . $json->data->checkout_url);
+                    die();
+                    return;
                 } else {
                     error_log('Tripay API Error: ' . $response);
                 }
