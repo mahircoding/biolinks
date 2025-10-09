@@ -177,86 +177,86 @@ class UserProducts extends Controller {
                 }
             }
             /* If Tripay configured for this user and addon enabled, create transaction and redirect to payment page */
-            // elseif(!empty($user->addon_tripay) && !empty($user->tripay_merchant_code) && !empty($user->tripay_api_key_public) && !empty($user->tripay_api_key_secret)) {
-            //     $reference = 'DOP-' . time() . '-' . rand(1000,9999);
+            else {
+                $reference = 'DOP-' . time() . '-' . rand(1000,9999);
 
-            //     $payload = [
-            //         'method'        => $payment_method ?: 'QRIS',
-            //         'merchant_ref'  => $reference,
-            //         'amount'        => $amount_cents,
-            //         'customer_name' => $name,
-            //         'customer_email'=> $email,
-            //         'customer_phone'=> $phone,
-            //         'order_items'   => [
-            //             [
-            //                 'sku'         => (string)$product->product_id,
-            //                 'name'        => $product->name,
-            //                 'price'       => $amount_cents,
-            //                 'quantity'    => 1,
-            //                 'product_url' => url($user_id . '/' . $product->slug)
-            //             ]
-            //         ],
-            //         'expired_time'  => time() + (24 * 60 * 60),
-            //         'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . $amount_cents, $user->tripay_api_key_secret),
-            //         'return_url'    => url($user_id . '/' . $product->slug),
-            //         'callback_url'  => url('digital-order/webhook')
-            //     ];
+                $payload = [
+                    'method'        => $payment_method ?: 'QRIS',
+                    'merchant_ref'  => $reference,
+                    'amount'        => $amount_cents,
+                    'customer_name' => $name,
+                    'customer_email'=> $email,
+                    'customer_phone'=> $phone,
+                    'order_items'   => [
+                        [
+                            'sku'         => (string)$product->product_id,
+                            'name'        => $product->name,
+                            'price'       => $amount_cents,
+                            'quantity'    => 1,
+                            'product_url' => url($user_id . '/' . $product->slug)
+                        ]
+                    ],
+                    'expired_time'  => time() + (24 * 60 * 60),
+                    'signature'     => hash_hmac('sha256', $user->tripay_merchant_code . $reference . $amount_cents, $user->tripay_api_key_secret),
+                    'return_url'    => url($user_id . '/' . $product->slug),
+                    'callback_url'  => url('digital-order/webhook')
+                ];
 
-            //     $ch = curl_init();
-            //     curl_setopt_array($ch, [
-            //         CURLOPT_FRESH_CONNECT  => true,
-            //         CURLOPT_URL            => 'https://tripay.co.id/api-sandbox/transaction/create',
-            //         CURLOPT_RETURNTRANSFER => true,
-            //         CURLOPT_HEADER         => false,
-            //         CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $user->tripay_api_key_public ],
-            //         CURLOPT_FAILONERROR    => false,
-            //         CURLOPT_POST           => true,
-            //         CURLOPT_POSTFIELDS     => http_build_query($payload),
-            //         CURLOPT_TIMEOUT        => 30
-            //     ]);
-            //     $response = curl_exec($ch);
-            //     $curl_error = curl_error($ch);
-            //     curl_close($ch);
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_FRESH_CONNECT  => true,
+                    CURLOPT_URL            => 'https://tripay.co.id/api-sandbox/transaction/create',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_HEADER         => false,
+                    CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $user->tripay_api_key_public ],
+                    CURLOPT_FAILONERROR    => false,
+                    CURLOPT_POST           => true,
+                    CURLOPT_POSTFIELDS     => http_build_query($payload),
+                    CURLOPT_TIMEOUT        => 30
+                ]);
+                $response = curl_exec($ch);
+                $curl_error = curl_error($ch);
+                curl_close($ch);
 
-            //     if($curl_error) {
-            //         error_log('Tripay CURL Error: ' . $curl_error);
-            //     }
+                if($curl_error) {
+                    error_log('Tripay CURL Error: ' . $curl_error);
+                }
 
-            //     $json = @json_decode($response);
-            //     if(isset($json->success) && $json->success && isset($json->data->reference)) {
-            //         /* Save reference */
-            //         Database::update(DigitalOrderModel::$table, [
-            //             'tripay_reference' => $json->data->reference,
-            //             'payment_channel' => $json->data->payment_method ?? $payment_method
-            //         ], [ 'download_token' => $token ]);
+                $json = @json_decode($response);
+                if(isset($json->success) && $json->success && isset($json->data->reference)) {
+                    /* Save reference */
+                    Database::update(DigitalOrderModel::$table, [
+                        'tripay_reference' => $json->data->reference,
+                        'payment_channel' => $json->data->payment_method ?? $payment_method
+                    ], [ 'download_token' => $token ]);
 
-            //         /* Redirect to payment url - use direct header redirect for external URLs */
-            //         header('Location: ' . $json->data->checkout_url);
-            //         die();
-            //         return;
-            //     } else {
-            //         error_log('Tripay API Error: ' . $response);
-            //     }
-            // }
+                    /* Redirect to payment url - use direct header redirect for external URLs */
+                    header('Location: ' . $json->data->checkout_url);
+                    die();
+                    return;
+                } else {
+                    error_log('Tripay API Error: ' . $response);
+                }
+            }
 
-            // /* Fallback: no payment gateway configured; show thank you & send immediate access */
-            // $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
-            // $content = '<p>Terima kasih atas pesanan Anda.</p>' .
-            //            '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
-            //            '<p>Akses produk Anda:<br />' .
-            //            '<a href="' . htmlspecialchars($download_url) . '">' . htmlspecialchars($download_url) . '</a></p>';
+            /* Fallback: no payment gateway configured; show thank you & send immediate access */
+            $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
+            $content = '<p>Terima kasih atas pesanan Anda.</p>' .
+                       '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
+                       '<p>Akses produk Anda:<br />' .
+                       '<a href="' . htmlspecialchars($download_url) . '">' . htmlspecialchars($download_url) . '</a></p>';
             
-            // try {
-            //     send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
-            // } catch(\Exception $e) {
-            //     error_log('Email send failed: ' . $e->getMessage());
-            // }
+            try {
+                send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
+            } catch(\Exception $e) {
+                error_log('Email send failed: ' . $e->getMessage());
+            }
 
-            // /* Update order to completed */
-            // Database::update(DigitalOrderModel::$table, ['status' => 'completed'], ['download_token' => $token]);
+            /* Update order to completed */
+            Database::update(DigitalOrderModel::$table, ['status' => 'completed'], ['download_token' => $token]);
 
-            // $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
-            // $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product, 'download_url' => $download_url]));
+            $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
+            $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product, 'download_url' => $download_url]));
         } else {
             $view = new \Altum\Views\View('user-products/checkout', (array) $this);
             $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));
