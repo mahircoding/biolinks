@@ -24,8 +24,8 @@
     <?php endif ?>
     
     <!-- Facebook Pixel Code (if available) -->
-    <?php if(isset($this->views['facebook_pixel_head'])): ?>
-        <?= $this->views['facebook_pixel_head'] ?>
+    <?php if(isset($GLOBALS['facebook_pixel_head'])): ?>
+        <?= $GLOBALS['facebook_pixel_head'] ?>
     <?php endif ?>
 
     <!-- Custom CSS -->
