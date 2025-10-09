@@ -240,23 +240,23 @@ class UserProducts extends Controller {
             }
 
             /* Fallback: no payment gateway configured; show thank you & send immediate access */
-            $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
-            $content = '<p>Terima kasih atas pesanan Anda.</p>' .
-                       '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
-                       '<p>Akses produk Anda:<br />' .
-                       '<a href="' . htmlspecialchars($download_url) . '">' . htmlspecialchars($download_url) . '</a></p>';
+            // $download_url = !empty($product->access_url) ? $product->access_url : url('digital-order/download/' . $token);
+            // $content = '<p>Terima kasih atas pesanan Anda.</p>' .
+            //            '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
+            //            '<p>Akses produk Anda:<br />' .
+            //            '<a href="' . htmlspecialchars($download_url) . '">' . htmlspecialchars($download_url) . '</a></p>';
             
-            try {
-                send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
-            } catch(\Exception $e) {
-                error_log('Email send failed: ' . $e->getMessage());
-            }
+            // try {
+            //     // send_mail($this->settings, $email, 'Akses Produk Digital - {{WEBSITE_TITLE}}', $content, false);
+            // } catch(\Exception $e) {
+            //     error_log('Email send failed: ' . $e->getMessage());
+            // }
 
             /* Update order to completed */
-            Database::update(DigitalOrderModel::$table, ['status' => 'completed'], ['download_token' => $token]);
+            // Database::update(DigitalOrderModel::$table, ['status' => 'completed'], ['download_token' => $token]);
 
             // $view = new \Altum\Views\View('user-products/thank-you', (array) $this);
-            $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product, 'download_url' => $download_url]));
+            // $this->add_view_content('content', $view->run(['email' => $email, 'product' => $product, 'download_url' => $download_url]));
         } else {
             $view = new \Altum\Views\View('user-products/checkout', (array) $this);
             $this->add_view_content('content', $view->run(['product' => $product, 'user' => $user]));
