@@ -183,7 +183,7 @@
         </div>
 
         <div class="action-buttons">
-            <a href="account-package" class="btn-upgrade">
+            <a href="https://wa.me/6282262235255&text=Upgrade+Paket" class="btn-upgrade">
                 <i class="fa fa-arrow-up mr-2"></i>
                 Upgrade Paket
             </a>
