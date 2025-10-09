@@ -103,7 +103,14 @@ fbq('track', '{$event_name}', {$params_json});
             'currency' => 'IDR'
         ];
 
-        return self::track_event('InitiateCheckout', $parameters);
+        $event_code = self::track_event('InitiateCheckout', $parameters);
+        
+        // Debug output
+        if (isset($_GET['debug'])) {
+            $event_code .= "\n<!-- DEBUG InitiateCheckout: " . json_encode($parameters) . " -->";
+        }
+        
+        return $event_code;
     }
 
     /**
@@ -119,6 +126,13 @@ fbq('track', '{$event_name}', {$params_json});
             'order_id' => $order->order_id
         ];
 
-        return self::track_event('Purchase', $parameters);
+        $event_code = self::track_event('Purchase', $parameters);
+        
+        // Debug output
+        if (isset($_GET['debug'])) {
+            $event_code .= "\n<!-- DEBUG Purchase: " . json_encode($parameters) . " -->";
+        }
+        
+        return $event_code;
     }
 }

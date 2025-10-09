@@ -3,13 +3,41 @@
 <?php
 /* Facebook Pixel tracking for bank transfer instructions */
 $pixel_id = $data->user->facebook_pixel_id ?? null;
+
+// Debug: Check if pixel_id is available
+if (isset($_GET['debug'])) {
+    echo "<!-- DEBUG: pixel_id = " . ($pixel_id ?: 'NULL') . " -->";
+    echo "<!-- DEBUG: user data available = " . (isset($data->user) ? 'YES' : 'NO') . " -->";
+    if (isset($data->user)) {
+        echo "<!-- DEBUG: user->facebook_pixel_id = " . ($data->user->facebook_pixel_id ?? 'NULL') . " -->";
+    }
+    echo "<!-- DEBUG: product data available = " . (isset($data->product) ? 'YES' : 'NO') . " -->";
+    echo "<!-- DEBUG: order data available = " . (isset($data->order) ? 'YES' : 'NO') . " -->";
+}
+
 if ($pixel_id) {
     echo \Altum\Helpers\FacebookPixel::get_base_code($pixel_id);
+    
+    // Set pixel ID for tracking methods
+    \Altum\Helpers\FacebookPixel::set_user_pixel_id($pixel_id);
+    
     echo \Altum\Helpers\FacebookPixel::track_initiate_checkout($data->product);
     
     /* Track Purchase event for bank transfer orders */
     if(isset($data->order) && $data->order) {
         echo \Altum\Helpers\FacebookPixel::track_purchase($data->order, $data->product);
+        if (isset($_GET['debug'])) {
+            echo "<!-- DEBUG: Purchase event fired -->";
+        }
+    } else {
+        if (isset($_GET['debug'])) {
+            echo "<!-- DEBUG: No order data available for Purchase event -->";
+        }
+    }
+} else {
+    // Debug: Show when no pixel_id
+    if (isset($_GET['debug'])) {
+        echo "<!-- DEBUG: No Facebook Pixel ID found -->";
     }
 }
 ?>
