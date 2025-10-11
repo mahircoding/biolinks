@@ -232,8 +232,30 @@ class UserProducts extends Controller {
                         'payment_channel' => $json->data->payment_method ?? $payment_method
                     ], [ 'download_token' => $token ]);
 
+                    /* Send payment instruction email */
+                    $payment_method_name = $json->data->payment_method ?? $payment_method;
+                    $checkout_url = $json->data->checkout_url;
+                    
+                    $content = '<p>Terima kasih atas pesanan Anda.</p>' .
+                               '<p>Produk: <strong>' . htmlspecialchars($product->name) . '</strong></p>' .
+                               '<p>Harga: <strong>Rp ' . number_format($amount_cents, 0, ',', '.') . '</strong></p>' .
+                               '<p>Metode Pembayaran: <strong>' . htmlspecialchars($payment_method_name) . '</strong></p>' .
+                               '<p>Silakan selesaikan pembayaran dengan mengklik link berikut:</p>' .
+                               '<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center;">' .
+                               '<a href="' . htmlspecialchars($checkout_url) . '" style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Bayar Sekarang</a>' .
+                               '</div>' .
+                               '<p>Atau copy link berikut ke browser Anda:</p>' .
+                               '<p style="word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 5px;">' . htmlspecialchars($checkout_url) . '</p>' .
+                               '<p><strong>Catatan:</strong> Pembayaran akan otomatis diverifikasi setelah Anda menyelesaikan transaksi.</p>';
+                    
+                    try {
+                        send_mail($this->settings, $email, 'Instruksi Pembayaran Tripay - {{WEBSITE_TITLE}}', $content, false);
+                    } catch(\Exception $e) {
+                        error_log('Tripay payment instruction email send failed: ' . $e->getMessage());
+                    }
+
                     /* Redirect to payment url - use direct header redirect for external URLs */
-                    header('Location: ' . $json->data->checkout_url);
+                    header('Location: ' . $checkout_url);
                     die();
                     return;
                 } else {
