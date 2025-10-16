@@ -166,6 +166,12 @@
 												</select>
 											</div>
 											
+											<div class="form-group">
+												<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text</label>
+												<input type="text" class="form-control" name="button_text" value="Add to Cart" placeholder="Ex: Add to Cart, Beli Sekarang, etc." />
+												<small class="text-muted">Custom text untuk tombol Add to Cart</small>
+											</div>
+											
 											<div class="d-flex justify-content-center mb-2">
 												<div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div>
 											</div>

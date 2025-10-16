@@ -8,7 +8,7 @@
 			</div>
 			<select class="selectpicker">
 			<option value="all">All</option>
-			<?php foreach($data->link->settings as $iy => $it) {?>
+			<?php foreach($settings_data as $iy => $it) {?>
 			<option value="<?= $iy ?>"><?= $it->category ?></option>
 			<?php }?>
 			</select>
@@ -16,7 +16,11 @@
 	</div>
 	<div class="pricing-table">
 		<div class="row justify-content-center align-items-stretch">
-		<?php $num_prd=0; foreach($data->link->settings as $iy => $it) {?>
+		<?php 
+		// Handle backward compatibility for old e-shop structure
+		$settings_data = isset($data->link->settings->data) ? $data->link->settings->data : $data->link->settings;
+		$button_text = isset($data->link->settings->button_text) ? $data->link->settings->button_text : 'Add to Cart';
+		$num_prd=0; foreach($settings_data as $iy => $it) {?>
 		<?php foreach($it->products as $iz => $pr) {
 		if(isset($pr->show)&&$pr->show) {
 		?>
@@ -32,7 +36,7 @@
 					<?php }?>
 				</div>
 				<div class="product-btn">
-					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;">Add to Cart</a>
+					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
 				</div>
 			</div>
 		</div>
@@ -49,7 +53,7 @@
 					<?php }?>
 				</div>
 				<div class="product-btn">
-					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;">Add to Cart</a>
+					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
 				</div>
 			</div>
 		</div>
@@ -59,7 +63,7 @@
 		?>
 		</div>
 	</div>
-	<script>eshop[<?= $data->link->link_id ?>] = <?= json_encode($data->link->settings) ?></script>
+	<script>eshop[<?= $data->link->link_id ?>] = <?= json_encode($settings_data) ?></script>
 	<style>
 	.bootstrap-select{flex: 1 1 auto !important;}.bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
 	</style>

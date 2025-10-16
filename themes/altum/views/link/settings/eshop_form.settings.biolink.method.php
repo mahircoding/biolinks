@@ -21,7 +21,10 @@
 		</div>
 		
 		<div class="form-product-main">
-			<?php foreach($row->settings as $ky => $sg) {?>				
+			<?php 
+		// Handle backward compatibility for old e-shop structure
+		$settings_data = isset($row->settings->data) ? $row->settings->data : $row->settings;
+		foreach($settings_data as $ky => $sg) {?>				
 			<div class="form-product-item">
 			
 				<div class="form-product-ctg">
@@ -288,6 +291,12 @@
 			<?php }?>
 		
 		</div>
+	</div>
+
+	<div class="form-group mt-4">
+		<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text</label>
+		<input type="text" class="form-control" name="button_text" value="<?= isset($row->settings->button_text) ? $row->settings->button_text : 'Add to Cart' ?>" placeholder="Ex: Add to Cart, Beli Sekarang, etc." />
+		<small class="text-muted">Custom text untuk tombol Add to Cart di semua produk</small>
 	</div>
 
     <div class="mt-4">

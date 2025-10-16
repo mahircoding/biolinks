@@ -1453,7 +1453,14 @@ class LinkAjax extends Controller {
 			$type = 'biolink';
 			$subtype = 'eshop';
 			$order = 99;
-			$settings = json_encode($item_settings);
+			
+			// Add button_text to settings
+			$button_text = !empty($_POST['button_text']) ? $_POST['button_text'] : 'Add to Cart';
+			$settings_data = [
+				'data' => $item_settings,
+				'button_text' => $button_text
+			];
+			$settings = json_encode($settings_data);
 			
 			$stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			$stmt->bind_param('ssssssssss', $project_id, $_POST['link_id'], $this->user->user_id, $type, $subtype, $url, $location_url, $settings, $order, \Altum\Date::$date);
@@ -2998,7 +3005,14 @@ class LinkAjax extends Controller {
 			$type = 'biolink';
 			$subtype = 'eshop';
 			$order = 99;
-			$settings = json_encode($item_settings);
+			
+			// Add button_text to settings
+			$button_text = !empty($_POST['button_text']) ? $_POST['button_text'] : 'Add to Cart';
+			$settings_data = [
+				'data' => $item_settings,
+				'button_text' => $button_text
+			];
+			$settings = json_encode($settings_data);
 			
 			$stmt = Database::$database->prepare("UPDATE `links` SET `settings` = ? WHERE `link_id` = ?");
 			$stmt->bind_param('ss', $settings, $_POST['link_id']);
