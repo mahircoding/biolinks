@@ -1417,12 +1417,18 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
+						// Get detailed description
+						$detailed_desc = '';
+						if(isset($_POST['detailed_description'][$i][$j]) && !empty($_POST['detailed_description'][$i][$j])) {
+							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
+						}
+						
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
 												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => ucfirst($_POST['description'][$i][$j]),
-												"detailed_description" => isset($_POST['detailed_description'][$i][$j]) ? ucfirst($_POST['detailed_description'][$i][$j]) : '',
+												"detailed_description" => $detailed_desc,
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
@@ -3000,12 +3006,20 @@ class LinkAjax extends Controller {
 							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
 						}
 						
+						// Get detailed description
+						$detailed_desc = '';
+						if(isset($_POST['detailed_description'][$i][$j]) && !empty($_POST['detailed_description'][$i][$j])) {
+							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
+						} else if(isset($images[$i]['products'][$j]['detailed_description'])) {
+							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
+						}
+						
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
 												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
-												"detailed_description" => isset($_POST['detailed_description'][$i][$j]) ? ucfirst($_POST['detailed_description'][$i][$j]) : '',
+												"detailed_description" => $detailed_desc,
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
