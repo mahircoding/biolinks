@@ -37,7 +37,18 @@
 				</div>
 				<div class="product-btn">
 					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
-					<a class="btn btn-outline-primary btn-sm ml-2" data-toggle="modal" data-target="#productDetailModal" data-product='<?= json_encode(array_merge((array)$pr, ['category_index' => $iy, 'product_index' => $iz])) ?>' href="javascript:;">Detail</a>
+					<a class="btn btn-outline-primary btn-sm ml-2" data-toggle="modal" data-target="#productDetailModal" data-product='<?= json_encode([
+						'title' => $pr->title,
+						'description' => $pr->description ?? '',
+						'detailed_description' => $pr->detailed_description ?? '',
+						'price' => $pr->price,
+						'price_strike' => $pr->price_strike ?? null,
+						'weight' => $pr->weight ?? 100,
+						'image_url' => $pr->image_url ?? '',
+						'images' => $pr->images ?? [],
+						'category_index' => $iy,
+						'product_index' => $iz
+					]) ?>' href="javascript:;">Detail</a>
 				</div>
 			</div>
 		</div>
@@ -55,7 +66,18 @@
 				</div>
 				<div class="product-btn">
 					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
-					<a class="btn btn-outline-primary btn-sm ml-2" data-toggle="modal" data-target="#productDetailModal" data-product='<?= json_encode(array_merge((array)$pr, ['category_index' => $iy, 'product_index' => $iz])) ?>' href="javascript:;">Detail</a>
+					<a class="btn btn-outline-primary btn-sm ml-2" data-toggle="modal" data-target="#productDetailModal" data-product='<?= json_encode([
+						'title' => $pr->title,
+						'description' => $pr->description ?? '',
+						'detailed_description' => $pr->detailed_description ?? '',
+						'price' => $pr->price,
+						'price_strike' => $pr->price_strike ?? null,
+						'weight' => $pr->weight ?? 100,
+						'image_url' => $pr->image_url ?? '',
+						'images' => $pr->images ?? [],
+						'category_index' => $iy,
+						'product_index' => $iz
+					]) ?>' href="javascript:;">Detail</a>
 				</div>
 			</div>
 		</div>
@@ -134,9 +156,10 @@ $(document).ready(function() {
 		modal.find('#weightValue').text(product.weight || 100);
 		
 		// Handle price display
-		var priceHtml = '<span class="h4 text-primary"><?= $data->user->currency ?><?= number_format(product.price, 0, ",", ".") ?></span>';
+		var currency = '<?= $data->user->currency ?>';
+		var priceHtml = '<span class="h4 text-primary">' + currency + product.price.toLocaleString('id-ID') + '</span>';
 		if(product.price_strike && product.price_strike > 0) {
-			priceHtml += ' <span class="text-muted text-decoration-line-through ml-2"><?= $data->user->currency ?><?= number_format(product.price_strike, 0, ",", ".") ?></span>';
+			priceHtml += ' <span class="text-muted text-decoration-line-through ml-2">' + currency + product.price_strike.toLocaleString('id-ID') + '</span>';
 		}
 		modal.find('#productPrice').html(priceHtml);
 		
