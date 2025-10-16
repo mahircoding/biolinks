@@ -1434,10 +1434,38 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
+						// Handle additional images
+						$additional_images = [];
+						if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+							// Process additional images upload
+							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
+								if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$img_ext = 'jpg';
+									
+									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$resize->resizeTo(500, 500,'maxWidth');
+									
+									/* Generate new name for logo */
+									if($mime_type['mime']=='image/png')
+										$img_ext = 'png';
+										
+									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+
+									/* Upload the original */
+									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+									
+									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
+								}
+							}
+						}
+						
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
+												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => ucfirst($_POST['description'][$i][$j]),
+												"detailed_description" => isset($_POST['detailed_description'][$i][$j]) ? ucfirst($_POST['detailed_description'][$i][$j]) : '',
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
@@ -2986,10 +3014,41 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
+						// Handle additional images for update
+						$additional_images = [];
+						if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+							// Process additional images upload
+							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
+								if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$img_ext = 'jpg';
+									
+									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$resize->resizeTo(500, 500,'maxWidth');
+									
+									/* Generate new name for logo */
+									if($mime_type['mime']=='image/png')
+										$img_ext = 'png';
+										
+									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+
+									/* Upload the original */
+									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+									
+									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
+								}
+							}
+						} else {
+							// Keep existing additional images if no new ones uploaded
+							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
+						}
+						
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
+												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
+												"detailed_description" => isset($_POST['detailed_description'][$i][$j]) ? ucfirst($_POST['detailed_description'][$i][$j]) : '',
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
