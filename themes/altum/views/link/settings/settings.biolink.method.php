@@ -2071,7 +2071,7 @@ function eventClose() {
     });
 
     /* Form handling */
-    $('form[name="update_biolink"],form[name="update_biolink_"]').on('submit', event => {
+    $('form[name="update_biolink"],form[name="update_biolink_"],form[name="update_biolink_eshop"]').on('submit', event => {
 		var ths = $(event.currentTarget)
 		let form = ths[0];
         let data = new FormData(form);

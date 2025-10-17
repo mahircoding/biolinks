@@ -1255,6 +1255,7 @@ class LinkAjax extends Controller {
 		$image_allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 		$folder_id = $_POST['link_id'];
 		
+		
 		if(!$project_id = Database::simple_get('project_id', 'links', ['user_id' => $this->user->user_id, 'link_id' => $_POST['link_id'], 'type' => 'biolink', 'subtype' => 'base'])) {
             die();
         }
@@ -1422,6 +1423,7 @@ class LinkAjax extends Controller {
 						if(isset($_POST['detailed_description'][$i][$j]) && !empty($_POST['detailed_description'][$i][$j])) {
 							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
 						}
+						
 						
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
@@ -2798,6 +2800,7 @@ class LinkAjax extends Controller {
 		$image_allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 		$folder_id = $_POST['link_id'];
 		
+		
 		if(!$link = Database::get('*', 'links', ['link_id' => $_POST['link_id'], 'user_id' => $this->user->user_id])) {
             die();
         }
@@ -3013,6 +3016,7 @@ class LinkAjax extends Controller {
 						} else if(isset($images[$i]['products'][$j]['detailed_description'])) {
 							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
 						}
+						
 						
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
