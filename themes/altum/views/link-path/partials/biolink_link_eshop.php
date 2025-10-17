@@ -91,6 +91,33 @@
 	<style>
 	.bootstrap-select{flex: 1 1 auto !important;}.bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
 	.product-btn{display:flex;gap:8px;align-items:center;justify-content:center;}
+	
+	/* Modal improvements */
+	#productDetailModal .modal-dialog {
+		max-width: 800px;
+	}
+	#productDetailModal .product-image-gallery {
+		position: relative;
+	}
+	#productDetailModal .thumbnail-img {
+		border-radius: 4px;
+		transition: all 0.3s ease;
+	}
+	#productDetailModal .thumbnail-img:hover {
+		transform: scale(1.05);
+		box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+	}
+	#productDetailModal .product-description {
+		max-height: 200px;
+		overflow-y: auto;
+	}
+	#productDetailModal .product-title {
+		color: #333;
+		font-weight: 600;
+	}
+	#productDetailModal .product-price .h4 {
+		font-weight: 700;
+	}
 	</style>
 </div>
 
@@ -145,10 +172,23 @@
 
 <script>
 $(document).ready(function() {
+	// Debug: Check if Bootstrap is loaded
+	if (typeof $.fn.modal === 'undefined') {
+		console.error('Bootstrap modal is not loaded!');
+		return;
+	}
+	
 	// Handle product detail modal
 	$('#productDetailModal').on('show.bs.modal', function (event) {
 		var button = $(event.relatedTarget);
-		var product = JSON.parse(button.data('product'));
+		var productData = button.data('product');
+		
+		if (!productData) {
+			console.error('No product data found');
+			return;
+		}
+		
+		var product = typeof productData === 'string' ? JSON.parse(productData) : productData;
 		var modal = $(this);
 		
 		// Populate product details
@@ -165,7 +205,12 @@ $(document).ready(function() {
 		
 		// Handle description
 		var description = product.detailed_description || product.description || 'Tidak ada deskripsi tersedia.';
-		modal.find('#productDescription').html('<p>' + description + '</p>');
+		// Check if description contains HTML tags
+		if(description.includes('<') && description.includes('>')) {
+			modal.find('#productDescription').html(description);
+		} else {
+			modal.find('#productDescription').html('<p>' + description + '</p>');
+		}
 		
 		// Handle images
 		var mainImage = modal.find('#mainProductImage');
@@ -175,7 +220,7 @@ $(document).ready(function() {
 		thumbnailGallery.empty();
 		
 		// Handle single image (backward compatibility)
-		if(product.image_url && !product.images) {
+		if(product.image_url && (!product.images || product.images.length === 0)) {
 			mainImage.attr('src', product.image_url);
 			thumbnailGallery.append('<img src="' + product.image_url + '" class="thumbnail-img" style="width:60px;height:60px;object-fit:cover;cursor:pointer;border:2px solid #ddd;" onclick="changeMainImage(this.src)">');
 		}
@@ -192,6 +237,10 @@ $(document).ready(function() {
 				if(index === 0) thumbnail.css('border-color', '#007bff');
 				thumbnailGallery.append(thumbnail);
 			});
+		}
+		// Fallback if no images
+		else {
+			mainImage.attr('src', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==');
 		}
 		
 		// Set up add to cart functionality
