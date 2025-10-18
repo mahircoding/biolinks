@@ -66,10 +66,8 @@
 								</div>
 								
 								<div class="form-product-bag">
-									
 									<div class="form-bag-item">
 										<div class="form-bag-view hide">
-											
 											<div class="form-group">
 												<div class="d-flex align-items-stretch">
 													<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2">
