@@ -121,6 +121,31 @@
 	#productDetailModal .product-price .h4 {
 		font-weight: 700;
 	}
+	
+	/* Fix modal backdrop issues - More specific selectors to avoid conflicts */
+	#productDetailModal .modal-backdrop,
+	.modal-backdrop.show {
+		z-index: 1040 !important;
+		position: relative !important;
+		top: 0 !important;
+		left: 0 !important;
+		width: 100vw !important;
+		height: 100vh !important;
+		background-color: rgba(0, 0, 0, 0.5) !important;
+		pointer-events: auto !important;
+	}
+	
+	/* Ensure modal dialog is properly positioned */
+	#productDetailModal .modal-dialog {
+		position: relative !important;
+		z-index: 1050 !important;
+	}
+	
+	/* Modal content styling */
+	#productDetailModal .modal-content {
+		position: relative !important;
+		z-index: 1051 !important;
+	}
 	</style>
 </div>
 
