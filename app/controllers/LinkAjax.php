@@ -799,13 +799,13 @@ class LinkAjax extends Controller {
 		
 		if($subtype=='picture') {
 			require APP_PATH . 'includes/ResizeImage.php';
-			$mime_type = getimagesize($_FILES['image']['tmp_name']);
+			$mime_type = getimagesize($_FILES['image_main']['tmp_name']);
 			$img_ext = 'jpg';
 			
-			if($_FILES['image']['error']) {
+			if($_FILES['image_main']['error']) {
 				Response::json($this->language->global->error_message->file_upload, 'error');
             }
-			if($_FILES['image']['size']>716800) {
+			if($_FILES['image_main']['size']>716800) {
 				Response::json($this->language->global->error_message->file_upload, 'error');
             }
 			if(!in_array($mime_type['mime'],$image_allowed)) {
@@ -813,7 +813,7 @@ class LinkAjax extends Controller {
 			}
 			
 			if($mime_type['mime']!='image/gif') {
-				$resize = new \ResizeImage($_FILES['image']['tmp_name']);
+				$resize = new \ResizeImage($_FILES['image_main']['tmp_name']);
 				$resize->resizeTo(800, 800, 'maxWidth');
 				
 				if (!file_exists(UPLOADS_PATH . 'galleries/' . $folder_id)) {
@@ -838,7 +838,7 @@ class LinkAjax extends Controller {
 					mkdir(UPLOADS_PATH . 'galleries/' . $folder_id, 0755, true);
 				}
 					
-				move_uploaded_file($_FILES['image']['tmp_name'], UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $picture_name);
+				move_uploaded_file($_FILES['image_main']['tmp_name'], UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $picture_name);
 				
 				$picture_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $picture_name;
 			}
@@ -994,19 +994,19 @@ class LinkAjax extends Controller {
 		
 		$image_allowed = ['image/png', 'image/jpeg', 'image/gif'];
 		require APP_PATH . 'includes/ResizeImage.php';
-		$mime_type = getimagesize($_FILES['image']['tmp_name']);
+		$mime_type = getimagesize($_FILES['image_main']['tmp_name']);
 		$img_ext = 'jpg';
 		
 		$folder_id = $_POST['link_id'];
 		
-		if($_FILES['image']['error']) {
+		if($_FILES['image_main']['error']) {
 			Response::json($this->language->global->error_message->file_upload, 'error');
 		}
 		if(!in_array($mime_type['mime'],$image_allowed)) {
 			Response::json($this->language->global->error_message->invalid_file_type, 'error');
 		}
 		
-		$resize = new \ResizeImage($_FILES['image']['tmp_name']);
+		$resize = new \ResizeImage($_FILES['image_main']['tmp_name']);
 		$resize->resizeTo(800, 800, 'maxWidth');
 		
 		if (!file_exists(UPLOADS_PATH . 'galleries/' . $folder_id)) {
@@ -1264,11 +1264,11 @@ class LinkAjax extends Controller {
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$item_errors = null;
 				for($j=0;$j<count($_POST['title'][$i]);$j++) {
-					if(isset($_FILES['image']['size'][$i][$j])) {
-						$mime_type = getimagesize($_FILES['image']['tmp_name'][$i][$j]);
-						if($_FILES['image']['error'][$i][$j]) {
+					if(isset($_FILES['image_main']['size'][$i][$j])) {
+						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
+						if($_FILES['image_main']['error'][$i][$j]) {
 							$item_errors[] = $this->language->global->error_message->file_upload_empty;
-						} elseif($_FILES['image']['size'][$i][$j]>716800) {
+						} elseif($_FILES['image_main']['size'][$i][$j]>716800) {
 							$item_errors[] = $this->language->global->error_message->file_upload_max_size;
 						} elseif(!in_array($mime_type['mime'],$image_allowed)) {
 							$item_errors[] = $this->language->global->error_message->invalid_file_type;
@@ -1325,11 +1325,11 @@ class LinkAjax extends Controller {
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$sub_settings = null;
 				for($j=0;$j<count($_POST['title'][$i]);$j++) {
-					if($_FILES['image']['size'][$i][$j]>0) {
-						$mime_type = getimagesize($_FILES['image']['tmp_name'][$i][$j]);
+					if($_FILES['image_main']['size'][$i][$j]>0) {
+						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
 						$img_ext = 'jpg';
 						
-						$resize = new \ResizeImage($_FILES['image']['tmp_name'][$i][$j]);
+						$resize = new \ResizeImage($_FILES['image_main']['tmp_name'][$i][$j]);
 						$resize->resizeTo(500, 500,'maxWidth');
 						
 						/* Generate new name for logo */
@@ -1343,36 +1343,37 @@ class LinkAjax extends Controller {
 						
 						$image_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $image_name;
 
-					// Handle additional images
+					// Handle additional images (image_1, image_2, image_3, image_4)
 					$additional_images = [];
 					
 					// Debug: Log $_FILES structure for additional images
 					error_log("DEBUG: Processing additional images for product $i-$j");
-					error_log("DEBUG: \$_FILES['images'] structure: " . print_r($_FILES['images'], true));
+					error_log("DEBUG: \$_FILES structure: " . print_r($_FILES, true));
 					
-					if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-						error_log("DEBUG: Found additional images, count: " . count($_FILES['images']['name'][$i][$j]));
-							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$img_ext = 'jpg';
-									
-									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$resize->resizeTo(500, 500,'maxWidth');
-									
-									/* Generate new name for logo */
-									if($mime_type['mime']=='image/png')
-										$img_ext = 'png';
-										
-									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+					// Process each additional image field
+					for($img_num = 1; $img_num <= 4; $img_num++) {
+						$field_name = "image_$img_num";
+						if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+							error_log("DEBUG: Found $field_name for product $i-$j");
+							
+							$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+							$img_ext = 'jpg';
+							
+							$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
+							$resize->resizeTo(500, 500,'maxWidth');
+							
+							/* Generate new name for image */
+							if($mime_type['mime']=='image/png')
+								$img_ext = 'png';
+								
+							$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
 
-									/* Upload the original */
-									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-									
-									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-								}
-							}
+							/* Upload the original */
+							$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+							
+							$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
 						}
+					}
 						
 						$variants = null;
 						if(isset($_POST['title_variant'][$i][$j])) {
@@ -1736,7 +1737,7 @@ class LinkAjax extends Controller {
 
     private function update_biolink() {
         $image_allowed_extensions = ['jpg', 'jpeg', 'png', 'svg', 'ico'];
-        $image = (bool) !empty($_FILES['image']['name']);
+        $image = (bool) !empty($_FILES['image_main']['name']);
         $image_delete = isset($_POST['image_delete']) && $_POST['image_delete'] == 'true';
         $_POST['title'] = Database::clean_string($_POST['title']);
         $_POST['description'] = Database::clean_string($_POST['description']);
@@ -1771,11 +1772,11 @@ class LinkAjax extends Controller {
         /* Check for any errors on the logo image */
         if($image) {
 
-            $image_file_extension = explode('.', $_FILES['image']['name']);
+            $image_file_extension = explode('.', $_FILES['image_main']['name']);
             $image_file_extension = strtolower(end($image_file_extension));
-            $image_file_temp = $_FILES['image']['tmp_name'];
-//dd($_FILES['image']);
-            if($_FILES['image']['error']) {
+            $image_file_temp = $_FILES['image_main']['tmp_name'];
+//dd($_FILES['image_main']);
+            if($_FILES['image_main']['error']) {
                 Response::json($this->language->global->error_message->file_upload." Ex: Image over size limit.", 'error');
             }
 
@@ -2065,16 +2066,16 @@ class LinkAjax extends Controller {
 		$images = json_decode($link->settings);
 		$folder_id = $link->biolink_id;
 		
-		if($_FILES['image']['size']>0) {
+		if($_FILES['image_main']['size']>0) {
 			if($images->image&&file_exists(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images->image)) {
 				unlink(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images->image);
 			}
 			
 			require APP_PATH . 'includes/ResizeImage.php';
-			$mime_type = getimagesize($_FILES['image']['tmp_name']);
+			$mime_type = getimagesize($_FILES['image_main']['tmp_name']);
 			$img_ext = 'jpg';
 			
-			$resize = new \ResizeImage($_FILES['image']['tmp_name']);
+			$resize = new \ResizeImage($_FILES['image_main']['tmp_name']);
 			$resize->resizeTo(100, 100, 'maxWidth');
 			
 			if (!file_exists(UPLOADS_PATH . 'galleries/' . $folder_id)) {
@@ -2426,11 +2427,11 @@ class LinkAjax extends Controller {
 		if($subtype=='picture') {
 			$picture_name = $images->picture_name;
 			
-			if($_FILES['image']['size']>0) {
-				$mime_type = getimagesize($_FILES['image']['tmp_name']);
+			if($_FILES['image_main']['size']>0) {
+				$mime_type = getimagesize($_FILES['image_main']['tmp_name']);
 				$img_ext = 'jpg';
 				
-				if($_FILES['image']['error']) {
+				if($_FILES['image_main']['error']) {
 					Response::json($this->language->global->error_message->file_upload, 'error');
 				}
 				if(!in_array($mime_type['mime'],$image_allowed)) {
@@ -2443,7 +2444,7 @@ class LinkAjax extends Controller {
 				
 				if($mime_type['mime']!='image/gif') {
 					require APP_PATH . 'includes/ResizeImage.php';
-					$resize = new \ResizeImage($_FILES['image']['tmp_name']);
+					$resize = new \ResizeImage($_FILES['image_main']['tmp_name']);
 					$resize->resizeTo(800, 800, 'maxWidth');
 					
 					if (!file_exists(UPLOADS_PATH . 'galleries/' . $folder_id)) {
@@ -2466,7 +2467,7 @@ class LinkAjax extends Controller {
 						mkdir(UPLOADS_PATH . 'galleries/' . $folder_id, 0755, true);
 					}
 					
-					move_uploaded_file($_FILES['image']['tmp_name'], UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $picture_name);
+					move_uploaded_file($_FILES['image_main']['tmp_name'], UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $picture_name);
 				}
 			}
 			$picture_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $picture_name;
@@ -2641,11 +2642,11 @@ class LinkAjax extends Controller {
 		$photo_name = $images->photo_name;
 		$folder_id = $link->biolink_id;
 		
-		if($_FILES['image']['size']>0) {
-			$mime_type = getimagesize($_FILES['image']['tmp_name']);
+		if($_FILES['image_main']['size']>0) {
+			$mime_type = getimagesize($_FILES['image_main']['tmp_name']);
 			$img_ext = 'jpg';
 			
-			if($_FILES['image']['error']) {
+			if($_FILES['image_main']['error']) {
 				Response::json($this->language->global->error_message->file_upload, 'error');
 			}
 			if(!in_array($mime_type['mime'],$image_allowed)) {
@@ -2657,7 +2658,7 @@ class LinkAjax extends Controller {
 			}
 			
 			require APP_PATH . 'includes/ResizeImage.php';
-			$resize = new \ResizeImage($_FILES['image']['tmp_name']);
+			$resize = new \ResizeImage($_FILES['image_main']['tmp_name']);
 			$resize->resizeTo(800, 800, 'maxWidth');
 			
 			if (!file_exists(UPLOADS_PATH . 'galleries/' . $folder_id)) {
@@ -2899,11 +2900,11 @@ class LinkAjax extends Controller {
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$item_errors = null;
 				for($j=0;$j<count($_POST['title'][$i]);$j++) {
-					if($_FILES['image']['size'][$i][$j]>0) {
-						$mime_type = getimagesize($_FILES['image']['tmp_name'][$i][$j]);
-						if($_FILES['image']['error'][$i][$j]) {
+					if($_FILES['image_main']['size'][$i][$j]>0) {
+						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
+						if($_FILES['image_main']['error'][$i][$j]) {
 							$item_errors[] = $this->language->global->error_message->file_upload_empty;
-						} elseif($_FILES['image']['size'][$i][$j]>716800) {
+						} elseif($_FILES['image_main']['size'][$i][$j]>716800) {
 							$item_errors[] = $this->language->global->error_message->file_upload_max_size;
 						} elseif(!in_array($mime_type['mime'],$image_allowed)) {
 							$item_errors[] = $this->language->global->error_message->invalid_file_type;
@@ -2962,11 +2963,11 @@ class LinkAjax extends Controller {
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$sub_settings = null;
 				for($j=0;$j<count($_POST['title'][$i]);$j++) {
-					if($_FILES['image']['size'][$i][$j]>0) {
-						$mime_type = getimagesize($_FILES['image']['tmp_name'][$i][$j]);
+					if($_FILES['image_main']['size'][$i][$j]>0) {
+						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
 						$img_ext = 'jpg';
 						
-						$resize = new \ResizeImage($_FILES['image']['tmp_name'][$i][$j]);
+						$resize = new \ResizeImage($_FILES['image_main']['tmp_name'][$i][$j]);
 						$resize->resizeTo(500, 500,'maxWidth');
 						
 						/* Generate new name for logo */

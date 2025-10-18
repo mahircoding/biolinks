@@ -228,12 +228,24 @@
 								<div class="multiple-image-upload">
 									<div class="image-upload-container">
 										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload" name="image[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<input type="file" class="custom-file-input" data-image="upload" name="image_main[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
 											<label class="custom-file-label" for="customFile">Choose main image</label>
 										</div>
+										<div class="custom-file mb-2">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label" for="customFile">Choose image 1 (optional)</label>
+										</div>
+										<div class="custom-file mb-2">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label" for="customFile">Choose image 2 (optional)</label>
+										</div>
+										<div class="custom-file mb-2">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label" for="customFile">Choose image 3 (optional)</label>
+										</div>
 										<div class="custom-file">
-											<input type="file" class="custom-file-input" data-image="upload-multiple" name="images[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" multiple>
-											<label class="custom-file-label" for="customFile">Choose additional images (optional)</label>
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label" for="customFile">Choose image 4 (optional)</label>
 										</div>
 									</div>
 									<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
