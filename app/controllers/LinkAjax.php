@@ -1436,6 +1436,31 @@ class LinkAjax extends Controller {
 												"show" => $_POST['show'][$i][$j] ? (int)$_POST['show'][$i][$j] : 1,
 												'variants' => $variants);
 					} else {
+						// Handle additional images even when no main image is uploaded
+						$additional_images = [];
+						if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
+								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$img_ext = 'jpg';
+									
+									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$resize->resizeTo(500, 500,'maxWidth');
+									
+									/* Generate new name for logo */
+									if($mime_type['mime']=='image/png')
+										$img_ext = 'png';
+										
+									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+
+									/* Upload the original */
+									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+									
+									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
+								}
+							}
+						}
+						
 						$variants = null;
 						if(isset($_POST['title_variant'][$i][$j])) {
 							for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
