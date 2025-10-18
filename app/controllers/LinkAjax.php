@@ -1255,7 +1255,6 @@ class LinkAjax extends Controller {
 		$image_allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 		$folder_id = $_POST['link_id'];
 		
-		
 		if(!$project_id = Database::simple_get('project_id', 'links', ['user_id' => $this->user->user_id, 'link_id' => $_POST['link_id'], 'type' => 'biolink', 'subtype' => 'base'])) {
             die();
         }
@@ -1276,22 +1275,6 @@ class LinkAjax extends Controller {
 						}
 					} else {
 						$item_errors[] = $this->language->global->error_message->file_upload_empty;
-					}
-					
-					// Validate additional images
-					if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-							if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-								if($_FILES['images']['error'][$i][$j][$img_idx]) {
-									$item_errors[] = $this->language->global->error_message->file_upload_empty;
-								} elseif($_FILES['images']['size'][$i][$j][$img_idx] > 716800) {
-									$item_errors[] = $this->language->global->error_message->file_upload_max_size;
-								} elseif(!in_array($mime_type['mime'],$image_allowed)) {
-									$item_errors[] = $this->language->global->error_message->invalid_file_type;
-								}
-							}
-						}
 					}
 					if(isset($_POST['title_variant'][$i][$j])) {
 						for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
@@ -1342,34 +1325,8 @@ class LinkAjax extends Controller {
 						$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $image_name, '90', $img_ext);
 						
 						$image_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $image_name;
-					}
-					
-					// Handle additional images
-					$additional_images = [];
-					if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-							if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-								$img_ext = 'jpg';
-								
-								$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-								$resize->resizeTo(500, 500,'maxWidth');
-								
-								/* Generate new name for logo */
-								if($mime_type['mime']=='image/png')
-									$img_ext = 'png';
-									
-								$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
-
-								/* Upload the original */
-								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-								
-								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-							}
-						}
-					}
-					
-					$variants = null;
+						
+						$variants = null;
 						if(isset($_POST['title_variant'][$i][$j])) {
 							for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
 								$sub_variants = null;
@@ -1418,19 +1375,69 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
-						// Get detailed description
-						$detailed_desc = '';
-						if(isset($_POST['detailed_description'][$i][$j]) && !empty($_POST['detailed_description'][$i][$j])) {
-							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
-						}
-						
-						
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
-												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => ucfirst($_POST['description'][$i][$j]),
-												"detailed_description" => $detailed_desc,
+												"price" => (int)$_POST['price'][$i][$j],
+												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
+												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
+												"show" => $_POST['show'][$i][$j] ? (int)$_POST['show'][$i][$j] : 1,
+												'variants' => $variants);
+					} else {
+						$variants = null;
+						if(isset($_POST['title_variant'][$i][$j])) {
+							for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
+								$sub_variants = null;
+								$image_name = null;
+								$image_url = null;
+								for($l=0;$l<count($_POST['name_variant'][$i][$j][$k]);$l++) {
+									if(isset($_POST['name_variant'][$i][$j][$k][$l])) {
+										$image_name = null;
+										$image_url = null;
+										if($_FILES['image_variant']['size'][$i][$j][$k][$l]>0) {
+											$mime_type = getimagesize($_FILES['image_variant']['tmp_name'][$i][$j][$k][$l]);
+											$img_ext = 'jpg';
+											
+											$resize = new \ResizeImage($_FILES['image_variant']['tmp_name'][$i][$j][$k][$l]);
+											$resize->resizeTo(500, 500,'maxWidth');
+											
+											/* Generate new name for logo */
+											if($mime_type['mime']=='image/png')
+												$img_ext = 'png';
+												
+											$image_name = md5(time() . rand()) . '.' . $img_ext;
+
+											/* Upload the original */
+											$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $image_name, '90', $img_ext);
+											
+											$image_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $image_name;
+											
+											if(isset($images[$i]['products'][$j]['variants'][$k]['variant'][$l]['image_name'])) {
+												if(file_exists(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images[$i]['products'][$j]['variants'][$k]['variant'][$l]['image_name'])) {
+													unlink(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images[$i]['products'][$j]['variants'][$k]['variant'][$l]['image_name']);
+												}
+											}
+										}
+										
+										$sub_variants[] = array('name' => ucwords($_POST['name_variant'][$i][$j][$k][$l]),
+																'image_name' => $image_name,
+																'image_url' => $image_url,
+																'price' => $_POST['price_variant'][$i][$j][$k][$l],
+																'weight' => $_POST['weight_variant'][$i][$j][$k][$l]);
+									}
+								}
+								if(isset($_POST['title_variant'][$i][$j][$k])) {
+									$variants[] = array('title' => ucwords($_POST['title_variant'][$i][$j][$k]),
+														'select' => isset($_POST['select_variant'][$i][$j][$k])&&(int)$_POST['select_variant'][$i][$j][$k]==1 ? 1 : 0,
+														'variant' => $sub_variants);
+								}
+							}
+						}
+						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
+												"image_url" => $images[$i]['products'][$j]['image_url'],
+												"title" => ucwords($_POST['title'][$i][$j]),
+												"description" => ucfirst($_POST['description'][$i][$j]),
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
@@ -1446,14 +1453,7 @@ class LinkAjax extends Controller {
 			$type = 'biolink';
 			$subtype = 'eshop';
 			$order = 99;
-			
-			// Add button_text to settings
-			$button_text = !empty($_POST['button_text']) ? $_POST['button_text'] : 'Add to Cart';
-			$settings_data = [
-				'data' => $item_settings,
-				'button_text' => $button_text
-			];
-			$settings = json_encode($settings_data);
+			$settings = json_encode($item_settings);
 			
 			$stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			$stmt->bind_param('ssssssssss', $project_id, $_POST['link_id'], $this->user->user_id, $type, $subtype, $url, $location_url, $settings, $order, \Altum\Date::$date);
@@ -1464,8 +1464,8 @@ class LinkAjax extends Controller {
 			\Altum\Cache::$adapter->deleteItemsByTag('biolinks_links_user_' . $this->user->user_id);
 
 			Response::json('', 'success', ['url' => url('link/' . $_POST['link_id'] . '?tab=links')]);
-		
-	}
+		}
+    }
 	
 	private function create_biolink_export() {
 		$_POST['link_id'] = (int) $_POST['link_id'];
@@ -2800,7 +2800,6 @@ class LinkAjax extends Controller {
 		$image_allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 		$folder_id = $_POST['link_id'];
 		
-		
 		if(!$link = Database::get('*', 'links', ['link_id' => $_POST['link_id'], 'user_id' => $this->user->user_id])) {
             die();
         }
@@ -2980,50 +2979,10 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
-						// Handle additional images for update
-						$additional_images = [];
-						if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-							// Process additional images upload
-							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-								if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$img_ext = 'jpg';
-									
-									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$resize->resizeTo(500, 500,'maxWidth');
-									
-									/* Generate new name for logo */
-									if($mime_type['mime']=='image/png')
-										$img_ext = 'png';
-										
-									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
-
-									/* Upload the original */
-									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-									
-									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-								}
-							}
-						} else {
-							// Keep existing additional images if no new ones uploaded
-							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
-						}
-						
-						// Get detailed description
-						$detailed_desc = '';
-						if(isset($_POST['detailed_description'][$i][$j]) && !empty($_POST['detailed_description'][$i][$j])) {
-							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
-						} else if(isset($images[$i]['products'][$j]['detailed_description'])) {
-							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
-						}
-						
-						
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
-												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
-												"detailed_description" => $detailed_desc,
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
@@ -3039,14 +2998,7 @@ class LinkAjax extends Controller {
 			$type = 'biolink';
 			$subtype = 'eshop';
 			$order = 99;
-			
-			// Add button_text to settings
-			$button_text = !empty($_POST['button_text']) ? $_POST['button_text'] : 'Add to Cart';
-			$settings_data = [
-				'data' => $item_settings,
-				'button_text' => $button_text
-			];
-			$settings = json_encode($settings_data);
+			$settings = json_encode($item_settings);
 			
 			$stmt = Database::$database->prepare("UPDATE `links` SET `settings` = ? WHERE `link_id` = ?");
 			$stmt->bind_param('ss', $settings, $_POST['link_id']);
