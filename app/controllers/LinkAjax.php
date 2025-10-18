@@ -1255,6 +1255,9 @@ class LinkAjax extends Controller {
 		$image_allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 		$folder_id = $_POST['link_id'];
 		
+		// Debug: Log entire $_FILES structure
+		error_log("DEBUG: Full \$_FILES structure: " . print_r($_FILES, true));
+		
 		if(!$project_id = Database::simple_get('project_id', 'links', ['user_id' => $this->user->user_id, 'link_id' => $_POST['link_id'], 'type' => 'biolink', 'subtype' => 'base'])) {
             die();
         }
@@ -1345,7 +1348,12 @@ class LinkAjax extends Controller {
 
 						// Handle additional images
 						$additional_images = [];
+						// Debug: Log $_FILES structure
+						error_log("DEBUG: Processing additional images for product $i-$j");
+						error_log("DEBUG: \$_FILES['images'] structure: " . print_r($_FILES['images'], true));
+						
 						if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+							error_log("DEBUG: Found additional images, count: " . count($_FILES['images']['name'][$i][$j]));
 							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
 								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
 									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
@@ -1538,6 +1546,10 @@ class LinkAjax extends Controller {
 				'button_text' => $button_text
 			];
 			$settings = json_encode($settings_data);
+			
+			// Debug: Log final settings data
+			error_log("DEBUG: Final settings data: " . print_r($settings_data, true));
+			error_log("DEBUG: JSON settings: " . $settings);
 			
 			$stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			$stmt->bind_param('ssssssssss', $project_id, $_POST['link_id'], $this->user->user_id, $type, $subtype, $url, $location_url, $settings, $order, \Altum\Date::$date);
