@@ -1218,6 +1218,13 @@ function getDataEshop() {
 	$('[data-eshop-btn]').off('click').on('click',function(e) {
 		var p_form = $(this).parents('form[role="form"]').get(0);
 		if($(e.target).parents('.dropdown').length==0) {
+			// Debug: Log form data before submission
+			var formData = new FormData(p_form);
+			console.log('Form data before submission:');
+			for (var pair of formData.entries()) {
+				console.log(pair[0] + ': ' + (pair[1] instanceof File ? 'File(' + pair[1].name + ')' : pair[1]));
+			}
+			
 			if(p_form.reportValidity()) {
 				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
 				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
@@ -1502,6 +1509,10 @@ function eventButtonUpload() {
 			container = $(this).closest('.multiple-image-upload').find('.d-flex.flex-wrap.gap-2');
 		}
 		container.empty();
+		
+		// Debug: Log files selected
+		console.log('Files selected:', files.length);
+		console.log('Files:', files);
 		
 		if(files.length > 4) {
 			alert('Maksimal 4 gambar tambahan');

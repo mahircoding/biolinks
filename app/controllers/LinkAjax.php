@@ -1346,7 +1346,12 @@ class LinkAjax extends Controller {
 					// Handle additional images
 					$additional_images = [];
 					
+					// Debug: Log $_FILES structure for additional images
+					error_log("DEBUG: Processing additional images for product $i-$j");
+					error_log("DEBUG: \$_FILES['images'] structure: " . print_r($_FILES['images'], true));
+					
 					if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+						error_log("DEBUG: Found additional images, count: " . count($_FILES['images']['name'][$i][$j]));
 							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
 								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
 									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
