@@ -1276,6 +1276,23 @@ class LinkAjax extends Controller {
 					} else {
 						$item_errors[] = $this->language->global->error_message->file_upload_empty;
 					}
+
+					// Validate additional images
+					if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
+							if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+								if($_FILES['images']['error'][$i][$j][$img_idx]) {
+									$item_errors[] = $this->language->global->error_message->file_upload_empty;
+								} elseif($_FILES['images']['size'][$i][$j][$img_idx] > 716800) {
+									$item_errors[] = $this->language->global->error_message->file_upload_max_size;
+								} elseif(!in_array($mime_type['mime'],$image_allowed)) {
+									$item_errors[] = $this->language->global->error_message->invalid_file_type;
+								}
+							}
+						}
+					}
+
 					if(isset($_POST['title_variant'][$i][$j])) {
 						for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
 							for($l=0;$l<count($_POST['name_variant'][$i][$j][$k]);$l++) {
@@ -1325,6 +1342,31 @@ class LinkAjax extends Controller {
 						$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $image_name, '90', $img_ext);
 						
 						$image_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $image_name;
+
+						// Handle additional images
+						$additional_images = [];
+						if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
+								if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$img_ext = 'jpg';
+									
+									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+									$resize->resizeTo(500, 500,'maxWidth');
+									
+									/* Generate new name for logo */
+									if($mime_type['mime']=='image/png')
+										$img_ext = 'png';
+										
+									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+
+									/* Upload the original */
+									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+									
+									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
+								}
+							}
+						}
 						
 						$variants = null;
 						if(isset($_POST['title_variant'][$i][$j])) {
@@ -1384,8 +1426,10 @@ class LinkAjax extends Controller {
 
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
+												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => ucfirst($_POST['description'][$i][$j]),
+												"detailed_description" => $detailed_desc,
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
@@ -2834,6 +2878,23 @@ class LinkAjax extends Controller {
 					} else {
 						//$item_errors[] = $this->language->global->error_message->file_upload_empty;
 					}
+
+					// Validate additional images
+					if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
+							if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
+								if($_FILES['images']['error'][$i][$j][$img_idx]) {
+									$item_errors[] = $this->language->global->error_message->file_upload_empty;
+								} elseif($_FILES['images']['size'][$i][$j][$img_idx] > 716800) {
+									$item_errors[] = $this->language->global->error_message->file_upload_max_size;
+								} elseif(!in_array($mime_type['mime'],$image_allowed)) {
+									$item_errors[] = $this->language->global->error_message->invalid_file_type;
+								}
+							}
+						}
+					}
+
 					if(isset($_POST['title_variant'][$i][$j])) {
 						for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
 							for($l=0;$l<count($_POST['name_variant'][$i][$j][$k]);$l++) {
