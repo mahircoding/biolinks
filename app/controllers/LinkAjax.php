@@ -1350,16 +1350,10 @@ class LinkAjax extends Controller {
 					// Handle additional images (image_1, image_2, image_3, image_4)
 					$additional_images = [];
 					
-					// Debug: Log $_FILES structure for additional images
-					error_log("DEBUG: Processing additional images for product $i-$j");
-					error_log("DEBUG: \$_FILES structure: " . print_r($_FILES, true));
-					
 					// Process each additional image field
 					for($img_num = 1; $img_num <= 4; $img_num++) {
 						$field_name = "image_$img_num";
-						error_log("DEBUG: Checking field $field_name for product $i-$j");
 						if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
-							error_log("DEBUG: Found $field_name for product $i-$j");
 							
 							$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
 							$img_ext = 'jpg';
@@ -1447,101 +1441,6 @@ class LinkAjax extends Controller {
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
 												"show" => $_POST['show'][$i][$j] ? (int)$_POST['show'][$i][$j] : 1,
 												'variants' => $variants);
-					} else {
-						// Handle additional images even when no main image is uploaded (image_1, image_2, image_3, image_4)
-						$additional_images = [];
-						
-						// Debug: Log $_FILES structure for additional images (no main image)
-						error_log("DEBUG: Processing additional images for product $i-$j (no main image)");
-						error_log("DEBUG: \$_FILES structure: " . print_r($_FILES, true));
-						
-						// Process each additional image field
-						for($img_num = 1; $img_num <= 4; $img_num++) {
-							$field_name = "image_$img_num";
-							error_log("DEBUG: Checking field $field_name for product $i-$j (no main image)");
-							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
-								error_log("DEBUG: Found $field_name for product $i-$j (no main image)");
-								
-								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
-								$img_ext = 'jpg';
-								
-								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
-								$resize->resizeTo(500, 500,'maxWidth');
-								
-								/* Generate new name for image */
-								if($mime_type['mime']=='image/png')
-									$img_ext = 'png';
-									
-								$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
-
-								/* Upload the original */
-								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-								
-								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-							}
-						}
-						
-						$variants = null;
-						if(isset($_POST['title_variant'][$i][$j])) {
-							for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
-								$sub_variants = null;
-								$image_name = null;
-								$image_url = null;
-								for($l=0;$l<count($_POST['name_variant'][$i][$j][$k]);$l++) {
-									if(isset($_POST['name_variant'][$i][$j][$k][$l])) {
-										$image_name = null;
-										$image_url = null;
-										if($_FILES['image_variant']['size'][$i][$j][$k][$l]>0) {
-											$mime_type = getimagesize($_FILES['image_variant']['tmp_name'][$i][$j][$k][$l]);
-											$img_ext = 'jpg';
-											
-											$resize = new \ResizeImage($_FILES['image_variant']['tmp_name'][$i][$j][$k][$l]);
-											$resize->resizeTo(500, 500,'maxWidth');
-											
-											/* Generate new name for logo */
-											if($mime_type['mime']=='image/png')
-												$img_ext = 'png';
-												
-											$image_name = md5(time() . rand()) . '.' . $img_ext;
-
-											/* Upload the original */
-											$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $image_name, '90', $img_ext);
-											
-											$image_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $image_name;
-											
-											if(isset($images[$i]['products'][$j]['variants'][$k]['variant'][$l]['image_name'])) {
-												if(file_exists(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images[$i]['products'][$j]['variants'][$k]['variant'][$l]['image_name'])) {
-													unlink(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images[$i]['products'][$j]['variants'][$k]['variant'][$l]['image_name']);
-												}
-											}
-										}
-										
-										$sub_variants[] = array('name' => ucwords($_POST['name_variant'][$i][$j][$k][$l]),
-																'image_name' => $image_name,
-																'image_url' => $image_url,
-																'price' => $_POST['price_variant'][$i][$j][$k][$l],
-																'weight' => $_POST['weight_variant'][$i][$j][$k][$l]);
-									}
-								}
-								if(isset($_POST['title_variant'][$i][$j][$k])) {
-									$variants[] = array('title' => ucwords($_POST['title_variant'][$i][$j][$k]),
-														'select' => isset($_POST['select_variant'][$i][$j][$k])&&(int)$_POST['select_variant'][$i][$j][$k]==1 ? 1 : 0,
-														'variant' => $sub_variants);
-								}
-							}
-						}
-						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
-												"image_url" => $images[$i]['products'][$j]['image_url'],
-												"images" => $additional_images,
-												"title" => ucwords($_POST['title'][$i][$j]),
-												"description" => ucfirst($_POST['description'][$i][$j]),
-												"detailed_description" => $detailed_desc,
-												"price" => (int)$_POST['price'][$i][$j],
-												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
-												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
-												"show" => $_POST['show'][$i][$j] ? (int)$_POST['show'][$i][$j] : 1,
-												'variants' => $variants);
-					}
 				}
 				$item_settings[] = array("category" => ucwords($_POST['category'][$i]),
 										 "products" => $sub_settings);

@@ -1220,12 +1220,6 @@ function getDataEshop() {
 		if($(e.target).parents('.dropdown').length==0) {
 			
 		if(p_form.reportValidity()) {
-			// Debug: Log form data before submission
-			var formData = new FormData(p_form);
-			console.log('Form data before submission:');
-			for (var pair of formData.entries()) {
-				console.log(pair[0] + ': ' + (pair[1] instanceof File ? 'File(' + pair[1].name + ')' : pair[1]));
-			}
 			
 			$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
 			$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
@@ -1510,9 +1504,6 @@ function eventButtonUpload() {
 			container = $(this).closest('.multiple-image-upload').find('.d-flex.flex-wrap.gap-2');
 		}
 		
-		// Debug: Log file selection
-		console.log('Additional image selected:', file ? file.name : 'none');
-		console.log('Field name:', $(this).attr('name'));
 		
 		if(file && file.type.startsWith('image/')) {
 			var reader = new FileReader();
