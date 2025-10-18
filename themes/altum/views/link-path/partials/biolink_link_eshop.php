@@ -110,6 +110,9 @@
 	#productDetailModal .product-description {
 		max-height: 200px;
 		overflow-y: auto;
+		text-align: left;
+		line-height: 2;
+		font-size: 14px;
 	}
 	#productDetailModal .product-title {
 		color: #333;
@@ -197,9 +200,9 @@ $(document).ready(function() {
 		
 		// Handle price display
 		var currency = '<?= $data->user->currency ?>';
-		var priceHtml = '<span class="h4 text-primary">' + currency + product.price.toLocaleString('id-ID') + '</span>';
+		var priceHtml = '<p class="h4 text-primary">' + currency + product.price.toLocaleString('id-ID') + '</p>';
 		if(product.price_strike && product.price_strike > 0) {
-			priceHtml += ' <span class="text-muted text-decoration-line-through ml-2">' + currency + product.price_strike.toLocaleString('id-ID') + '</span>';
+			priceHtml += ' <p class="text-muted text-decoration-line-through ml-2">' + currency + product.price_strike.toLocaleString('id-ID') + '</p>';
 		}
 		modal.find('#productPrice').html(priceHtml);
 		
