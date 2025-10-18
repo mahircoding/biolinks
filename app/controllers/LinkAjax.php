@@ -2956,9 +2956,10 @@ class LinkAjax extends Controller {
 						}
 						
 						// Handle additional images for update (image_1, image_2, image_3, image_4)
-						$additional_images = [];
+						// Start with existing images from database
+						$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
 						
-						// Process each additional image field
+						// Process each additional image field - only if new image is uploaded
 						for($img_num = 1; $img_num <= 4; $img_num++) {
 							$field_name = "image_$img_num";
 							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
@@ -2978,13 +2979,9 @@ class LinkAjax extends Controller {
 								/* Upload the original */
 								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
 								
+								// Add new image to existing images array
 								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
 							}
-						}
-						
-						// If no new additional images uploaded, keep existing ones
-						if(empty($additional_images)) {
-							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
 						}
 						
 						$sub_settings[] = array("image_name" => $image_name,
@@ -3047,9 +3044,10 @@ class LinkAjax extends Controller {
 						}
 						
 						// Handle additional images for update (image_1, image_2, image_3, image_4)
-						$additional_images = [];
+						// Start with existing images from database
+						$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
 						
-						// Process each additional image field
+						// Process each additional image field - only if new image is uploaded
 						for($img_num = 1; $img_num <= 4; $img_num++) {
 							$field_name = "image_$img_num";
 							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
@@ -3069,13 +3067,9 @@ class LinkAjax extends Controller {
 								/* Upload the original */
 								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
 								
+								// Add new image to existing images array
 								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
 							}
-						}
-						
-						// If no new additional images uploaded, keep existing ones
-						if(empty($additional_images)) {
-							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
 						}
 
 						// Get detailed description
