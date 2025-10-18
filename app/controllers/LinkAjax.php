@@ -1345,7 +1345,8 @@ class LinkAjax extends Controller {
 						$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $image_name, '90', $img_ext);
 						
 						$image_url = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $image_name;
-
+					}
+					
 					// Handle additional images (image_1, image_2, image_3, image_4)
 					$additional_images = [];
 					
@@ -3055,8 +3056,41 @@ class LinkAjax extends Controller {
 							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
 						}
 						
+						// Handle additional images for update (image_1, image_2, image_3, image_4)
+						$additional_images = [];
+						
+						// Process each additional image field
+						for($img_num = 1; $img_num <= 4; $img_num++) {
+							$field_name = "image_$img_num";
+							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+								
+								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$img_ext = 'jpg';
+								
+								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$resize->resizeTo(500, 500,'maxWidth');
+								
+								/* Generate new name for image */
+								if($mime_type['mime']=='image/png')
+									$img_ext = 'png';
+									
+								$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
+
+								/* Upload the original */
+								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+								
+								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
+							}
+						}
+						
+						// If no new additional images uploaded, keep existing ones
+						if(empty($additional_images)) {
+							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
+						}
+						
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
+												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
 												"detailed_description" => $detailed_desc,
@@ -3112,7 +3146,7 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
-
+						
 						// Handle additional images for update (image_1, image_2, image_3, image_4)
 						$additional_images = [];
 						
