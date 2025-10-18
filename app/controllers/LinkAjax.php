@@ -1464,7 +1464,7 @@ class LinkAjax extends Controller {
 			\Altum\Cache::$adapter->deleteItemsByTag('biolinks_links_user_' . $this->user->user_id);
 
 			Response::json('', 'success', ['url' => url('link/' . $_POST['link_id'] . '?tab=links')]);
-		}
+		
 	}
 	
 	private function create_biolink_export() {
