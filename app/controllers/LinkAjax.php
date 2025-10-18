@@ -1324,6 +1324,10 @@ class LinkAjax extends Controller {
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$sub_settings = null;
 				for($j=0;$j<count($_POST['title'][$i]);$j++) {
+					// Initialize image variables to null
+					$image_name = null;
+					$image_url = null;
+					
 					if($_FILES['image_main']['size'][$i][$j]>0) {
 						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
 						$img_ext = 'jpg';
@@ -2959,6 +2963,10 @@ class LinkAjax extends Controller {
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$sub_settings = null;
 				for($j=0;$j<count($_POST['title'][$i]);$j++) {
+					// Initialize image variables to null
+					$image_name = null;
+					$image_url = null;
+					
 					if($_FILES['image_main']['size'][$i][$j]>0) {
 						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
 						$img_ext = 'jpg';
@@ -3134,8 +3142,8 @@ class LinkAjax extends Controller {
 							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
 						}
 
-						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
-												"image_url" => $images[$i]['products'][$j]['image_url'],
+						$sub_settings[] = array("image_name" => isset($images[$i]['products'][$j]['image_name']) ? $images[$i]['products'][$j]['image_name'] : null,
+												"image_url" => isset($images[$i]['products'][$j]['image_url']) ? $images[$i]['products'][$j]['image_url'] : null,
 												"images" => $additional_images,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
