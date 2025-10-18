@@ -1277,18 +1277,17 @@ class LinkAjax extends Controller {
 						$item_errors[] = $this->language->global->error_message->file_upload_empty;
 					}
 
-					// Validate additional images
-					if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-							if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-								if($_FILES['images']['error'][$i][$j][$img_idx]) {
-									$item_errors[] = $this->language->global->error_message->file_upload_empty;
-								} elseif($_FILES['images']['size'][$i][$j][$img_idx] > 716800) {
-									$item_errors[] = $this->language->global->error_message->file_upload_max_size;
-								} elseif(!in_array($mime_type['mime'],$image_allowed)) {
-									$item_errors[] = $this->language->global->error_message->invalid_file_type;
-								}
+					// Validate additional images (image_1, image_2, image_3, image_4)
+					for($img_num = 1; $img_num <= 4; $img_num++) {
+						$field_name = "image_$img_num";
+						if(isset($_FILES[$field_name]['size'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+							$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+							if($_FILES[$field_name]['error'][$i][$j]) {
+								$item_errors[] = $this->language->global->error_message->file_upload_empty;
+							} elseif($_FILES[$field_name]['size'][$i][$j] > 716800) {
+								$item_errors[] = $this->language->global->error_message->file_upload_max_size;
+							} elseif(!in_array($mime_type['mime'],$image_allowed)) {
+								$item_errors[] = $this->language->global->error_message->invalid_file_type;
 							}
 						}
 					}
@@ -1346,15 +1345,11 @@ class LinkAjax extends Controller {
 					// Handle additional images (image_1, image_2, image_3, image_4)
 					$additional_images = [];
 					
-					// Debug: Log $_FILES structure for additional images
-					error_log("DEBUG: Processing additional images for product $i-$j");
-					error_log("DEBUG: \$_FILES structure: " . print_r($_FILES, true));
 					
 					// Process each additional image field
 					for($img_num = 1; $img_num <= 4; $img_num++) {
 						$field_name = "image_$img_num";
 						if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
-							error_log("DEBUG: Found $field_name for product $i-$j");
 							
 							$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
 							$img_ext = 'jpg';
@@ -1443,28 +1438,30 @@ class LinkAjax extends Controller {
 												"show" => $_POST['show'][$i][$j] ? (int)$_POST['show'][$i][$j] : 1,
 												'variants' => $variants);
 					} else {
-						// Handle additional images even when no main image is uploaded
+						// Handle additional images even when no main image is uploaded (image_1, image_2, image_3, image_4)
 						$additional_images = [];
-						if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$img_ext = 'jpg';
+						
+						// Process each additional image field
+						for($img_num = 1; $img_num <= 4; $img_num++) {
+							$field_name = "image_$img_num";
+							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+								
+								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$img_ext = 'jpg';
+								
+								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$resize->resizeTo(500, 500,'maxWidth');
+								
+								/* Generate new name for image */
+								if($mime_type['mime']=='image/png')
+									$img_ext = 'png';
 									
-									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$resize->resizeTo(500, 500,'maxWidth');
-									
-									/* Generate new name for logo */
-									if($mime_type['mime']=='image/png')
-										$img_ext = 'png';
-										
-									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+								$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
 
-									/* Upload the original */
-									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-									
-									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-								}
+								/* Upload the original */
+								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+								
+								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
 							}
 						}
 						
@@ -2913,18 +2910,17 @@ class LinkAjax extends Controller {
 						//$item_errors[] = $this->language->global->error_message->file_upload_empty;
 					}
 
-					// Validate additional images
-					if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-							if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-								if($_FILES['images']['error'][$i][$j][$img_idx]) {
-									$item_errors[] = $this->language->global->error_message->file_upload_empty;
-								} elseif($_FILES['images']['size'][$i][$j][$img_idx] > 716800) {
-									$item_errors[] = $this->language->global->error_message->file_upload_max_size;
-								} elseif(!in_array($mime_type['mime'],$image_allowed)) {
-									$item_errors[] = $this->language->global->error_message->invalid_file_type;
-								}
+					// Validate additional images (image_1, image_2, image_3, image_4)
+					for($img_num = 1; $img_num <= 4; $img_num++) {
+						$field_name = "image_$img_num";
+						if(isset($_FILES[$field_name]['size'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+							$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+							if($_FILES[$field_name]['error'][$i][$j]) {
+								$item_errors[] = $this->language->global->error_message->file_upload_empty;
+							} elseif($_FILES[$field_name]['size'][$i][$j] > 716800) {
+								$item_errors[] = $this->language->global->error_message->file_upload_max_size;
+							} elseif(!in_array($mime_type['mime'],$image_allowed)) {
+								$item_errors[] = $this->language->global->error_message->invalid_file_type;
 							}
 						}
 					}
@@ -3098,32 +3094,35 @@ class LinkAjax extends Controller {
 							}
 						}
 
-						// Handle additional images for update
+						// Handle additional images for update (image_1, image_2, image_3, image_4)
 						$additional_images = [];
-						if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
-							// Process additional images upload
-							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
-									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$img_ext = 'jpg';
+						
+						// Process each additional image field
+						for($img_num = 1; $img_num <= 4; $img_num++) {
+							$field_name = "image_$img_num";
+							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+								
+								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$img_ext = 'jpg';
+								
+								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$resize->resizeTo(500, 500,'maxWidth');
+								
+								/* Generate new name for image */
+								if($mime_type['mime']=='image/png')
+									$img_ext = 'png';
 									
-									$resize = new \ResizeImage($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
-									$resize->resizeTo(500, 500,'maxWidth');
-									
-									/* Generate new name for logo */
-									if($mime_type['mime']=='image/png')
-										$img_ext = 'png';
-										
-									$additional_image_name = md5(time() . rand() . $img_idx) . '.' . $img_ext;
+								$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
 
-									/* Upload the original */
-									$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-									
-									$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-								}
+								/* Upload the original */
+								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+								
+								$additional_images[] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
 							}
-						} else {
-							// Keep existing additional images if no new ones uploaded
+						}
+						
+						// If no new additional images uploaded, keep existing ones
+						if(empty($additional_images)) {
 							$additional_images = isset($images[$i]['products'][$j]['images']) ? $images[$i]['products'][$j]['images'] : [];
 						}
 

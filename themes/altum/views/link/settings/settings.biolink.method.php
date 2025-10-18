@@ -1218,12 +1218,6 @@ function getDataEshop() {
 	$('[data-eshop-btn]').off('click').on('click',function(e) {
 		var p_form = $(this).parents('form[role="form"]').get(0);
 		if($(e.target).parents('.dropdown').length==0) {
-			// Debug: Log form data before submission
-			var formData = new FormData(p_form);
-			console.log('Form data before submission:');
-			for (var pair of formData.entries()) {
-				console.log(pair[0] + ': ' + (pair[1] instanceof File ? 'File(' + pair[1].name + ')' : pair[1]));
-			}
 			
 			if(p_form.reportValidity()) {
 				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
@@ -1509,8 +1503,6 @@ function eventButtonUpload() {
 			container = $(this).closest('.multiple-image-upload').find('.d-flex.flex-wrap.gap-2');
 		}
 		
-		// Debug: Log file selected
-		console.log('File selected:', file ? file.name : 'none');
 		
 		if(file && file.type.startsWith('image/')) {
 			var reader = new FileReader();
