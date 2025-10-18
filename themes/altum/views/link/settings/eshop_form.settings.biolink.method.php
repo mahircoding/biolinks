@@ -229,23 +229,53 @@
 									<div class="image-upload-container">
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload" name="image_main[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label" for="customFile">Choose main image</label>
+											<label class="custom-file-label <?= (isset($sp->image_url) && !empty($sp->image_url)) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->image_url) && !empty($sp->image_url)): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_url) ?>
+												<?php else: ?>
+													Choose main image
+												<?php endif; ?>
+											</label>
 										</div>
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label" for="customFile">Choose image 1 (optional)</label>
+											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[0])) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[0])): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[0]) ?>
+												<?php else: ?>
+													Choose image 1 (optional)
+												<?php endif; ?>
+											</label>
 										</div>
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label" for="customFile">Choose image 2 (optional)</label>
+											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[1])) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[1])): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[1]) ?>
+												<?php else: ?>
+													Choose image 2 (optional)
+												<?php endif; ?>
+											</label>
 										</div>
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label" for="customFile">Choose image 3 (optional)</label>
+											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[2])) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[2])): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[2]) ?>
+												<?php else: ?>
+													Choose image 3 (optional)
+												<?php endif; ?>
+											</label>
 										</div>
 										<div class="custom-file">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label" for="customFile">Choose image 4 (optional)</label>
+											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[3])) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[3])): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[3]) ?>
+												<?php else: ?>
+													Choose image 4 (optional)
+												<?php endif; ?>
+											</label>
 										</div>
 									</div>
 									<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
@@ -259,7 +289,15 @@
 										</div>
 									</div>
 								</div>
-								<small class="text-muted">Upload 1 gambar utama + maksimal 4 gambar tambahan</small>
+								<small class="text-muted">
+									Upload 1 gambar utama + maksimal 4 gambar tambahan
+									<?php if(isset($sp->image_url) && !empty($sp->image_url)): ?>
+										<br><i class="fas fa-info-circle mr-1"></i>Current main image: <code><?= basename($sp->image_url) ?></code>
+									<?php endif; ?>
+									<?php if(isset($sp->images) && is_array($sp->images) && count($sp->images) > 0): ?>
+										<br><i class="fas fa-info-circle mr-1"></i>Current additional images: <?= count($sp->images) ?> file(s)
+									<?php endif; ?>
+								</small>
 								<small class="text-danger" data-field="image"></small>
 							</div>
 							
