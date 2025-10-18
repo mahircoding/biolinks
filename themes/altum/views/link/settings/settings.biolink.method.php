@@ -1219,11 +1219,18 @@ function getDataEshop() {
 		var p_form = $(this).parents('form[role="form"]').get(0);
 		if($(e.target).parents('.dropdown').length==0) {
 			
-			if(p_form.reportValidity()) {
-				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
-				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
-				$(this).parents('form[role="form"]').find('.form-product-item.open').not($(this).parents('.form-product-item')).toggleClass('open')
-				$(this).parents('form[role="form"]').find('.form-product-item .fbv-switch').text('Show')
+		if(p_form.reportValidity()) {
+			// Debug: Log form data before submission
+			var formData = new FormData(p_form);
+			console.log('Form data before submission:');
+			for (var pair of formData.entries()) {
+				console.log(pair[0] + ': ' + (pair[1] instanceof File ? 'File(' + pair[1].name + ')' : pair[1]));
+			}
+			
+			$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
+			$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+			$(this).parents('form[role="form"]').find('.form-product-item.open').not($(this).parents('.form-product-item')).toggleClass('open')
+			$(this).parents('form[role="form"]').find('.form-product-item .fbv-switch').text('Show')
 				$(this).parents('.form-product-item').toggleClass('open')
 				if($(this).parents('.form-product-item').hasClass('open')) {
 					$(this).parents('.form-product-item').find('.fbv-switch').text('Hide')
@@ -1503,6 +1510,9 @@ function eventButtonUpload() {
 			container = $(this).closest('.multiple-image-upload').find('.d-flex.flex-wrap.gap-2');
 		}
 		
+		// Debug: Log file selection
+		console.log('Additional image selected:', file ? file.name : 'none');
+		console.log('Field name:', $(this).attr('name'));
 		
 		if(file && file.type.startsWith('image/')) {
 			var reader = new FileReader();

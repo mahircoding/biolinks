@@ -1349,11 +1349,16 @@ class LinkAjax extends Controller {
 					// Handle additional images (image_1, image_2, image_3, image_4)
 					$additional_images = [];
 					
+					// Debug: Log $_FILES structure for additional images
+					error_log("DEBUG: Processing additional images for product $i-$j");
+					error_log("DEBUG: \$_FILES structure: " . print_r($_FILES, true));
 					
 					// Process each additional image field
 					for($img_num = 1; $img_num <= 4; $img_num++) {
 						$field_name = "image_$img_num";
+						error_log("DEBUG: Checking field $field_name for product $i-$j");
 						if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+							error_log("DEBUG: Found $field_name for product $i-$j");
 							
 							$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
 							$img_ext = 'jpg';
@@ -1445,10 +1450,16 @@ class LinkAjax extends Controller {
 						// Handle additional images even when no main image is uploaded (image_1, image_2, image_3, image_4)
 						$additional_images = [];
 						
+						// Debug: Log $_FILES structure for additional images (no main image)
+						error_log("DEBUG: Processing additional images for product $i-$j (no main image)");
+						error_log("DEBUG: \$_FILES structure: " . print_r($_FILES, true));
+						
 						// Process each additional image field
 						for($img_num = 1; $img_num <= 4; $img_num++) {
 							$field_name = "image_$img_num";
+							error_log("DEBUG: Checking field $field_name for product $i-$j (no main image)");
 							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+								error_log("DEBUG: Found $field_name for product $i-$j (no main image)");
 								
 								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
 								$img_ext = 'jpg';
