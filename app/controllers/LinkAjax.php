@@ -1278,9 +1278,9 @@ class LinkAjax extends Controller {
 					}
 
 					// Validate additional images
-					if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+					if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
 						for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-							if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+							if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
 								$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
 								if($_FILES['images']['error'][$i][$j][$img_idx]) {
 									$item_errors[] = $this->language->global->error_message->file_upload_empty;
@@ -1345,9 +1345,9 @@ class LinkAjax extends Controller {
 
 						// Handle additional images
 						$additional_images = [];
-						if(isset($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
+						if(isset($_FILES['images']['name'][$i][$j]) && is_array($_FILES['images']['name'][$i][$j]) && !empty($_FILES['images']['name'][$i][$j][0])) {
 							for($img_idx = 0; $img_idx < count($_FILES['images']['name'][$i][$j]); $img_idx++) {
-								if($_FILES['images']['size'][$i][$j][$img_idx] > 0) {
+								if(isset($_FILES['images']['size'][$i][$j][$img_idx]) && $_FILES['images']['size'][$i][$j][$img_idx] > 0) {
 									$mime_type = getimagesize($_FILES['images']['tmp_name'][$i][$j][$img_idx]);
 									$img_ext = 'jpg';
 									
