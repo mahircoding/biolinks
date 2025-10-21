@@ -278,13 +278,8 @@
 	$(document).on('change', 'input[data-image="upload"]', function() {
 		var file = this.files[0];
 		var container = $(this).closest('.multiple-image-upload').find('.main-image');
-		var $this = $(this);
-		var label = $this.siblings('.custom-file-label');
 		
 		if(file && file.type.startsWith('image/')) {
-			// Update label text
-			label.text(file.name);
-			
 			var reader = new FileReader();
 			reader.onload = function(e) {
 				container.css('background-image', 'url(' + e.target.result + ')');
@@ -299,13 +294,8 @@
 		var container = $(this).closest('.multiple-image-upload').find('#additional-images-preview');
 		var inputName = $(this).attr('name');
 		var imageIndex = inputName.match(/image_(\d+)/);
-		var $this = $(this);
-		var label = $this.siblings('.custom-file-label');
 		
 		if(file && file.type.startsWith('image/')) {
-			// Update only this specific label
-			label.text(file.name);
-			
 			var reader = new FileReader();
 			reader.onload = function(e) {
 				// Remove existing preview for this image slot
@@ -321,32 +311,6 @@
 				container.append(img);
 			};
 			reader.readAsDataURL(file);
-		}
-	});
-	
-	// Prevent Bootstrap from updating all labels
-	$(document).on('change', '.custom-file-input', function() {
-		var $this = $(this);
-		var file = this.files[0];
-		var label = $this.siblings('.custom-file-label');
-		
-		// Only update the label for this specific input
-		if(file) {
-			label.text(file.name);
-		} else {
-			// Reset to default text based on input name
-			var inputName = $this.attr('name');
-			if(inputName.includes('image_main')) {
-				label.text('Choose main image');
-			} else if(inputName.includes('image_1')) {
-				label.text('Choose image 1 (optional)');
-			} else if(inputName.includes('image_2')) {
-				label.text('Choose image 2 (optional)');
-			} else if(inputName.includes('image_3')) {
-				label.text('Choose image 3 (optional)');
-			} else if(inputName.includes('image_4')) {
-				label.text('Choose image 4 (optional)');
-			}
 		}
 	});
 	
@@ -377,50 +341,6 @@
 			}
 		}
 	});
-	
-	// Add custom CSS to prevent Bootstrap interference
-	$('<style>')
-		.prop('type', 'text/css')
-		.html(`
-			.custom-file-input:focus ~ .custom-file-label {
-				border-color: #80bdff;
-				box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-			}
-			.custom-file-input:lang(en) ~ .custom-file-label::after {
-				content: "Browse";
-			}
-			.custom-file-label {
-				position: absolute;
-				top: 0;
-				right: 0;
-				left: 0;
-				z-index: 1;
-				height: calc(1.5em + 0.75rem + 2px);
-				padding: 0.375rem 0.75rem;
-				line-height: 1.5;
-				color: #495057;
-				background-color: #fff;
-				border: 1px solid #ced4da;
-				border-radius: 0.25rem;
-			}
-			.custom-file-label::after {
-				position: absolute;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				z-index: 3;
-				display: block;
-				height: calc(1.5em + 0.75rem);
-				padding: 0.375rem 0.75rem;
-				line-height: 1.5;
-				color: #495057;
-				content: "Browse";
-				background-color: #e9ecef;
-				border-left: inherit;
-				border-radius: 0 0.25rem 0.25rem 0;
-			}
-		`)
-		.appendTo('head');
 	
 </script>
 <?php \Altum\Event::add_content(ob_get_clean(), 'javascript') ?>
