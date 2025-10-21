@@ -239,9 +239,9 @@
 										</div>
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[0])) ? 'text-success' : '' ?>" for="customFile">
-												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[0])): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[0]) ?>
+											<label class="custom-file-label <?= (isset($sp->image_1) && !empty($sp->image_1)) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->image_1) && !empty($sp->image_1)): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_1) ?>
 												<?php else: ?>
 													Choose image 1 (optional)
 												<?php endif; ?>
@@ -249,9 +249,9 @@
 										</div>
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[1])) ? 'text-success' : '' ?>" for="customFile">
-												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[1])): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[1]) ?>
+											<label class="custom-file-label <?= (isset($sp->image_2) && !empty($sp->image_2)) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->image_2) && !empty($sp->image_2)): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_2) ?>
 												<?php else: ?>
 													Choose image 2 (optional)
 												<?php endif; ?>
@@ -259,9 +259,9 @@
 										</div>
 										<div class="custom-file mb-2">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[2])) ? 'text-success' : '' ?>" for="customFile">
-												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[2])): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[2]) ?>
+											<label class="custom-file-label <?= (isset($sp->image_3) && !empty($sp->image_3)) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->image_3) && !empty($sp->image_3)): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_3) ?>
 												<?php else: ?>
 													Choose image 3 (optional)
 												<?php endif; ?>
@@ -269,9 +269,9 @@
 										</div>
 										<div class="custom-file">
 											<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->images) && is_array($sp->images) && isset($sp->images[3])) ? 'text-success' : '' ?>" for="customFile">
-												<?php if(isset($sp->images) && is_array($sp->images) && isset($sp->images[3])): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->images[3]) ?>
+											<label class="custom-file-label <?= (isset($sp->image_4) && !empty($sp->image_4)) ? 'text-success' : '' ?>" for="customFile">
+												<?php if(isset($sp->image_4) && !empty($sp->image_4)): ?>
+													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_4) ?>
 												<?php else: ?>
 													Choose image 4 (optional)
 												<?php endif; ?>
@@ -281,10 +281,17 @@
 									<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
 										<div role="image" class="form-image-preview wh-70 main-image" style="background-image:url(<?= $sp->image_url?>)"></div>
 										<div id="additional-images-preview-<?= $ky?>-<?= $pk?>" class="d-flex flex-wrap gap-2">
-											<?php if(isset($sp->images) && is_array($sp->images)): ?>
-												<?php foreach($sp->images as $img): ?>
-													<img src="<?= $img ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
-												<?php endforeach; ?>
+											<?php if(isset($sp->image_1) && !empty($sp->image_1)): ?>
+												<img src="<?= $sp->image_1 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
+											<?php endif; ?>
+											<?php if(isset($sp->image_2) && !empty($sp->image_2)): ?>
+												<img src="<?= $sp->image_2 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
+											<?php endif; ?>
+											<?php if(isset($sp->image_3) && !empty($sp->image_3)): ?>
+												<img src="<?= $sp->image_3 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
+											<?php endif; ?>
+											<?php if(isset($sp->image_4) && !empty($sp->image_4)): ?>
+												<img src="<?= $sp->image_4 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
 											<?php endif; ?>
 										</div>
 									</div>
@@ -294,8 +301,14 @@
 									<?php if(isset($sp->image_url) && !empty($sp->image_url)): ?>
 										<br><i class="fas fa-info-circle mr-1"></i>Current main image: <code><?= basename($sp->image_url) ?></code>
 									<?php endif; ?>
-									<?php if(isset($sp->images) && is_array($sp->images) && count($sp->images) > 0): ?>
-										<br><i class="fas fa-info-circle mr-1"></i>Current additional images: <?= count($sp->images) ?> file(s)
+									<?php 
+									$additional_count = 0;
+									if(isset($sp->image_1) && !empty($sp->image_1)) $additional_count++;
+									if(isset($sp->image_2) && !empty($sp->image_2)) $additional_count++;
+									if(isset($sp->image_3) && !empty($sp->image_3)) $additional_count++;
+									if(isset($sp->image_4) && !empty($sp->image_4)) $additional_count++;
+									if($additional_count > 0): ?>
+										<br><i class="fas fa-info-circle mr-1"></i>Current additional images: <?= $additional_count ?> file(s)
 									<?php endif; ?>
 								</small>
 								<small class="text-danger" data-field="image"></small>

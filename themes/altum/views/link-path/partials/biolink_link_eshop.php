@@ -45,7 +45,10 @@
 						'price_strike' => $pr->price_strike ?? null,
 						'weight' => $pr->weight ?? 100,
 						'image_url' => $pr->image_url ?? '',
-						'images' => $pr->images ?? [],
+						'image_1' => $pr->image_1 ?? null,
+						'image_2' => $pr->image_2 ?? null,
+						'image_3' => $pr->image_3 ?? null,
+						'image_4' => $pr->image_4 ?? null,
 						'category_index' => $iy,
 						'product_index' => $iz
 					]) ?>' href="javascript:;">Detail</a>
@@ -74,7 +77,10 @@
 						'price_strike' => $pr->price_strike ?? null,
 						'weight' => $pr->weight ?? 100,
 						'image_url' => $pr->image_url ?? '',
-						'images' => $pr->images ?? [],
+						'image_1' => $pr->image_1 ?? null,
+						'image_2' => $pr->image_2 ?? null,
+						'image_3' => $pr->image_3 ?? null,
+						'image_4' => $pr->image_4 ?? null,
 						'category_index' => $iy,
 						'product_index' => $iz
 					]) ?>' href="javascript:;">Detail</a>
@@ -247,15 +253,19 @@ $(document).ready(function() {
 		// Clear previous thumbnails
 		thumbnailGallery.empty();
 		
-		// Handle single image (backward compatibility)
-		if(product.image_url && (!product.images || product.images.length === 0)) {
-			mainImage.attr('src', product.image_url);
-			thumbnailGallery.append('<img src="' + product.image_url + '" class="thumbnail-img" style="width:60px;height:60px;object-fit:cover;cursor:pointer;border:2px solid #ddd;" onclick="changeMainImage(this.src)">');
-		}
-		// Handle multiple images
-		else if(product.images && product.images.length > 0) {
-			mainImage.attr('src', product.images[0]);
-			product.images.forEach(function(image, index) {
+		// Handle individual image fields (image_1, image_2, image_3, image_4)
+		var allImages = [];
+		
+		// Collect all non-null images
+		if(product.image_url) allImages.push(product.image_url);
+		if(product.image_1) allImages.push(product.image_1);
+		if(product.image_2) allImages.push(product.image_2);
+		if(product.image_3) allImages.push(product.image_3);
+		if(product.image_4) allImages.push(product.image_4);
+		
+		if(allImages.length > 0) {
+			mainImage.attr('src', allImages[0]);
+			allImages.forEach(function(image, index) {
 				var thumbnail = $('<img>').attr({
 					'src': image,
 					'class': 'thumbnail-img',
