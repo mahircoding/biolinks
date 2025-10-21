@@ -228,8 +228,8 @@
 								<div class="multiple-image-upload">
 									<div class="image-upload-container">
 										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload" name="image_main[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->image_url) && !empty($sp->image_url)) ? 'text-success' : '' ?>" for="customFile">
+											<input type="file" class="custom-file-input" data-image="upload" name="image_main[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_main_<?= $ky?>_<?= $pk?>">
+											<label class="custom-file-label <?= (isset($sp->image_url) && !empty($sp->image_url)) ? 'text-success' : '' ?>" for="image_main_<?= $ky?>_<?= $pk?>">
 												<?php if(isset($sp->image_url) && !empty($sp->image_url)): ?>
 													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_url) ?>
 												<?php else: ?>
@@ -238,8 +238,8 @@
 											</label>
 										</div>
 										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->image_1) && !empty($sp->image_1)) ? 'text-success' : '' ?>" for="customFile">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_1_<?= $ky?>_<?= $pk?>">
+											<label class="custom-file-label <?= (isset($sp->image_1) && !empty($sp->image_1)) ? 'text-success' : '' ?>" for="image_1_<?= $ky?>_<?= $pk?>">
 												<?php if(isset($sp->image_1) && !empty($sp->image_1)): ?>
 													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_1) ?>
 												<?php else: ?>
@@ -248,8 +248,8 @@
 											</label>
 										</div>
 										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->image_2) && !empty($sp->image_2)) ? 'text-success' : '' ?>" for="customFile">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_2_<?= $ky?>_<?= $pk?>">
+											<label class="custom-file-label <?= (isset($sp->image_2) && !empty($sp->image_2)) ? 'text-success' : '' ?>" for="image_2_<?= $ky?>_<?= $pk?>">
 												<?php if(isset($sp->image_2) && !empty($sp->image_2)): ?>
 													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_2) ?>
 												<?php else: ?>
@@ -258,8 +258,8 @@
 											</label>
 										</div>
 										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->image_3) && !empty($sp->image_3)) ? 'text-success' : '' ?>" for="customFile">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_3_<?= $ky?>_<?= $pk?>">
+											<label class="custom-file-label <?= (isset($sp->image_3) && !empty($sp->image_3)) ? 'text-success' : '' ?>" for="image_3_<?= $ky?>_<?= $pk?>">
 												<?php if(isset($sp->image_3) && !empty($sp->image_3)): ?>
 													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_3) ?>
 												<?php else: ?>
@@ -268,8 +268,8 @@
 											</label>
 										</div>
 										<div class="custom-file">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
-											<label class="custom-file-label <?= (isset($sp->image_4) && !empty($sp->image_4)) ? 'text-success' : '' ?>" for="customFile">
+											<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_4_<?= $ky?>_<?= $pk?>">
+											<label class="custom-file-label <?= (isset($sp->image_4) && !empty($sp->image_4)) ? 'text-success' : '' ?>" for="image_4_<?= $ky?>_<?= $pk?>">
 												<?php if(isset($sp->image_4) && !empty($sp->image_4)): ?>
 													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_4) ?>
 												<?php else: ?>

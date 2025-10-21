@@ -115,24 +115,24 @@
 												<div class="multiple-image-upload">
 													<div class="image-upload-container">
 														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload" name="image_main[0][]" accept="image/x-png,image/gif,image/jpeg" required>
-															<label class="custom-file-label" for="customFile">Choose main image</label>
+															<input type="file" class="custom-file-input" data-image="upload" name="image_main[0][]" accept="image/x-png,image/gif,image/jpeg" required id="image_main_0">
+															<label class="custom-file-label" for="image_main_0">Choose main image</label>
 														</div>
 														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 1 (optional)</label>
+															<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[0][]" accept="image/x-png,image/gif,image/jpeg" id="image_1_0">
+															<label class="custom-file-label" for="image_1_0">Choose image 1 (optional)</label>
 														</div>
 														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 2 (optional)</label>
+															<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[0][]" accept="image/x-png,image/gif,image/jpeg" id="image_2_0">
+															<label class="custom-file-label" for="image_2_0">Choose image 2 (optional)</label>
 														</div>
 														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 3 (optional)</label>
+															<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[0][]" accept="image/x-png,image/gif,image/jpeg" id="image_3_0">
+															<label class="custom-file-label" for="image_3_0">Choose image 3 (optional)</label>
 														</div>
 														<div class="custom-file">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 4 (optional)</label>
+															<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[0][]" accept="image/x-png,image/gif,image/jpeg" id="image_4_0">
+															<label class="custom-file-label" for="image_4_0">Choose image 4 (optional)</label>
 														</div>
 													</div>
 													<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
@@ -274,7 +274,47 @@
         event.preventDefault();
     })
 	
-	// Handle multiple image upload preview
+	// Handle main image upload preview
+	$(document).on('change', 'input[data-image="upload"]', function() {
+		var file = this.files[0];
+		var container = $(this).closest('.multiple-image-upload').find('.main-image');
+		
+		if(file && file.type.startsWith('image/')) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				container.css('background-image', 'url(' + e.target.result + ')');
+			};
+			reader.readAsDataURL(file);
+		}
+	});
+	
+	// Handle individual image upload preview
+	$(document).on('change', 'input[data-image="upload-single"]', function() {
+		var file = this.files[0];
+		var container = $(this).closest('.multiple-image-upload').find('#additional-images-preview');
+		var inputName = $(this).attr('name');
+		var imageIndex = inputName.match(/image_(\d+)/);
+		
+		if(file && file.type.startsWith('image/')) {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				// Remove existing preview for this image slot
+				container.find('[data-slot="' + imageIndex[1] + '"]').remove();
+				
+				// Add new preview
+				var img = $('<img>').attr({
+					'src': e.target.result,
+					'class': 'additional-image-preview',
+					'data-slot': imageIndex[1],
+					'style': 'width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;'
+				});
+				container.append(img);
+			};
+			reader.readAsDataURL(file);
+		}
+	});
+	
+	// Handle multiple image upload preview (for backward compatibility)
 	$(document).on('change', 'input[data-image="upload-multiple"]', function() {
 		var files = this.files;
 		var container = $(this).closest('.multiple-image-upload').find('#additional-images-preview');
