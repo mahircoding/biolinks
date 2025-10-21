@@ -2875,16 +2875,17 @@ class LinkAjax extends Controller {
 				mkdir(UPLOADS_PATH . 'galleries/' . $folder_id, 0755, true);
 			}
 			
-			$images = json_decode($link->settings,true);
-			
-			for($i=0;$i<count($_POST['category']);$i++) {
-				$sub_settings = null;
-				for($j=0;$j<count($_POST['title'][$i]);$j++) {
-					// Initialize image variables to null
-					$image_name = null;
-					$image_url = null;
-					
-					if($_FILES['image_main']['size'][$i][$j]>0) {
+		$images = json_decode($link->settings,true);
+		
+		for($i=0;$i<count($_POST['category']);$i++) {
+			$sub_settings = null;
+			for($j=0;$j<count($_POST['title'][$i]);$j++) {
+				// Initialize image variables with existing values - PRESERVE EXISTING IMAGES
+				$image_name = isset($images[$i]['products'][$j]['image_name']) ? $images[$i]['products'][$j]['image_name'] : null;
+				$image_url = isset($images[$i]['products'][$j]['image_url']) ? $images[$i]['products'][$j]['image_url'] : null;
+				
+				// Only update main image if new image is uploaded
+				if($_FILES['image_main']['size'][$i][$j]>0) {
 						$mime_type = getimagesize($_FILES['image_main']['tmp_name'][$i][$j]);
 						$img_ext = 'jpg';
 						
@@ -2962,7 +2963,7 @@ class LinkAjax extends Controller {
 						}
 						
 						// Handle additional images for update (image_1, image_2, image_3, image_4) - Individual fields
-						// Start with existing images from database
+						// Start with existing images from database - PRESERVE EXISTING IMAGES
 						$image_1 = isset($images[$i]['products'][$j]['image_1']) ? $images[$i]['products'][$j]['image_1'] : null;
 						$image_2 = isset($images[$i]['products'][$j]['image_2']) ? $images[$i]['products'][$j]['image_2'] : null;
 						$image_3 = isset($images[$i]['products'][$j]['image_3']) ? $images[$i]['products'][$j]['image_3'] : null;
@@ -2982,6 +2983,7 @@ class LinkAjax extends Controller {
 							$field_name = "image_$img_num";
 							$image_field = "image_$img_num";
 							
+							// Check if new image is uploaded for this specific field
 							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
 								
 								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
@@ -2999,9 +3001,10 @@ class LinkAjax extends Controller {
 								/* Upload the original */
 								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
 								
-								// Update individual field
+								// Update individual field - ONLY if new image uploaded
 								$$image_field = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
 							}
+							// If no new image uploaded, keep existing value (already set above)
 						}
 						
 						$sub_settings[] = array("image_name" => $image_name,
