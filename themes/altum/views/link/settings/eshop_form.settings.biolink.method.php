@@ -281,7 +281,9 @@
 									<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
 										<div role="image" class="form-image-preview wh-70 main-image" style="background-image:url(<?= $sp->image_url?>)"></div>
 										<div id="additional-images-preview-<?= $ky?>-<?= $pk?>" class="d-flex flex-wrap gap-2">
-											<?php if(isset($sp->image_1) && !empty($sp->image_1)): ?>
+											<?php 
+											// Handle individual fields first
+											if(isset($sp->image_1) && !empty($sp->image_1)): ?>
 												<img src="<?= $sp->image_1 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
 											<?php endif; ?>
 											<?php if(isset($sp->image_2) && !empty($sp->image_2)): ?>
@@ -292,6 +294,14 @@
 											<?php endif; ?>
 											<?php if(isset($sp->image_4) && !empty($sp->image_4)): ?>
 												<img src="<?= $sp->image_4 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
+											<?php endif; ?>
+											
+											<?php 
+											// Backward compatibility: If old format 'images' array exists and no individual fields, use it
+											if(isset($sp->images) && is_array($sp->images) && !isset($sp->image_1)): ?>
+												<?php foreach($sp->images as $img): ?>
+													<img src="<?= $img ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
+												<?php endforeach; ?>
 											<?php endif; ?>
 										</div>
 									</div>

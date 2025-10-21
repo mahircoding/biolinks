@@ -263,6 +263,11 @@ $(document).ready(function() {
 		if(product.image_3) allImages.push(product.image_3);
 		if(product.image_4) allImages.push(product.image_4);
 		
+		// Backward compatibility: If old format 'images' array exists, use it
+		if(product.images && product.images.length > 0) {
+			allImages = [product.image_url].concat(product.images).filter(img => img);
+		}
+		
 		if(allImages.length > 0) {
 			mainImage.attr('src', allImages[0]);
 			allImages.forEach(function(image, index) {
