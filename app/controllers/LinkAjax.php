@@ -133,7 +133,6 @@ class LinkAjax extends Controller {
 				$url = $location_url = '';
 				$order = 99;
 				$setting = json_encode($link->settings);
-				
 				$stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				$stmt->bind_param('ssssssssss', $link->project_id, $link->biolink_id, $this->user->user_id, $link->type, $link->subtype, $url, $location_url, $setting, $order, \Altum\Date::$date);
 				$stmt->execute();
