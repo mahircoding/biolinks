@@ -2908,6 +2908,52 @@ class LinkAjax extends Controller {
 								unlink(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $images[$i]['products'][$j]['image_name']);
 							}
 						}
+						
+						// Handle additional images for update (image_1, image_2, image_3, image_4) - Individual fields
+						// Start with existing images from database - PRESERVE EXISTING IMAGES
+						$image_1 = isset($images[$i]['products'][$j]['image_1']) ? $images[$i]['products'][$j]['image_1'] : null;
+						$image_2 = isset($images[$i]['products'][$j]['image_2']) ? $images[$i]['products'][$j]['image_2'] : null;
+						$image_3 = isset($images[$i]['products'][$j]['image_3']) ? $images[$i]['products'][$j]['image_3'] : null;
+						$image_4 = isset($images[$i]['products'][$j]['image_4']) ? $images[$i]['products'][$j]['image_4'] : null;
+						
+						// Backward compatibility: If old format 'images' array exists, migrate to individual fields
+						if(isset($images[$i]['products'][$j]['images']) && is_array($images[$i]['products'][$j]['images'])) {
+							$old_images = $images[$i]['products'][$j]['images'];
+							if(isset($old_images[0])) $image_1 = $old_images[0];
+							if(isset($old_images[1])) $image_2 = $old_images[1];
+							if(isset($old_images[2])) $image_3 = $old_images[2];
+							if(isset($old_images[3])) $image_4 = $old_images[3];
+						}
+						
+						// Process each additional image field - only if new image is uploaded
+						for($img_num = 1; $img_num <= 4; $img_num++) {
+							$field_name = "image_$img_num";
+							$image_field = "image_$img_num";
+							
+							// Check if new image is uploaded for this specific field
+							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+								
+								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$img_ext = 'jpg';
+								
+								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$resize->resizeTo(500, 500,'maxWidth');
+								
+								/* Generate new name for image */
+								if($mime_type['mime']=='image/png')
+									$img_ext = 'png';
+									
+								$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
+
+								/* Upload the original */
+								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
+								
+								// Update individual field - ONLY if new image uploaded
+								$$image_field = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
+							}
+							// If no new image uploaded, keep existing value (already set above)
+						}
+						
 						$variants = null;
 						if(isset($_POST['title_variant'][$i][$j])) {
 							for($k=0;$k<count($_POST['title_variant'][$i][$j]);$k++) {
@@ -2960,51 +3006,6 @@ class LinkAjax extends Controller {
 							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
 						} else if(isset($images[$i]['products'][$j]['detailed_description'])) {
 							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
-						}
-						
-						// Handle additional images for update (image_1, image_2, image_3, image_4) - Individual fields
-						// Start with existing images from database - PRESERVE EXISTING IMAGES
-						$image_1 = isset($images[$i]['products'][$j]['image_1']) ? $images[$i]['products'][$j]['image_1'] : null;
-						$image_2 = isset($images[$i]['products'][$j]['image_2']) ? $images[$i]['products'][$j]['image_2'] : null;
-						$image_3 = isset($images[$i]['products'][$j]['image_3']) ? $images[$i]['products'][$j]['image_3'] : null;
-						$image_4 = isset($images[$i]['products'][$j]['image_4']) ? $images[$i]['products'][$j]['image_4'] : null;
-						
-						// Backward compatibility: If old format 'images' array exists, migrate to individual fields
-						if(isset($images[$i]['products'][$j]['images']) && is_array($images[$i]['products'][$j]['images'])) {
-							$old_images = $images[$i]['products'][$j]['images'];
-							if(isset($old_images[0])) $image_1 = $old_images[0];
-							if(isset($old_images[1])) $image_2 = $old_images[1];
-							if(isset($old_images[2])) $image_3 = $old_images[2];
-							if(isset($old_images[3])) $image_4 = $old_images[3];
-						}
-						
-						// Process each additional image field - only if new image is uploaded
-						for($img_num = 1; $img_num <= 4; $img_num++) {
-							$field_name = "image_$img_num";
-							$image_field = "image_$img_num";
-							
-							// Check if new image is uploaded for this specific field
-							if(isset($_FILES[$field_name]['name'][$i][$j]) && !empty($_FILES[$field_name]['name'][$i][$j]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
-								
-								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
-								$img_ext = 'jpg';
-								
-								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
-								$resize->resizeTo(500, 500,'maxWidth');
-								
-								/* Generate new name for image */
-								if($mime_type['mime']=='image/png')
-									$img_ext = 'png';
-									
-								$additional_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
-
-								/* Upload the original */
-								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name, '90', $img_ext);
-								
-								// Update individual field - ONLY if new image uploaded
-								$$image_field = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $additional_image_name;
-							}
-							// If no new image uploaded, keep existing value (already set above)
 						}
 						
 						$sub_settings[] = array("image_name" => $image_name,
@@ -3069,28 +3070,7 @@ class LinkAjax extends Controller {
 							}
 						}
 						
-						// Get detailed description
-						$detailed_desc = '';
-						if(isset($_POST['detailed_description'][$i][$j]) && !empty($_POST['detailed_description'][$i][$j])) {
-							$detailed_desc = ucfirst($_POST['detailed_description'][$i][$j]);
-						} else if(isset($images[$i]['products'][$j]['detailed_description'])) {
-							$detailed_desc = $images[$i]['products'][$j]['detailed_description'];
-						}
-
-						$sub_settings[] = array("image_name" => isset($images[$i]['products'][$j]['image_name']) ? $images[$i]['products'][$j]['image_name'] : null,
-												"image_url" => isset($images[$i]['products'][$j]['image_url']) ? $images[$i]['products'][$j]['image_url'] : null,
-												"image_1" => $image_1,
-												"image_2" => $image_2,
-												"image_3" => $image_3,
-												"image_4" => $image_4,
-												"title" => ucwords($_POST['title'][$i][$j]),
-												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
-												"detailed_description" => $detailed_desc,
-												"price" => (int)$_POST['price'][$i][$j],
-												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
-												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
-												"show" => isset($_POST['show'][$i][$j]) ? (int)$_POST['show'][$i][$j] : 1,
-												'variants' => $variants);
+						// This section is handled above, no need to duplicate
 					}
 				}
 				$item_settings[] = array("category" => ucwords($_POST['category'][$i]),
