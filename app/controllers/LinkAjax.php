@@ -137,6 +137,7 @@ class LinkAjax extends Controller {
 				$stmt->bind_param('ssssssssss', $link->project_id, $link->biolink_id, $this->user->user_id, $link->type, $link->subtype, $url, $location_url, $setting, $order, \Altum\Date::$date);
 				$stmt->execute();
 				$stmt->close();
+				
 
 				/* Clear the cache */
 				\Altum\Cache::$adapter->deleteItemsByTag('biolinks_links_user_' . $this->user->user_id);
