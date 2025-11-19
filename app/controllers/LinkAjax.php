@@ -1437,7 +1437,10 @@ class LinkAjax extends Controller {
 
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
-												"images" => $additional_images,
+												"image_1" => $image_1,
+												"image_2" => $image_2,
+												"image_3" => $image_3,
+												"image_4" => $image_4,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => ucfirst($_POST['description'][$i][$j]),
 												"detailed_description" => $detailed_desc,
