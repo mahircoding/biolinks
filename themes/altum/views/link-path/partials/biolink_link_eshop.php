@@ -138,11 +138,23 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					document.getElementById('modalProductPriceStrike').style.display = 'none';
 				}
 				
-				// Set add to cart data
+				// Set add to cart data and click handler
 				const modalCartBtn = document.getElementById('modalAddToCart');
 				modalCartBtn.setAttribute('data-index', index);
 				modalCartBtn.setAttribute('data-cart', 'add');
 				modalCartBtn.setAttribute('data-link-id', linkId);
+				
+				// Add click event to trigger cart add
+				modalCartBtn.onclick = function() {
+					// Find the original add to cart button and trigger its click
+					const originalBtn = document.querySelector(`a[data-cart="add"][data-link-id="${linkId}"]`);
+					if(originalBtn) {
+						originalBtn.click();
+						// Close modal after adding to cart
+						modal.style.display = 'none';
+						document.body.style.overflow = 'auto';
+					}
+				};
 				
 				modal.style.display = 'block';
 				document.body.style.overflow = 'hidden';
