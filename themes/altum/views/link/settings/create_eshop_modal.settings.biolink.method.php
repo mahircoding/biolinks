@@ -166,6 +166,12 @@
 												</select>
 											</div>
 											
+											<div class="form-group">
+												<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text <small>(Optional)</small></label>
+												<input type="text" class="form-control" name="button_text" placeholder="Add to Cart" value="Add to Cart" />
+												<small class="form-text text-muted">Custom text for the add to cart button</small>
+											</div>
+											
 											<div class="d-flex justify-content-center mb-2">
 												<div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div>
 											</div>

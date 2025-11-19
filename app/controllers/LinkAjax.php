@@ -1449,11 +1449,18 @@ class LinkAjax extends Controller {
 										 "products" => $sub_settings);
 			}
 			
+			// Get custom button text or use default
+			$button_text = !empty($_POST['button_text']) ? trim(Database::clean_string($_POST['button_text'])) : 'Add to Cart';
+			
 			$url = $location_url = '';
 			$type = 'biolink';
 			$subtype = 'eshop';
 			$order = 99;
-			$settings = json_encode($item_settings);
+			$settings_data = [
+				'data' => $item_settings,
+				'button_text' => $button_text
+			];
+			$settings = json_encode($settings_data);
 			
 			$stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			$stmt->bind_param('ssssssssss', $project_id, $_POST['link_id'], $this->user->user_id, $type, $subtype, $url, $location_url, $settings, $order, \Altum\Date::$date);
@@ -2850,7 +2857,9 @@ class LinkAjax extends Controller {
 				mkdir(UPLOADS_PATH . 'galleries/' . $folder_id, 0755, true);
 			}
 			
-			$images = json_decode($link->settings,true);
+			$settings_decoded = json_decode($link->settings,true);
+			// Extract data array with backward compatibility
+			$images = isset($settings_decoded['data']) ? $settings_decoded['data'] : $settings_decoded;
 			
 			for($i=0;$i<count($_POST['category']);$i++) {
 				$sub_settings = null;
@@ -2994,11 +3003,18 @@ class LinkAjax extends Controller {
 										 "products" => $sub_settings);
 			}
 			
+			// Get custom button text or use default
+			$button_text = !empty($_POST['button_text']) ? trim(Database::clean_string($_POST['button_text'])) : 'Add to Cart';
+			
 			$url = $location_url = '';
 			$type = 'biolink';
 			$subtype = 'eshop';
 			$order = 99;
-			$settings = json_encode($item_settings);
+			$settings_data = [
+				'data' => $item_settings,
+				'button_text' => $button_text
+			];
+			$settings = json_encode($settings_data);
 			
 			$stmt = Database::$database->prepare("UPDATE `links` SET `settings` = ? WHERE `link_id` = ?");
 			$stmt->bind_param('ss', $settings, $_POST['link_id']);
