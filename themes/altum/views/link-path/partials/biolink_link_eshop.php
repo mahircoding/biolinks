@@ -354,7 +354,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	.product-modal-info h2 {
 		margin: 0 0 15px 0;
-		font-size: 28px;
+		font-size: 20px;
 		font-weight: 700;
 		color: #333;
 		text-align: left;
@@ -366,14 +366,14 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	}
 	
 	.modal-price {
-		font-size: 32px;
+		font-size: 24px;
 		font-weight: 700;
 		color: #667eea;
 		margin-right: 10px;
 	}
 	
 	.modal-price-strike {
-		font-size: 20px;
+		font-size: 16px;
 		color: #999;
 		text-decoration: line-through;
 	}
