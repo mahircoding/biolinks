@@ -136,6 +136,13 @@
 											<div class="form-group">
 												<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label>
 												<textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea>
+												<small class="form-text text-muted">Short description for product card (max 80 chars shown)</small>
+											</div>
+											
+											<div class="form-group">
+												<label><i class="fa fa-fw fa-align-left fa-sm mr-1"></i> Full Description <small>(Opsional)</small></label>
+												<textarea class="form-control" role="full_description" name="full_description[0][]" rows="4" placeholder="Insert full product description"></textarea>
+												<small class="form-text text-muted">Detailed description shown only in modal</small>
 											</div>
 											
 											<div class="row">

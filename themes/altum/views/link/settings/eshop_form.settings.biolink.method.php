@@ -237,6 +237,7 @@ $button_text = isset($row->settings->button_text) ? $row->settings->button_text 
 									<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2">
 										<div role="image" class="form-image-preview wh-70" style="background-image:url(<?= $sp->image_url?>)"></div>
 									</div>
+```
 								</div>
 								<small class="text-danger" data-field="image"></small>
 							</div>
@@ -249,6 +250,13 @@ $button_text = isset($row->settings->button_text) ? $row->settings->button_text 
 							<div class="form-group">
 								<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label>
 								<textarea class="form-control" role="description" name="description[<?= $ky?>][]" rows="2" placeholder="Insert description product"><?= $sp->description?></textarea>
+								<small class="form-text text-muted">Short description for product card (max 80 chars shown)</small>
+							</div>
+							
+							<div class="form-group">
+								<label><i class="fa fa-fw fa-align-left fa-sm mr-1"></i> Full Description <small>(Opsional)</small></label>
+								<textarea class="form-control" role="full_description" name="full_description[<?= $ky?>][]" rows="4" placeholder="Insert full product description"><?= isset($sp->full_description) ? $sp->full_description : '' ?></textarea>
+								<small class="form-text text-muted">Detailed description shown only in modal</small>
 							</div>
 							
 							<div class="row">

@@ -41,6 +41,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					<a class="btn-detail" 
 					   data-product-title="<?= htmlspecialchars($pr->title) ?>" 
 					   data-product-desc="<?= htmlspecialchars($pr->description ?? '') ?>" 
+					   data-product-full-desc="<?= htmlspecialchars($pr->full_description ?? $pr->description ?? '') ?>" 
 					   data-product-price="<?= $data->user->currency.number_format($pr->price,0,"",",") ?>" 
 					   data-product-price-strike="<?= !empty($pr->price_strike) ? $data->user->currency.number_format($pr->price_strike,0,"",",") : '' ?>" 
 					   data-product-image="<?= str_replace('http://','https://',$pr->image_url) ?>"
@@ -67,6 +68,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					<a class="btn-detail" 
 					   data-product-title="<?= htmlspecialchars($pr->title) ?>" 
 					   data-product-desc="<?= htmlspecialchars($pr->description ?? '') ?>" 
+					   data-product-full-desc="<?= htmlspecialchars($pr->full_description ?? $pr->description ?? '') ?>" 
 					   data-product-price="<?= $data->user->currency.number_format($pr->price,0,"",",") ?>" 
 					   data-product-price-strike="<?= !empty($pr->price_strike) ? $data->user->currency.number_format($pr->price_strike,0,"",",") : '' ?>" 
 					   data-product-image="<?= str_replace('http://','https://',$pr->image_url) ?>"
@@ -120,6 +122,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 			btn.addEventListener('click', function() {
 				const title = this.getAttribute('data-product-title');
 				const desc = this.getAttribute('data-product-desc');
+				const fullDesc = this.getAttribute('data-product-full-desc');
 				const price = this.getAttribute('data-product-price');
 				const priceStrike = this.getAttribute('data-product-price-strike');
 				const image = this.getAttribute('data-product-image');
@@ -127,7 +130,8 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 				const linkId = this.getAttribute('data-product-link-id');
 				
 				document.getElementById('modalProductTitle').textContent = title;
-				document.getElementById('modalProductDesc').textContent = desc || 'No description available';
+				// Use full description in modal, fallback to short description if not available
+				document.getElementById('modalProductDesc').textContent = fullDesc || desc || 'No description available';
 				document.getElementById('modalProductPrice').textContent = price;
 				document.getElementById('modalProductImage').src = image;
 				

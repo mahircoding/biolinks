@@ -1437,11 +1437,12 @@ class LinkAjax extends Controller {
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
 												"title" => ucwords($_POST['title'][$i][$j]),
-												"description" => ucfirst($_POST['description'][$i][$j]),
+												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
+												"full_description" => isset($_POST['full_description'][$i][$j]) ? $_POST['full_description'][$i][$j] : null,
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
-												"show" => $_POST['show'][$i][$j] ? (int)$_POST['show'][$i][$j] : 1,
+												"show" => isset($_POST['show'][$i][$j]) ? (int)$_POST['show'][$i][$j] : 1,
 												'variants' => $variants);
 					}
 				}
@@ -2992,6 +2993,7 @@ class LinkAjax extends Controller {
 												"image_url" => $images[$i]['products'][$j]['image_url'],
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
+												"full_description" => isset($_POST['full_description'][$i][$j]) ? $_POST['full_description'][$i][$j] : null,
 												"price" => (int)$_POST['price'][$i][$j],
 												"price_strike" => $_POST['price_strike'][$i][$j] ? (int)$_POST['price_strike'][$i][$j] : null,
 												"weight" => $_POST['weight'][$i][$j] ? (int)$_POST['weight'][$i][$j] : 100,
