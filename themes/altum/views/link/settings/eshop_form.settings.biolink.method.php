@@ -1,6 +1,6 @@
 <?php defined('ALTUMCODE') || die() ?>
 
-<form name="update_biolink_eshop" method="post" role="form">
+<form name="update_biolink_" method="post" role="form">
     <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" required="required" />
     <input type="hidden" name="request_type" value="update" />
     <input type="hidden" name="type" value="biolink" />
@@ -21,10 +21,7 @@
 		</div>
 		
 		<div class="form-product-main">
-			<?php 
-		// Handle backward compatibility for old e-shop structure
-		$settings_data = isset($row->settings->data) ? $row->settings->data : $row->settings;
-		foreach($settings_data as $ky => $sg) {?>				
+			<?php foreach($row->settings as $ky => $sg) {?>				
 			<div class="form-product-item">
 			
 				<div class="form-product-ctg">
@@ -224,103 +221,18 @@
 						<div class="form-bag-edit">
 						
 							<div class="form-group">
-								<label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Product Images</label>
-								<div class="multiple-image-upload">
-									<div class="image-upload-container">
-										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload" name="image_main[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_main_<?= $ky?>_<?= $pk?>">
-											<label class="custom-file-label <?= (isset($sp->image_url) && !empty($sp->image_url)) ? 'text-success' : '' ?>" for="image_main_<?= $ky?>_<?= $pk?>">
-												<?php if(isset($sp->image_url) && !empty($sp->image_url)): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_url) ?>
-												<?php else: ?>
-													Choose main image
-												<?php endif; ?>
-											</label>
-										</div>
-										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_1_<?= $ky?>_<?= $pk?>">
-											<label class="custom-file-label <?= (isset($sp->image_1) && !empty($sp->image_1)) ? 'text-success' : '' ?>" for="image_1_<?= $ky?>_<?= $pk?>">
-												<?php if(isset($sp->image_1) && !empty($sp->image_1)): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_1) ?>
-												<?php else: ?>
-													Choose image 1 (optional)
-												<?php endif; ?>
-											</label>
-										</div>
-										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_2_<?= $ky?>_<?= $pk?>">
-											<label class="custom-file-label <?= (isset($sp->image_2) && !empty($sp->image_2)) ? 'text-success' : '' ?>" for="image_2_<?= $ky?>_<?= $pk?>">
-												<?php if(isset($sp->image_2) && !empty($sp->image_2)): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_2) ?>
-												<?php else: ?>
-													Choose image 2 (optional)
-												<?php endif; ?>
-											</label>
-										</div>
-										<div class="custom-file mb-2">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_3_<?= $ky?>_<?= $pk?>">
-											<label class="custom-file-label <?= (isset($sp->image_3) && !empty($sp->image_3)) ? 'text-success' : '' ?>" for="image_3_<?= $ky?>_<?= $pk?>">
-												<?php if(isset($sp->image_3) && !empty($sp->image_3)): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_3) ?>
-												<?php else: ?>
-													Choose image 3 (optional)
-												<?php endif; ?>
-											</label>
-										</div>
+								<div class="d-flex align-items-stretch">
+									<div class="flex-grow-1">
+										<label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label>
 										<div class="custom-file">
-											<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg" id="image_4_<?= $ky?>_<?= $pk?>">
-											<label class="custom-file-label <?= (isset($sp->image_4) && !empty($sp->image_4)) ? 'text-success' : '' ?>" for="image_4_<?= $ky?>_<?= $pk?>">
-												<?php if(isset($sp->image_4) && !empty($sp->image_4)): ?>
-													<i class="fas fa-check-circle mr-1"></i>Current: <?= basename($sp->image_4) ?>
-												<?php else: ?>
-													Choose image 4 (optional)
-												<?php endif; ?>
-											</label>
+											<input type="file" class="custom-file-input" data-image="upload" name="image[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label" for="customFile">Choose file</label>
 										</div>
 									</div>
-									<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
-										<div role="image" class="form-image-preview wh-70 main-image" style="background-image:url(<?= $sp->image_url?>)"></div>
-										<div id="additional-images-preview-<?= $ky?>-<?= $pk?>" class="d-flex flex-wrap gap-2">
-											<?php 
-											// Handle individual fields first
-											if(isset($sp->image_1) && !empty($sp->image_1)): ?>
-												<img src="<?= $sp->image_1 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
-											<?php endif; ?>
-											<?php if(isset($sp->image_2) && !empty($sp->image_2)): ?>
-												<img src="<?= $sp->image_2 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
-											<?php endif; ?>
-											<?php if(isset($sp->image_3) && !empty($sp->image_3)): ?>
-												<img src="<?= $sp->image_3 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
-											<?php endif; ?>
-											<?php if(isset($sp->image_4) && !empty($sp->image_4)): ?>
-												<img src="<?= $sp->image_4 ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
-											<?php endif; ?>
-											
-											<?php 
-											// Backward compatibility: If old format 'images' array exists and no individual fields, use it
-											if(isset($sp->images) && is_array($sp->images) && !isset($sp->image_1)): ?>
-												<?php foreach($sp->images as $img): ?>
-													<img src="<?= $img ?>" class="additional-image-preview" style="width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;">
-												<?php endforeach; ?>
-											<?php endif; ?>
-										</div>
+									<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2">
+										<div role="image" class="form-image-preview wh-70" style="background-image:url(<?= $sp->image_url?>)"></div>
 									</div>
 								</div>
-								<small class="text-muted">
-									Upload 1 gambar utama + maksimal 4 gambar tambahan
-									<?php if(isset($sp->image_url) && !empty($sp->image_url)): ?>
-										<br><i class="fas fa-info-circle mr-1"></i>Current main image: <code><?= basename($sp->image_url) ?></code>
-									<?php endif; ?>
-									<?php 
-									$additional_count = 0;
-									if(isset($sp->image_1) && !empty($sp->image_1)) $additional_count++;
-									if(isset($sp->image_2) && !empty($sp->image_2)) $additional_count++;
-									if(isset($sp->image_3) && !empty($sp->image_3)) $additional_count++;
-									if(isset($sp->image_4) && !empty($sp->image_4)) $additional_count++;
-									if($additional_count > 0): ?>
-										<br><i class="fas fa-info-circle mr-1"></i>Current additional images: <?= $additional_count ?> file(s)
-									<?php endif; ?>
-								</small>
 								<small class="text-danger" data-field="image"></small>
 							</div>
 							
@@ -330,14 +242,8 @@
 							</div>
 							
 							<div class="form-group">
-								<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Short Description <small>(Opsional)</small></label>
-								<textarea class="form-control" role="description" name="description[<?= $ky?>][]" rows="2" placeholder="Short description for product card"><?= $sp->description?></textarea>
-							</div>
-							
-							<div class="form-group">
-								<label><i class="fa fa-fw fa-align-left fa-sm mr-1"></i> Detailed Description <small>(Opsional)</small></label>
-								<textarea class="form-control" role="detailed_description" name="detailed_description[<?= $ky?>][]" rows="4" placeholder="Detailed description for product popup"><?= isset($sp->detailed_description) ? $sp->detailed_description : '' ?></textarea>
-								<small class="text-muted">Deskripsi panjang yang akan ditampilkan di popup detail produk</small>
+								<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label>
+								<textarea class="form-control" role="description" name="description[<?= $ky?>][]" rows="2" placeholder="Insert description product"><?= $sp->description?></textarea>
 							</div>
 							
 							<div class="row">
@@ -382,12 +288,6 @@
 			<?php }?>
 		
 		</div>
-	</div>
-
-	<div class="form-group mt-4">
-		<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text</label>
-		<input type="text" class="form-control" name="button_text" value="<?= isset($row->settings->button_text) ? $row->settings->button_text : 'Add to Cart' ?>" placeholder="Ex: Add to Cart, Beli Sekarang, etc." />
-		<small class="text-muted">Custom text untuk tombol Add to Cart di semua produk</small>
 	</div>
 
     <div class="mt-4">

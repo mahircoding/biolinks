@@ -1210,7 +1210,7 @@ $(window).on('load',function(d){
 })
 
 function getDataEshop() {
-	var eshp_prd = '<div class="form-bag-item"><div class="form-bag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2"><div class="fbv-image form-image-preview wh-70"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fbv-title mb-1"><span></span></div><div class="fbv-description mb-1"></div><div class="fbv-mprice"><div class="text-nowrap">Rp<span class="fbv-price"></span></div><div class="fbv-pstrike text-nowrap">Rp<span class="fbv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="epi" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dpi" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div><div class="form-vrn-main"><div class="form-vrn-vrm mb-2"><div class="d-flex justify-content-between align-items-center"><div class="form-mvrn-text flex--1"><div class="form-vrn-name">Variants</div></div><div class="d-flex"><div data-eshop="vra" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div></div></div></div></div></div><div class="form-bag-edit show"><div class="form-group"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Product Images</label><div class="multiple-image-upload"><div class="image-upload-container"><div class="custom-file mb-2"><input type="file" class="custom-file-input" data-image="upload" name="image_main[0][]" accept="image/x-png,image/gif,image/jpeg" required><label class="custom-file-label" for="customFile">Choose main image</label></div><div class="custom-file mb-2"><input type="file" class="custom-file-input" data-image="upload-single" name="image_1[0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose image 1 (optional)</label></div><div class="custom-file mb-2"><input type="file" class="custom-file-input" data-image="upload-single" name="image_2[0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose image 2 (optional)</label></div><div class="custom-file mb-2"><input type="file" class="custom-file-input" data-image="upload-single" name="image_3[0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose image 3 (optional)</label></div><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload-single" name="image_4[0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose image 4 (optional)</label></div></div><div class="image-preview-container d-flex flex-wrap gap-2 mt-2"><div role="image" class="form-image-preview wh-70 main-image"></div><div id="additional-images-preview" class="d-flex flex-wrap gap-2"></div></div></div><small class="text-muted">Upload 1 gambar utama + maksimal 4 gambar tambahan</small><small class="text-danger" data-field="image"></small></div><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label><input type="text" role="title" class="form-control" name="title[0][]" placeholder="Insert product title" required="required" /></div><div class="form-group"><label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label><textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price[0][]" placeholder="Price..." required/></div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price Strike <small>(Opsional)</small></label><input type="number" role="price_strike" class="form-control" name="price_strike[0][]" placeholder="Price Strike..." /></div></div></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" min="1" role="price" class="form-control" name="weight[0][]" placeholder="Ex: 100" required/></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Show Product</label><select class="form-control" role="show" name="show[0][]"><option value="1">Show</option><option value="0">Hide</option></select></div><div class="d-flex justify-content-between mb-2"><div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="pci" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div>';
+	var eshp_prd = '<div class="form-bag-item"><div class="form-bag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2"><div class="fbv-image form-image-preview wh-70"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fbv-title mb-1"><span></span></div><div class="fbv-description mb-1"></div><div class="fbv-mprice"><div class="text-nowrap">Rp<span class="fbv-price"></span></div><div class="fbv-pstrike text-nowrap">Rp<span class="fbv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="epi" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dpi" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div><div class="form-vrn-main"><div class="form-vrn-vrm mb-2"><div class="d-flex justify-content-between align-items-center"><div class="form-mvrn-text flex--1"><div class="form-vrn-name">Variants</div></div><div class="d-flex"><div data-eshop="vra" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div></div></div></div></div></div><div class="form-bag-edit show"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image[0][]" accept="image/x-png,image/gif,image/jpeg" required><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70"></div></div></div><small class="text-danger" data-field="image"></small></div><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label><input type="text" role="title" class="form-control" name="title[0][]" placeholder="Insert product title" required="required" /></div><div class="form-group"><label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label><textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price[0][]" placeholder="Price..." required/></div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price Strike <small>(Opsional)</small></label><input type="number" role="price_strike" class="form-control" name="price_strike[0][]" placeholder="Price Strike..." /></div></div></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" min="1" role="price" class="form-control" name="weight[0][]" placeholder="Ex: 100" required/></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Show Product</label><select class="form-control" role="show" name="show[0][]"><option value="1">Show</option><option value="0">Hide</option></select></div><div class="d-flex justify-content-between mb-2"><div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="pci" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div>';
 	var eshp_ctg = '<div class="form-product-item open"><div class="form-product-ctg"><div data-eshop-btn="true" class="form-ctg-view hide"><div class="d-flex justify-content-between align-items-center"><div class="form-ctg-text flex--1"><div class="form-ctg-name"></div></div><div class="d-flex"><div data-eshop="api" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="sci" class="dropdown-item none" href="javascript:;"><i class="fas fa-exchange-alt mr-1"></i> <span class="fbv-switch">Hide</span></a><a data-eshop="eci" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dci" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div></div><div class="form-ctg-edit show"><div class="form-group mt-1"><input class="form-control" name="category[]" value="" placeholder="Insert a category name" required /> </div><div class="d-flex justify-content-center mb-1" style="display:none !important"><div data-eshop="csp" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div></div></div></div><div class="form-product-bag"><div class="form-bag-item"><div class="form-bag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2"><div class="fbv-image form-image-preview wh-70"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fbv-title mb-1"><span></span></div><div class="fbv-description mb-1"></div><div class="fbv-mprice"><div class="text-nowrap">Rp<span class="fbv-price"></span></div><div class="fbv-pstrike text-nowrap">Rp<span class="fbv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"><a data-eshop="epi" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a><a data-eshop="dpi" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a></div></div></div></div><div class="form-vrn-main"><div class="form-vrn-vrm mb-2"><div class="d-flex justify-content-between align-items-center"><div class="form-mvrn-text flex--1"><div class="form-vrn-name">Variants</div></div><div class="d-flex"><div data-eshop="vra" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div></div></div></div></div></div><div class="form-bag-edit show"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image[0][]" accept="image/x-png,image/gif,image/jpeg" required><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70"></div></div></div><small class="text-danger" data-field="image"></small></div><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label><input type="text" role="title" class="form-control" name="title[0][]" placeholder="Insert product title" required="required" /> </div><div class="form-group"><label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label><textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea></div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price[0][]" placeholder="Price..." required/> </div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price Strike <small>(Opsional)</small></label><input type="number" role="price_strike" class="form-control" name="price_strike[0][]" placeholder="Price Strike..." /> </div></div></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" min="1" role="price" class="form-control" name="weight[0][]" placeholder="Ex: 100" required/></div><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Show Product</label><select class="form-control" role="show" name="show[0][]"><option value="1">Show</option><option value="0">Hide</option></select></div><div class="d-flex justify-content-between mb-2"><div data-eshop="psi" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="dci" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div></div></div>';
 	var eshp_vrn = '<div class="form-mvrn-item open"><div class="form-vrn-product"><div class="form-vrn-view hide"><div class="d-flex justify-content-between align-items-center"><div data-eshop="vrb" class="form-vrn-text flex--1"><div class="form-vrn-name"></div></div><div class="d-flex"><label data-eshop="vmr" class="form-radio btn btn-secondary cursor-pointer mr-1"><i class="fas fa-check"></i><input type="radio" class="form-control" role="select" name="select_variant[0][0][0]" value="0" /> </label><div data-eshop="vma" class="btn btn-primary cursor-pointer mr-1"><i class="fa fa-plus"></i></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"> <a data-eshop="vrs" class="dropdown-item none" href="javascript:;"><i class="fas fa-exchange-alt mr-1"></i> <span class="fvr-switch">Hide</span></a> <a data-eshop="vre" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a> <a data-eshop="vrd" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a> </div></div></div></div></div><div class="form-vrn-edit show"><div class="form-group mt-2"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Variant Name</label><input type="text" role="variant" class="form-control" name="title_variant[0][0][]" value="" placeholder="Ex: Color or Size" required/> </div><div class="d-flex justify-content-center mt-3 mb-1" style="display:none !important"><div data-eshop="vms" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div></div></div></div><div class="form-vrn-bag"><div class="form-vbag-item"><div class="form-vbag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview wh-60 mr-2"><div class="fvv-image form-image-preview wh-60"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fvv-title mb-2"><span>Blue</span></div><div class="fvv-mprice"><div class="text-nowrap"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price"></span></div><div class="fvv-pstrike text-nowrap" style="display:none"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"> <a data-eshop="vie" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a> <a data-eshop="vid" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a> </div></div></div></div></div><div class="form-vbag-edit show"><div class="product-vrn-item"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Name</label><input type="text" role="title" class="form-control" name="name_variant[0][0][0][]" value="" placeholder="Ex: Blue or M" required/> </div><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image_variant[0][0][0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70" style=""></div></div></div><small class="text-danger" data-field="image"></small> </div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price_variant[0][0][0][]" value="" placeholder="Insert price product" required/> </div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" role="weight" class="form-control" name="weight_variant[0][0][0][]" value="" placeholder="Ex: 100" required/></div></div></div><div class="d-flex justify-content-between mb-2"><div data-eshop="vns" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="vmc" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div></div></div></div>';
 	var eshp_vri = '<div class="form-vbag-item"><div class="form-vbag-view hide"><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview wh-60 mr-2"><div class="fvv-image form-image-preview wh-60"></div></div><div class="overflow-hidden w-100 d-flex flex-direction-row flex-wrap"><div class="flex--1"><div class="fvv-title mb-2"><span>Blue</span></div><div class="fvv-mprice"><div class="text-nowrap"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price"></span></div><div class="fvv-pstrike text-nowrap" style="display:none"><?= $this->user->currency ? $this->user->currency : "Rp" ?><span class="fvv-price-strike"></span></div></div></div></div><div class="dropdown"><div data-toggle="dropdown" class="btn btn-light  cursor-pointer dropdown-toggle dropdown-toggle-simple"><i class="fa fa-ellipsis-v"></i></div><div class="dropdown-menu dropdown-menu-right"> <a data-eshop="vie" class="dropdown-item none" href="javascript:;"><i class="fa fa-pencil-alt fa-sm mr-1"></i> Edit</a> <a data-eshop="vid" class="dropdown-item none" href="javascript:;"><i class="fa fa-times mr-1"></i> Delete</a> </div></div></div></div></div><div class="form-vbag-edit show"><div class="product-vrn-item"><div class="form-group"><label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Name</label><input type="text" role="title" class="form-control" name="name_variant[0][0][0][]" value="" placeholder="Ex: Blue or M" required/> </div><div class="form-group"><div class="d-flex align-items-stretch"><div class="flex-grow-1"><label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label><div class="custom-file"><input type="file" class="custom-file-input" data-image="upload" name="image_variant[0][0][0][]" accept="image/x-png,image/gif,image/jpeg"><label class="custom-file-label" for="customFile">Choose file</label></div></div><div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2"><div role="image" class="form-image-preview wh-70" style=""></div></div></div><small class="text-danger" data-field="image"></small> </div><div class="row"><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Price</label><input type="number" min="1" role="price" class="form-control" name="price_variant[0][0][0][]" value="" placeholder="Insert price product" required/> </div></div><div class="col-lg-6"><div class="form-group"><label><i class="fa fa-fw fa-calendar fa-sm mr-1"></i> Weight <small>(Gram)</small></label><input type="number" role="weight" class="form-control" name="weight_variant[0][0][0][]" value="" placeholder="Ex: 100" required/> </div></div></div><div class="d-flex justify-content-between mb-2"><div data-eshop="vns" class="badge badge-primary badge-pill cursor-pointer p-2 pl-4 pr-4">Save</div><div data-eshop="vnc" class="badge badge-secondary badge-pill cursor-pointer p-2 pl-4 pr-4">Cancel</div></div></div></div></div>';
@@ -1218,13 +1218,11 @@ function getDataEshop() {
 	$('[data-eshop-btn]').off('click').on('click',function(e) {
 		var p_form = $(this).parents('form[role="form"]').get(0);
 		if($(e.target).parents('.dropdown').length==0) {
-			
-		if(p_form.reportValidity()) {
-			
-			$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
-			$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
-			$(this).parents('form[role="form"]').find('.form-product-item.open').not($(this).parents('.form-product-item')).toggleClass('open')
-			$(this).parents('form[role="form"]').find('.form-product-item .fbv-switch').text('Show')
+			if(p_form.reportValidity()) {
+				$(this).parents('form[role="form"]').find('.form-product-item .form-ctg-edit.show').find('[data-eshop="csp"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item .form-bag-edit.show').find('[data-eshop="psi"]').click();
+				$(this).parents('form[role="form"]').find('.form-product-item.open').not($(this).parents('.form-product-item')).toggleClass('open')
+				$(this).parents('form[role="form"]').find('.form-product-item .fbv-switch').text('Show')
 				$(this).parents('.form-product-item').toggleClass('open')
 				if($(this).parents('.form-product-item').hasClass('open')) {
 					$(this).parents('.form-product-item').find('.fbv-switch').text('Hide')
@@ -1493,29 +1491,6 @@ function eventButtonUpload() {
 			ths.parents('.form-group').find('.form-image-preview').removeAttr('style')
 			$(this).parents('.form-group').find('.custom-file-label').text('');
 			ths.val('')
-		}
-	});
-	
-	// Handle single image upload preview for additional images
-	$(document).on('change', '[data-image="upload-single"]', function() {
-		var file = this.files[0];
-		var container = $(this).closest('.multiple-image-upload').find('#additional-images-preview');
-		if(container.length === 0) {
-			container = $(this).closest('.multiple-image-upload').find('.d-flex.flex-wrap.gap-2');
-		}
-		
-		
-		if(file && file.type.startsWith('image/')) {
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				var img = $('<img>').attr({
-					'src': e.target.result,
-					'class': 'additional-image-preview',
-					'style': 'width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;'
-				});
-				container.append(img);
-			};
-			reader.readAsDataURL(file);
 		}
 	});
 }
@@ -2096,7 +2071,7 @@ function eventClose() {
     });
 
     /* Form handling */
-    $('form[name="update_biolink"],form[name="update_biolink_"],form[name="update_biolink_eshop"]').on('submit', event => {
+    $('form[name="update_biolink"],form[name="update_biolink_"]').on('submit', event => {
 		var ths = $(event.currentTarget)
 		let form = ths[0];
         let data = new FormData(form);
@@ -2149,83 +2124,6 @@ function eventClose() {
         event.preventDefault();
 		return false
     })
-	
-	// Handle main image upload preview for eshop
-	$(document).on('change', 'input[data-image="upload"]', function() {
-		var file = this.files[0];
-		var container = $(this).closest('.multiple-image-upload').find('.main-image');
-		var $this = $(this);
-		var label = $this.siblings('.custom-file-label');
-		
-		if(file && file.type.startsWith('image/')) {
-			// Update label text
-			label.text(file.name);
-			
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				container.css('background-image', 'url(' + e.target.result + ')');
-			};
-			reader.readAsDataURL(file);
-		}
-	});
-	
-	// Handle individual image upload preview for eshop
-	$(document).on('change', 'input[data-image="upload-single"]', function() {
-		var file = this.files[0];
-		var container = $(this).closest('.multiple-image-upload').find('[id^="additional-images-preview"]');
-		var inputName = $(this).attr('name');
-		var imageIndex = inputName.match(/image_(\d+)/);
-		var $this = $(this);
-		var label = $this.siblings('.custom-file-label');
-		
-		if(file && file.type.startsWith('image/')) {
-			// Update only this specific label
-			label.text(file.name);
-			
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				// Remove existing preview for this image slot
-				container.find('[data-slot="' + imageIndex[1] + '"]').remove();
-				
-				// Add new preview
-				var img = $('<img>').attr({
-					'src': e.target.result,
-					'class': 'additional-image-preview',
-					'data-slot': imageIndex[1],
-					'style': 'width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;'
-				});
-				container.append(img);
-			};
-			reader.readAsDataURL(file);
-		}
-	});
-	
-	// Prevent Bootstrap from updating all labels
-	$(document).on('change', '.custom-file-input', function() {
-		var $this = $(this);
-		var file = this.files[0];
-		var label = $this.siblings('.custom-file-label');
-		
-		// Only update the label for this specific input
-		if(file) {
-			label.text(file.name);
-		} else {
-			// Reset to default text based on input name
-			var inputName = $this.attr('name');
-			if(inputName.includes('image_main')) {
-				label.text('Choose main image');
-			} else if(inputName.includes('image_1')) {
-				label.text('Choose image 1 (optional)');
-			} else if(inputName.includes('image_2')) {
-				label.text('Choose image 2 (optional)');
-			} else if(inputName.includes('image_3')) {
-				label.text('Choose image 3 (optional)');
-			} else if(inputName.includes('image_4')) {
-				label.text('Choose image 4 (optional)');
-			}
-		}
-	});
-	
 </script>
 <script>
     /* Links tab */

@@ -66,8 +66,10 @@
 								</div>
 								
 								<div class="form-product-bag">
+									
 									<div class="form-bag-item">
 										<div class="form-bag-view hide">
+											
 											<div class="form-group">
 												<div class="d-flex align-items-stretch">
 													<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview mr-2">
@@ -111,36 +113,18 @@
 										<div class="form-bag-edit show">
 										
 											<div class="form-group">
-												<label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Product Images</label>
-												<div class="multiple-image-upload">
-													<div class="image-upload-container">
-														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload" name="image_main[0][]" accept="image/x-png,image/gif,image/jpeg" required>
-															<label class="custom-file-label" for="customFile">Choose main image</label>
-														</div>
-														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_1[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 1 (optional)</label>
-														</div>
-														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_2[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 2 (optional)</label>
-														</div>
-														<div class="custom-file mb-2">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_3[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 3 (optional)</label>
-														</div>
+												<div class="d-flex align-items-stretch">
+													<div class="flex-grow-1">
+														<label><i class="fas fa-fw fa-image fa-sm mr-1"></i> Image Product</label>
 														<div class="custom-file">
-															<input type="file" class="custom-file-input" data-image="upload-single" name="image_4[0][]" accept="image/x-png,image/gif,image/jpeg">
-															<label class="custom-file-label" for="customFile">Choose image 4 (optional)</label>
+															<input type="file" class="custom-file-input" data-image="upload" name="image[0][]" accept="image/x-png,image/gif,image/jpeg" required>
+															<label class="custom-file-label" for="customFile">Choose file</label>
 														</div>
 													</div>
-													<div class="image-preview-container d-flex flex-wrap gap-2 mt-2">
-														<div role="image" class="form-image-preview wh-70 main-image"></div>
-														<div id="additional-images-preview" class="d-flex flex-wrap gap-2"></div>
+													<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2">
+														<div role="image" class="form-image-preview wh-70"></div>
 													</div>
 												</div>
-												<small class="text-muted">Upload 1 gambar utama + maksimal 4 gambar tambahan</small>
 												<small class="text-danger" data-field="image"></small>
 											</div>
 											
@@ -150,14 +134,8 @@
 											</div>
 											
 											<div class="form-group">
-												<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Short Description <small>(Opsional)</small></label>
-												<textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Short description for product card"></textarea>
-											</div>
-											
-											<div class="form-group">
-												<label><i class="fa fa-fw fa-align-left fa-sm mr-1"></i> Detailed Description <small>(Opsional)</small></label>
-												<textarea class="form-control" role="detailed_description" name="detailed_description[0][]" rows="4" placeholder="Detailed description for product popup"></textarea>
-												<small class="text-muted">Deskripsi panjang yang akan ditampilkan di popup detail produk</small>
+												<label><i class="fa fa-fw fa-paragraph fa-sm mr-1"></i> Description <small>(Opsional)</small></label>
+												<textarea class="form-control" role="description" name="description[0][]" rows="2" placeholder="Insert description product"></textarea>
 											</div>
 											
 											<div class="row">
@@ -186,12 +164,6 @@
 												<option value="1">Show</option>
 												<option value="0">Hide</option>
 												</select>
-											</div>
-											
-											<div class="form-group">
-												<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text</label>
-												<input type="text" class="form-control" name="button_text" value="Add to Cart" placeholder="Ex: Add to Cart, Beli Sekarang, etc." />
-												<small class="text-muted">Custom text untuk tombol Add to Cart</small>
 											</div>
 											
 											<div class="d-flex justify-content-center mb-2">
@@ -273,34 +245,6 @@
 
         event.preventDefault();
     })
-	
-	// Handle multiple image upload preview
-	$(document).on('change', 'input[data-image="upload-multiple"]', function() {
-		var files = this.files;
-		var container = $(this).closest('.multiple-image-upload').find('#additional-images-preview');
-		container.empty();
-		
-		if(files.length > 4) {
-			alert('Maksimal 4 gambar tambahan');
-			return;
-		}
-		
-		for(var i = 0; i < files.length; i++) {
-			var file = files[i];
-			if(file.type.startsWith('image/')) {
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					var img = $('<img>').attr({
-						'src': e.target.result,
-						'class': 'additional-image-preview',
-						'style': 'width:60px;height:60px;object-fit:cover;border-radius:4px;border:1px solid #ddd;'
-					});
-					container.append(img);
-				};
-				reader.readAsDataURL(file);
-			}
-		}
-	});
 	
 </script>
 <?php \Altum\Event::add_content(ob_get_clean(), 'javascript') ?>
