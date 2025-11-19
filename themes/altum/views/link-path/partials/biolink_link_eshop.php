@@ -49,6 +49,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					   data-product-image2="<?= !empty($pr->image_2) ? str_replace('http://','https://',$pr->image_2) : '' ?>"
 					   data-product-image3="<?= !empty($pr->image_3) ? str_replace('http://','https://',$pr->image_3) : '' ?>"
 					   data-product-image4="<?= !empty($pr->image_4) ? str_replace('http://','https://',$pr->image_4) : '' ?>"
+					   data-product-variants='<?= isset($pr->variants) ? json_encode($pr->variants) : '[]' ?>'
 					   data-product-index="<?= $num_prd ?>"
 					   data-product-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>"
 					   href="javascript:;">Detail</a>
@@ -80,6 +81,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					   data-product-image2="<?= !empty($pr->image_2) ? str_replace('http://','https://',$pr->image_2) : '' ?>"
 					   data-product-image3="<?= !empty($pr->image_3) ? str_replace('http://','https://',$pr->image_3) : '' ?>"
 					   data-product-image4="<?= !empty($pr->image_4) ? str_replace('http://','https://',$pr->image_4) : '' ?>"
+					   data-product-variants='<?= isset($pr->variants) ? json_encode($pr->variants) : '[]' ?>'
 					   data-product-index="<?= $num_prd ?>"
 					   data-product-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>"
 					   href="javascript:;">Detail</a>
@@ -112,6 +114,9 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					<div class="product-modal-price">
 						<span id="modalProductPrice" class="modal-price"></span>
 						<span id="modalProductPriceStrike" class="modal-price-strike"></span>
+					</div>
+					<div id="modalProductVariants" class="product-modal-variants">
+						<!-- Variants will be populated by JavaScript -->
 					</div>
 					<div id="modalProductDesc" class="product-modal-description"></div>
 					<div class="product-modal-actions">
@@ -177,8 +182,69 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 						thumbnailGallery.appendChild(thumbElement);
 					});
 				}
+		
+		// Populate product variants
+		const variantsData = this.getAttribute('data-product-variants');
+		let variants = [];
+		try {
+			variants = JSON.parse(variantsData || '[]');
+		} catch(e) {
+			variants = [];
+		}
+		
+		const variantsContainer = document.getElementById('modalProductVariants');
+		variantsContainer.innerHTML = '';
+		
+		if(variants && variants.length > 0) {
+			variants.forEach((variantGroup, groupIndex) => {
+				const groupDiv = document.createElement('div');
+				groupDiv.className = 'variant-group';
 				
-				if(priceStrike) {
+				const groupTitle = document.createElement('div');
+				groupTitle.className = 'variant-title';
+				groupTitle.textContent = variantGroup.title;
+				groupDiv.appendChild(groupTitle);
+				
+				const variantOptions = document.createElement('div');
+				variantOptions.className = 'variant-options';
+				
+				if(variantGroup.variant && variantGroup.variant.length > 0) {
+					variantGroup.variant.forEach((option, optionIndex) => {
+						const optionBtn = document.createElement('button');
+						optionBtn.className = 'variant-btn' + (optionIndex === 0 ? ' active' : '');
+						optionBtn.textContent = option.name;
+						optionBtn.dataset.variantPrice = option.price || '';
+						optionBtn.dataset.variantImage = option.image_url || '';
+						optionBtn.dataset.groupIndex = groupIndex;
+						optionBtn.dataset.optionIndex = optionIndex;
+						
+						optionBtn.onclick = function() {
+							// Remove active from siblings
+							this.parentElement.querySelectorAll('.variant-btn').forEach(btn => btn.classList.remove('active'));
+							this.classList.add('active');
+							
+							// Update price if variant has price
+							if(this.dataset.variantPrice) {
+								const currency = price.split(/[0-9]/)[0]; // Extract currency symbol
+								document.getElementById('modalProductPrice').textContent = currency + new Intl.NumberFormat('id-ID').format(this.dataset.variantPrice);
+							}
+							
+							// Update main image if variant has image
+							if(this.dataset.variantImage) {
+								document.getElementById('mainProductImage').src = this.dataset.variantImage;
+							}
+						};
+						
+						variantOptions.appendChild(optionBtn);
+					});
+				}
+				
+				groupDiv.appendChild(variantOptions);
+				variantsContainer.appendChild(groupDiv);
+			});
+		}
+		
+		if(priceStrike) {
 					document.getElementById('modalProductPriceStrike').textContent = priceStrike;
 					document.getElementById('modalProductPriceStrike').style.display = 'inline-block';
 				} else {
@@ -417,6 +483,53 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		font-size: 16px;
 		color: #999;
 		text-decoration: line-through;
+	}
+	
+	.product-modal-variants {
+		margin-bottom: 20px;
+	}
+	
+	.variant-group {
+		margin-bottom: 15px;
+	}
+	
+	.variant-title {
+		font-size: 14px;
+		font-weight: 600;
+		color: #333;
+		margin-bottom: 8px;
+		text-align: left;
+	}
+	
+	.variant-options {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	
+	.variant-btn {
+		padding: 8px 16px;
+		border: 2px solid #e0e0e0;
+		border-radius: 8px;
+		background: #fff;
+		color: #333;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		outline: none;
+	}
+	
+	.variant-btn:hover {
+		border-color: #667eea;
+		background: #f8f9ff;
+	}
+	
+	.variant-btn.active {
+		border-color: #667eea;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: #fff;
+		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 	}
 	
 	.product-modal-description {
