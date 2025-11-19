@@ -2877,7 +2877,9 @@ class LinkAjax extends Controller {
 				mkdir(UPLOADS_PATH . 'galleries/' . $folder_id, 0755, true);
 			}
 			
-		$images = json_decode($link->settings,true);
+		$settings_decoded = json_decode($link->settings,true);
+		// Extract the actual data array from the wrapper structure
+		$images = isset($settings_decoded['data']) ? $settings_decoded['data'] : $settings_decoded;
 		
 		for($i=0;$i<count($_POST['category']);$i++) {
 			$sub_settings = null;
