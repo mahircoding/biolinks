@@ -328,6 +328,28 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		line-height: 1.6;
 		color: #666;
 		white-space: pre-wrap;
+		max-height: 200px;
+		overflow-y: auto;
+		padding-right: 10px;
+	}
+	
+	/* Custom scrollbar for description */
+	.product-modal-description::-webkit-scrollbar {
+		width: 6px;
+	}
+	
+	.product-modal-description::-webkit-scrollbar-track {
+		background: #f1f1f1;
+		border-radius: 10px;
+	}
+	
+	.product-modal-description::-webkit-scrollbar-thumb {
+		background: #667eea;
+		border-radius: 10px;
+	}
+	
+	.product-modal-description::-webkit-scrollbar-thumb:hover {
+		background: #764ba2;
 	}
 	
 	.product-modal-actions {
