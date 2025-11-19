@@ -100,8 +100,11 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 			<span class="product-modal-close">&times;</span>
 			<div class="product-modal-body">
 				<div class="product-modal-images">
-					<div id="modalProductGallery" class="product-image-gallery">
-						<!-- Images will be populated by JavaScript -->
+					<div class="main-image-container">
+						<img id="mainProductImage" src="" alt="Product Image" class="main-product-image">
+					</div>
+					<div id="thumbnailGallery" class="thumbnail-gallery">
+						<!-- Thumbnails will be populated by JavaScript -->
 					</div>
 				</div>
 				<div class="product-modal-info">
@@ -148,19 +151,32 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 				document.getElementById('modalProductDesc').textContent = fullDesc || desc || 'No description available';
 				document.getElementById('modalProductPrice').textContent = price;
 				
-				// Populate image gallery
-				const gallery = document.getElementById('modalProductGallery');
-				gallery.innerHTML = '';
-				
-				// Add all available images
+				// Populate image gallery with main image + thumbnails
 				const images = [image, image1, image2, image3, image4].filter(img => img && img.trim() !== '');
-				images.forEach(imgUrl => {
-					const imgElement = document.createElement('img');
-					imgElement.src = imgUrl;
-					imgElement.alt = title;
-					imgElement.className = 'gallery-image';
-					gallery.appendChild(imgElement);
-				});
+				
+				if(images.length > 0) {
+					// Set first image as main
+					document.getElementById('mainProductImage').src = images[0];
+					
+					// Create thumbnails
+					const thumbnailGallery = document.getElementById('thumbnailGallery');
+					thumbnailGallery.innerHTML = '';
+					
+					images.forEach((imgUrl, index) => {
+						const thumbElement = document.createElement('img');
+						thumbElement.src = imgUrl;
+						thumbElement.alt = title;
+						thumbElement.className = 'thumbnail-image' + (index === 0 ? ' active' : '');
+						thumbElement.onclick = function() {
+							// Update main image
+							document.getElementById('mainProductImage').src = imgUrl;
+							// Update active state
+							document.querySelectorAll('.thumbnail-image').forEach(t => t.classList.remove('active'));
+							this.classList.add('active');
+						};
+						thumbnailGallery.appendChild(thumbElement);
+					});
+				}
 				
 				if(priceStrike) {
 					document.getElementById('modalProductPriceStrike').textContent = priceStrike;
@@ -311,38 +327,63 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		max-width: 350px;
 	}
 	
-	.product-image-gallery {
-		display: flex;
-		flex-direction: column;
-		gap: 10px;
-		max-height: 500px;
-		overflow-y: auto;
-		padding-right: 5px;
+	.main-image-container {
+		width: 100%;
+		margin-bottom: 10px;
 	}
 	
-	.gallery-image {
+	.main-product-image {
 		width: 100%;
 		height: auto;
 		border-radius: 12px;
 		object-fit: cover;
+		max-height: 350px;
 	}
 	
-	/* Custom scrollbar for gallery */
-	.product-image-gallery::-webkit-scrollbar {
-		width: 6px;
+	.thumbnail-gallery {
+		display: flex;
+		gap: 8px;
+		overflow-x: auto;
+		padding: 5px 0;
 	}
 	
-	.product-image-gallery::-webkit-scrollbar-track {
+	.thumbnail-image {
+		width: 60px;
+		height: 60px;
+		border-radius: 8px;
+		object-fit: cover;
+		cursor: pointer;
+		border: 2px solid transparent;
+		transition: all 0.3s ease;
+		flex-shrink: 0;
+	}
+	
+	.thumbnail-image:hover {
+		border-color: #667eea;
+		transform: scale(1.05);
+	}
+	
+	.thumbnail-image.active {
+		border-color: #667eea;
+		box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+	}
+	
+	/* Custom scrollbar for thumbnails */
+	.thumbnail-gallery::-webkit-scrollbar {
+		height: 4px;
+	}
+	
+	.thumbnail-gallery::-webkit-scrollbar-track {
 		background: #f1f1f1;
 		border-radius: 10px;
 	}
 	
-	.product-image-gallery::-webkit-scrollbar-thumb {
+	.thumbnail-gallery::-webkit-scrollbar-thumb {
 		background: #667eea;
 		border-radius: 10px;
 	}
 	
-	.product-image-gallery::-webkit-scrollbar-thumb:hover {
+	.thumbnail-gallery::-webkit-scrollbar-thumb:hover {
 		background: #764ba2;
 	}
 	
