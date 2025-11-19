@@ -45,6 +45,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					   data-product-price="<?= $data->user->currency.number_format($pr->price,0,"",",") ?>" 
 					   data-product-price-strike="<?= !empty($pr->price_strike) ? $data->user->currency.number_format($pr->price_strike,0,"",",") : '' ?>" 
 					   data-product-image="<?= str_replace('http://','https://',$pr->image_url) ?>"
+					   data-product-image1="<?= !empty($pr->image_1) ? str_replace('http://','https://',$pr->image_1) : '' ?>"
+					   data-product-image2="<?= !empty($pr->image_2) ? str_replace('http://','https://',$pr->image_2) : '' ?>"
+					   data-product-image3="<?= !empty($pr->image_3) ? str_replace('http://','https://',$pr->image_3) : '' ?>"
+					   data-product-image4="<?= !empty($pr->image_4) ? str_replace('http://','https://',$pr->image_4) : '' ?>"
 					   data-product-index="<?= $num_prd ?>"
 					   data-product-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>"
 					   href="javascript:;">Detail</a>
@@ -72,6 +76,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					   data-product-price="<?= $data->user->currency.number_format($pr->price,0,"",",") ?>" 
 					   data-product-price-strike="<?= !empty($pr->price_strike) ? $data->user->currency.number_format($pr->price_strike,0,"",",") : '' ?>" 
 					   data-product-image="<?= str_replace('http://','https://',$pr->image_url) ?>"
+					   data-product-image1="<?= !empty($pr->image_1) ? str_replace('http://','https://',$pr->image_1) : '' ?>"
+					   data-product-image2="<?= !empty($pr->image_2) ? str_replace('http://','https://',$pr->image_2) : '' ?>"
+					   data-product-image3="<?= !empty($pr->image_3) ? str_replace('http://','https://',$pr->image_3) : '' ?>"
+					   data-product-image4="<?= !empty($pr->image_4) ? str_replace('http://','https://',$pr->image_4) : '' ?>"
 					   data-product-index="<?= $num_prd ?>"
 					   data-product-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>"
 					   href="javascript:;">Detail</a>
@@ -91,8 +99,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		<div class="product-modal-content">
 			<span class="product-modal-close">&times;</span>
 			<div class="product-modal-body">
-				<div class="product-modal-image">
-					<img id="modalProductImage" src="" alt="Product Image">
+				<div class="product-modal-images">
+					<div id="modalProductGallery" class="product-image-gallery">
+						<!-- Images will be populated by JavaScript -->
+					</div>
 				</div>
 				<div class="product-modal-info">
 					<h2 id="modalProductTitle"></h2>
@@ -126,6 +136,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 				const price = this.getAttribute('data-product-price');
 				const priceStrike = this.getAttribute('data-product-price-strike');
 				const image = this.getAttribute('data-product-image');
+				const image1 = this.getAttribute('data-product-image1');
+				const image2 = this.getAttribute('data-product-image2');
+				const image3 = this.getAttribute('data-product-image3');
+				const image4 = this.getAttribute('data-product-image4');
 				const index = this.getAttribute('data-product-index');
 				const linkId = this.getAttribute('data-product-link-id');
 				
@@ -133,7 +147,20 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 				// Use full description in modal, fallback to short description if not available
 				document.getElementById('modalProductDesc').textContent = fullDesc || desc || 'No description available';
 				document.getElementById('modalProductPrice').textContent = price;
-				document.getElementById('modalProductImage').src = image;
+				
+				// Populate image gallery
+				const gallery = document.getElementById('modalProductGallery');
+				gallery.innerHTML = '';
+				
+				// Add all available images
+				const images = [image, image1, image2, image3, image4].filter(img => img && img.trim() !== '');
+				images.forEach(imgUrl => {
+					const imgElement = document.createElement('img');
+					imgElement.src = imgUrl;
+					imgElement.alt = title;
+					imgElement.className = 'gallery-image';
+					gallery.appendChild(imgElement);
+				});
 				
 				if(priceStrike) {
 					document.getElementById('modalProductPriceStrike').textContent = priceStrike;
@@ -279,16 +306,44 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		gap: 30px;
 	}
 	
-	.product-modal-image {
+	.product-modal-images {
 		flex: 1;
 		max-width: 350px;
 	}
 	
-	.product-modal-image img {
+	.product-image-gallery {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		max-height: 500px;
+		overflow-y: auto;
+		padding-right: 5px;
+	}
+	
+	.gallery-image {
 		width: 100%;
 		height: auto;
 		border-radius: 12px;
 		object-fit: cover;
+	}
+	
+	/* Custom scrollbar for gallery */
+	.product-image-gallery::-webkit-scrollbar {
+		width: 6px;
+	}
+	
+	.product-image-gallery::-webkit-scrollbar-track {
+		background: #f1f1f1;
+		border-radius: 10px;
+	}
+	
+	.product-image-gallery::-webkit-scrollbar-thumb {
+		background: #667eea;
+		border-radius: 10px;
+	}
+	
+	.product-image-gallery::-webkit-scrollbar-thumb:hover {
+		background: #764ba2;
 	}
 	
 	.product-modal-info {
@@ -302,10 +357,12 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		font-size: 28px;
 		font-weight: 700;
 		color: #333;
+		text-align: left;
 	}
 	
 	.product-modal-price {
 		margin-bottom: 20px;
+		text-align: left;
 	}
 	
 	.modal-price {
@@ -331,6 +388,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		max-height: 200px;
 		overflow-y: auto;
 		padding-right: 10px;
+		text-align: left;
 	}
 	
 	/* Custom scrollbar for description */

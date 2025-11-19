@@ -237,9 +237,50 @@ $button_text = isset($row->settings->button_text) ? $row->settings->button_text 
 									<div class="flex-grow-1 w-100 d-flex align-items-stretch mw-preview ml-2">
 										<div role="image" class="form-image-preview wh-70" style="background-image:url(<?= $sp->image_url?>)"></div>
 									</div>
-```
 								</div>
 								<small class="text-danger" data-field="image"></small>
+							</div>
+							
+							<div class="form-group">
+								<label><i class="fas fa-fw fa-images fa-sm mr-1"></i> Additional Images <small>(Optional - 4 more images)</small></label>
+								<div class="row">
+									<div class="col-md-6 mb-2">
+										<div class="custom-file">
+											<input type="file" class="custom-file-input" name="image_1[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label">Image 2</label>
+										</div>
+										<?php if(!empty($sp->image_1)): ?>
+										<small class="text-muted">Current: <a href="<?= $sp->image_1 ?>" target="_blank">View</a></small>
+										<?php endif; ?>
+									</div>
+									<div class="col-md-6 mb-2">
+										<div class="custom-file">
+											<input type="file" class="custom-file-input" name="image_2[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label">Image 3</label>
+										</div>
+										<?php if(!empty($sp->image_2)): ?>
+										<small class="text-muted">Current: <a href="<?= $sp->image_2 ?>" target="_blank">View</a></small>
+										<?php endif; ?>
+									</div>
+									<div class="col-md-6 mb-2">
+										<div class="custom-file">
+											<input type="file" class="custom-file-input" name="image_3[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label">Image 4</label>
+										</div>
+										<?php if(!empty($sp->image_3)): ?>
+										<small class="text-muted">Current: <a href="<?= $sp->image_3 ?>" target="_blank">View</a></small>
+										<?php endif; ?>
+									</div>
+									<div class="col-md-6 mb-2">
+										<div class="custom-file">
+											<input type="file" class="custom-file-input" name="image_4[<?= $ky?>][]" accept="image/x-png,image/gif,image/jpeg">
+											<label class="custom-file-label">Image 5</label>
+										</div>
+										<?php if(!empty($sp->image_4)): ?>
+										<small class="text-muted">Current: <a href="<?= $sp->image_4 ?>" target="_blank">View</a></small>
+										<?php endif; ?>
+									</div>
+								</div>
 							</div>
 							
 							<div class="form-group">

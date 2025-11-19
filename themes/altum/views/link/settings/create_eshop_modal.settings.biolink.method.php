@@ -129,6 +129,36 @@
 											</div>
 											
 											<div class="form-group">
+												<label><i class="fas fa-fw fa-images fa-sm mr-1"></i> Additional Images <small>(Optional - 4 more images)</small></label>
+												<div class="row">
+													<div class="col-md-6 mb-2">
+														<div class="custom-file">
+															<input type="file" class="custom-file-input" name="image_1[0][]" accept="image/x-png,image/gif,image/jpeg">
+															<label class="custom-file-label">Image 2</label>
+														</div>
+													</div>
+													<div class="col-md-6 mb-2">
+														<div class="custom-file">
+															<input type="file" class="custom-file-input" name="image_2[0][]" accept="image/x-png,image/gif,image/jpeg">
+															<label class="custom-file-label">Image 3</label>
+														</div>
+													</div>
+													<div class="col-md-6 mb-2">
+														<div class="custom-file">
+															<input type="file" class="custom-file-input" name="image_3[0][]" accept="image/x-png,image/gif,image/jpeg">
+															<label class="custom-file-label">Image 4</label>
+														</div>
+													</div>
+													<div class="col-md-6 mb-2">
+														<div class="custom-file">
+															<input type="file" class="custom-file-input" name="image_4[0][]" accept="image/x-png,image/gif,image/jpeg">
+															<label class="custom-file-label">Image 5</label>
+														</div>
+													</div>
+												</div>
+											</div>
+											
+											<div class="form-group">
 												<label><i class="fa fa-fw fa-heading fa-sm mr-1"></i> Title</label>
 												<input type="text" role="title" class="form-control" name="title[0][]" placeholder="Insert product title" required="required" />
 											</div>

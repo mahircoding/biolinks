@@ -1375,8 +1375,35 @@ class LinkAjax extends Controller {
 								}
 							}
 						}
+						
+						// Upload additional images (image_1 to image_4)
+						$additional_images = [];
+						for($img_num = 1; $img_num <= 4; $img_num++) {
+							$field_name = 'image_' . $img_num;
+							if(isset($_FILES[$field_name]) && $_FILES[$field_name]['size'][$i][$j] > 0) {
+								$mime_type = getimagesize($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$img_ext = 'jpg';
+								
+								$resize = new \ResizeImage($_FILES[$field_name]['tmp_name'][$i][$j]);
+								$resize->resizeTo(500, 500,'maxWidth');
+								
+								if($mime_type['mime']=='image/png')
+									$img_ext = 'png';
+								
+								$add_image_name = md5(time() . rand() . $img_num) . '.' . $img_ext;
+								$resize->saveImage(UPLOADS_PATH . 'galleries/' . $folder_id . '/' . $add_image_name, '90', $img_ext);
+								$additional_images[$field_name] = SITE_URL . UPLOADS_URL_PATH . 'galleries/' . $folder_id . '/' . $add_image_name;
+							} else {
+								$additional_images[$field_name] = null;
+							}
+						}
+						
 						$sub_settings[] = array("image_name" => $image_name,
 												"image_url" => $image_url,
+												"image_1" => $additional_images['image_1'],
+												"image_2" => $additional_images['image_2'],
+												"image_3" => $additional_images['image_3'],
+												"image_4" => $additional_images['image_4'],
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => ucfirst($_POST['description'][$i][$j]),
 												"price" => (int)$_POST['price'][$i][$j],
@@ -2991,6 +3018,10 @@ class LinkAjax extends Controller {
 						}
 						$sub_settings[] = array("image_name" => $images[$i]['products'][$j]['image_name'],
 												"image_url" => $images[$i]['products'][$j]['image_url'],
+												"image_1" => isset($images[$i]['products'][$j]['image_1']) ? $images[$i]['products'][$j]['image_1'] : null,
+												"image_2" => isset($images[$i]['products'][$j]['image_2']) ? $images[$i]['products'][$j]['image_2'] : null,
+												"image_3" => isset($images[$i]['products'][$j]['image_3']) ? $images[$i]['products'][$j]['image_3'] : null,
+												"image_4" => isset($images[$i]['products'][$j]['image_4']) ? $images[$i]['products'][$j]['image_4'] : null,
 												"title" => ucwords($_POST['title'][$i][$j]),
 												"description" => isset($_POST['description'][$i][$j]) ? ucfirst($_POST['description'][$i][$j]) : null,
 												"full_description" => isset($_POST['full_description'][$i][$j]) ? $_POST['full_description'][$i][$j] : null,
