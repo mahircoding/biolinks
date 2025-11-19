@@ -1,4 +1,9 @@
 <?php defined('ALTUMCODE') || die() ?>
+<?php 
+// Extract products data with backward compatibility
+$products_data = isset($row->settings->data) ? $row->settings->data : $row->settings;
+$button_text = isset($row->settings->button_text) ? $row->settings->button_text : 'Add to Cart';
+?>
 
 <form name="update_biolink_" method="post" role="form">
     <input type="hidden" name="token" value="<?= \Altum\Middlewares\Csrf::get() ?>" required="required" />
@@ -10,7 +15,7 @@
     <div class="notification-container"></div>
 	
 	<div class="form-product-container">
-					
+				
 		<div class="d-flex justify-content-between mb-3">
 			<div class="flex-grow-1">
 				<i class="fas fa-list-alt"></i> <b class="ml-1">Categories</b>
@@ -21,7 +26,7 @@
 		</div>
 		
 		<div class="form-product-main">
-			<?php foreach($row->settings as $ky => $sg) {?>				
+			<?php foreach($products_data as $ky => $sg) {?>			
 			<div class="form-product-item">
 			
 				<div class="form-product-ctg">
@@ -288,6 +293,12 @@
 			<?php }?>
 		
 		</div>
+	</div>
+	
+	<div class="form-group">
+		<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text <small>(Optional)</small></label>
+		<input type="text" class="form-control" name="button_text" value="<?= $button_text ?>" placeholder="Add to Cart" />
+		<small class="form-text text-muted">Custom text for the add to cart button</small>
 	</div>
 
     <div class="mt-4">
