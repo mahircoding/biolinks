@@ -1,4 +1,10 @@
 <?php defined('ALTUMCODE') || die() ?>
+<?php 
+// Get settings - handle both old and new format
+$settings_data = is_object($data->link->settings) ? $data->link->settings : json_decode(json_encode($data->link->settings));
+$products_data = isset($settings_data->data) ? $settings_data->data : $settings_data;
+$button_text = isset($settings_data->button_text) ? $settings_data->button_text : 'Add to Cart';
+?>
 
 <div class="my-3 category-product">
     <div class="form-group">
@@ -8,7 +14,7 @@
 			</div>
 			<select class="selectpicker">
 			<option value="all">All</option>
-			<?php foreach($data->link->settings as $iy => $it) {?>
+			<?php foreach($products_data as $iy => $it) {?>
 			<option value="<?= $iy ?>"><?= $it->category ?></option>
 			<?php }?>
 			</select>
@@ -16,7 +22,7 @@
 	</div>
 	<div class="pricing-table">
 		<div class="row justify-content-center align-items-stretch">
-		<?php $num_prd=0; foreach($data->link->settings as $iy => $it) {?>
+		<?php $num_prd=0; foreach($products_data as $iy => $it) {?>
 		<?php foreach($it->products as $iz => $pr) {
 		if(isset($pr->show)&&$pr->show) {
 		?>
@@ -32,7 +38,7 @@
 					<?php }?>
 				</div>
 				<div class="product-btn">
-					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;">Add to Cart</a>
+					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
 				</div>
 			</div>
 		</div>
@@ -49,7 +55,7 @@
 					<?php }?>
 				</div>
 				<div class="product-btn">
-					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;">Add to Cart</a>
+					<a class="none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
 				</div>
 			</div>
 		</div>
@@ -59,7 +65,7 @@
 		?>
 		</div>
 	</div>
-	<script>eshop[<?= $data->link->link_id ?>] = <?= json_encode($data->link->settings) ?></script>
+	<script>eshop[<?= $data->link->link_id ?>] = <?= json_encode($products_data) ?></script>
 	<style>
 	.bootstrap-select{flex: 1 1 auto !important;}.bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
 	</style>
