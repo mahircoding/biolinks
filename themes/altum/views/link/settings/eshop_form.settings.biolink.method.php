@@ -296,7 +296,7 @@ $button_text = isset($row->settings->button_text) ? $row->settings->button_text 
 	</div>
 	
 	<div class="form-group">
-		<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1"></i> Button Text <small>(Optional)</small></label>
+		<label><i class="fa fa-fw fa-shopping-cart fa-sm mr-1 mt-5"></i> Button Text <small>(Optional)</small></label>
 		<input type="text" class="form-control" name="button_text" value="<?= $button_text ?>" placeholder="Add to Cart" />
 		<small class="form-text text-muted">Custom text for the add to cart button</small>
 	</div>
