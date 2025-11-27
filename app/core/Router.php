@@ -442,6 +442,31 @@ class Router {
             'alias' => 'admin'
         ],
 
+        /* API Endpoints */
+        'api' => [
+            'user-create' => [
+                'controller' => 'ApiUser',
+                'method' => 'create',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+            'user-package' => [
+                'controller' => 'ApiUser',
+                'method' => 'update_package',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ],
+            'packages' => [
+                'controller' => 'ApiUser',
+                'method' => 'get_packages',
+                'settings' => [
+                    'no_authentication_check' => true
+                ]
+            ]
+        ],
+
         /* User Products */
         'user-products' => [
             'index' => [
@@ -499,7 +524,7 @@ class Router {
         if(!empty(self::$params[0])) {
 
             /* Check for special paths first (admin, agency, etc.) */
-            if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p'])) {
+            if(in_array(self::$params[0], ['admin','superagency','agency','subagency','whitelabel','ecommerce','s','p','api'])) {
                 self::$path = self::$params[0];
 
                 unset(self::$params[0]);
