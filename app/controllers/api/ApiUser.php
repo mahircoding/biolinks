@@ -369,7 +369,7 @@ class ApiUser extends Controller {
 
         try {
             // Get custom packages from database
-            $packages_result = Database::$database->query("SELECT `package_id`, `name`, `description`, `monthly_price`, `annual_price`, `lifetime_price`, `trial_days` as `days`, `is_enabled`, `status`, `color` FROM `packages` WHERE `is_enabled` = 1 ORDER BY `package_id` ASC");
+            $packages_result = Database::$database->query("SELECT * FROM `packages` WHERE `is_enabled` = 1 ORDER BY `package_id` ASC");
 
             if($packages_result) {
                 while($row = $packages_result->fetch_object()) {
@@ -380,10 +380,11 @@ class ApiUser extends Controller {
                         'monthly_price' => $row->monthly_price ?? 0,
                         'annual_price' => $row->annual_price ?? 0,
                         'lifetime_price' => $row->lifetime_price ?? 0,
-                        'days' => $row->days ?? 30,
+                        'days' => $row->trial_days ?? ($row->trial_expired ?? 30),
                         'is_enabled' => $row->is_enabled,
                         'status' => $row->status ?? 'active',
-                        'color' => $row->color ?? null
+                        'color' => $row->color ?? null,
+                        'settings' => $row->settings ?? null
                     ];
                 }
             }
