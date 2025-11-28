@@ -328,18 +328,20 @@ class ApiUser extends Controller {
 
         // Add built-in packages
         // Trial package
+        $trial_settings = $this->settings->package_trial ?? null;
         $packages[] = [
             'package_id' => 'trial',
             'name' => 'Trial',
             'description' => 'Trial package',
-            'days' => $this->settings->package_trial->days ?? 7,
+            'days' => $trial_settings->days ?? 7,
             'is_enabled' => 1,
             'is_trial' => 1,
-            'settings' => $this->settings->package_trial->settings ?? null
+            'settings' => $trial_settings->settings ?? null
         ];
 
         // Free package
         if(isset($this->settings->package_free)) {
+            $free_settings = $this->settings->package_free;
             $packages[] = [
                 'package_id' => 'free',
                 'name' => 'Free',
@@ -347,12 +349,13 @@ class ApiUser extends Controller {
                 'days' => null,
                 'is_enabled' => 1,
                 'is_trial' => 0,
-                'settings' => $this->settings->package_free->settings ?? null
+                'settings' => $free_settings->settings ?? null
             ];
         }
 
         // Custom package
         if(isset($this->settings->package_custom)) {
+            $custom_settings = $this->settings->package_custom;
             $packages[] = [
                 'package_id' => 'custom',
                 'name' => 'Custom',
@@ -360,28 +363,33 @@ class ApiUser extends Controller {
                 'days' => null,
                 'is_enabled' => 1,
                 'is_trial' => 0,
-                'settings' => $this->settings->package_custom->settings ?? null
+                'settings' => $custom_settings->settings ?? null
             ];
         }
 
-        // Get custom packages from database
-        $packages_result = Database::$database->query("SELECT `package_id`, `name`, `description`, `monthly_price`, `annual_price`, `lifetime_price`, `trial_days` as `days`, `is_enabled`, `status`, `color` FROM `packages` WHERE `is_enabled` = 1 ORDER BY `package_id` ASC");
+        try {
+            // Get custom packages from database
+            $packages_result = Database::$database->query("SELECT `package_id`, `name`, `description`, `monthly_price`, `annual_price`, `lifetime_price`, `trial_days` as `days`, `is_enabled`, `status`, `color` FROM `packages` WHERE `is_enabled` = 1 ORDER BY `package_id` ASC");
 
-        if($packages_result) {
-            while($row = $packages_result->fetch_object()) {
-                $packages[] = [
-                    'package_id' => $row->package_id,
-                    'name' => $row->name,
-                    'description' => $row->description ?? '',
-                    'monthly_price' => $row->monthly_price ?? 0,
-                    'annual_price' => $row->annual_price ?? 0,
-                    'lifetime_price' => $row->lifetime_price ?? 0,
-                    'days' => $row->days ?? 30,
-                    'is_enabled' => $row->is_enabled,
-                    'status' => $row->status ?? 'active',
-                    'color' => $row->color ?? null
-                ];
+            if($packages_result) {
+                while($row = $packages_result->fetch_object()) {
+                    $packages[] = [
+                        'package_id' => $row->package_id,
+                        'name' => $row->name,
+                        'description' => $row->description ?? '',
+                        'monthly_price' => $row->monthly_price ?? 0,
+                        'annual_price' => $row->annual_price ?? 0,
+                        'lifetime_price' => $row->lifetime_price ?? 0,
+                        'days' => $row->days ?? 30,
+                        'is_enabled' => $row->is_enabled,
+                        'status' => $row->status ?? 'active',
+                        'color' => $row->color ?? null
+                    ];
+                }
             }
+        } catch (\Exception $e) {
+            // Log error but continue with built-in packages
+            Logger::log('API get_packages error: ' . $e->getMessage());
         }
 
         // Return success response
