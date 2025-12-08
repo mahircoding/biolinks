@@ -94,6 +94,16 @@ class ApiUser extends Controller {
         $package_id = $data['package_id'] ?? 'trial';
         $active = isset($data['active']) ? (int)$data['active'] : 1;
 
+        // New fields
+        $addon_digital_products = isset($data['addon_digital_products']) ? (int)$data['addon_digital_products'] : 0;
+        $addon_tripay = isset($data['addon_tripay']) ? (int)$data['addon_tripay'] : 0;
+        $esc_package = isset($data['esc_package']) ? (int)$data['esc_package'] : 0;
+        $esc_expired = isset($data['esc_expired']) ? $data['esc_expired'] : null;
+        
+        if($esc_expired) {
+            $esc_expired = date("Y-m-d H:i:s", strtotime($esc_expired));
+        }
+
         // Validate name length
         if(strlen($name) < 3 || strlen($name) > 32) {
             Response::json('Name must be between 3 and 32 characters', 'error', ['code' => 'INVALID_NAME_LENGTH'], 400);
@@ -174,9 +184,17 @@ class ApiUser extends Controller {
         $package_expiration_date = date("Y-m-d H:i:s", strtotime('+' . $this->settings->package_trial->days . ' days'));
         $package_settings = json_encode($this->settings->package_trial->settings);
 
+        // Override package expiration date if provided
+        if(isset($data['package_expiration_date'])) {
+            $package_expiration_date = date("Y-m-d H:i:s", strtotime($data['package_expiration_date']));
+        }
+
         if($main_server_name && $whitelabel) {
             if($pkgs = Database::get('*', 'packages', ['uid' => $whitelabel->user_id, 'is_trial' => 1, 'is_default' => 1])) {
-                $package_expiration_date = date("Y-m-d H:i:s", strtotime('+' . $pkgs->trial_expired));
+                // Only use trial expiration if not manually provided
+                if(!isset($data['package_expiration_date'])) {
+                    $package_expiration_date = date("Y-m-d H:i:s", strtotime('+' . $pkgs->trial_expired));
+                }
                 $package_settings = $pkgs->settings;
                 $package_id = $pkgs->package_id;
             }
@@ -194,15 +212,15 @@ class ApiUser extends Controller {
             }
 
             // Insert user with whitelabel
-            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `ids_insert`, `whitelabel_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param('ssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $whitelabel->user_id, $whitelabel->id);
+            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `ids_insert`, `whitelabel_id`, `addon_digital_products`, `addon_tripay`, `esc_package`, `esc_expired`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param('ssssssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $whitelabel->user_id, $whitelabel->id, $addon_digital_products, $addon_tripay, $esc_package, $esc_expired);
             $stmt->execute();
             $registered_user_id = $stmt->insert_id;
             $stmt->close();
         } else {
             // Insert user without whitelabel
-            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param('ssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins);
+            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `addon_digital_products`, `addon_tripay`, `esc_package`, `esc_expired`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param('ssssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $addon_digital_products, $addon_tripay, $esc_package, $esc_expired);
             $stmt->execute();
             $registered_user_id = $stmt->insert_id;
             $stmt->close();
@@ -231,7 +249,11 @@ class ApiUser extends Controller {
             'phone' => $phone,
             'package_id' => $package_id,
             'package_expiration_date' => $package_expiration_date,
-            'active' => $active
+            'active' => $active,
+            'addon_digital_products' => $addon_digital_products,
+            'addon_tripay' => $addon_tripay,
+            'esc_package' => $esc_package,
+            'esc_expired' => $esc_expired
         ], 201);
     }
 
