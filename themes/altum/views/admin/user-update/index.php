@@ -224,7 +224,7 @@
 			</div>
 			<?php }?>
 
-			/// Hapus semenentara
+			<!-- Hapus semenentara -->
 
             <h2 class="h4 mt-5"><?= $this->language->admin_user_update->change_password->header ?></h2>
             <p class="text-muted"><?= $this->language->admin_user_update->change_password->header_help ?></p>
