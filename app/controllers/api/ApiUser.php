@@ -99,6 +99,7 @@ class ApiUser extends Controller {
         $addon_tripay = isset($data['addon_tripay']) ? (int)$data['addon_tripay'] : 0;
         $esc_package = isset($data['esc_package']) ? (int)$data['esc_package'] : 0;
         $esc_expired = isset($data['esc_expired']) ? $data['esc_expired'] : null;
+        $ro_pro_package = isset($data['ro_pro_package']) ? (int)$data['ro_pro_package'] : 0;
         
         if($esc_expired) {
             $esc_expired = date("Y-m-d H:i:s", strtotime($esc_expired));
@@ -212,15 +213,15 @@ class ApiUser extends Controller {
             }
 
             // Insert user with whitelabel
-            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `ids_insert`, `whitelabel_id`, `addon_digital_products`, `addon_tripay`, `esc_package`, `esc_expired`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param('ssssssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $whitelabel->user_id, $whitelabel->id, $addon_digital_products, $addon_tripay, $esc_package, $esc_expired);
+            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `ids_insert`, `whitelabel_id`, `addon_digital_products`, `addon_tripay`, `esc_package`, `esc_expired`, `ro_pro_package`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param('sssssssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $whitelabel->user_id, $whitelabel->id, $addon_digital_products, $addon_tripay, $esc_package, $esc_expired, $ro_pro_package);
             $stmt->execute();
             $registered_user_id = $stmt->insert_id;
             $stmt->close();
         } else {
             // Insert user without whitelabel
-            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `addon_digital_products`, `addon_tripay`, `esc_package`, `esc_expired`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param('ssssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $addon_digital_products, $addon_tripay, $esc_package, $esc_expired);
+            $stmt = Database::$database->prepare("INSERT INTO `users` (`password`, `email`, `phone`, `email_activation_code`, `name`, `package_id`, `package_expiration_date`, `package_settings`, `language`, `active`, `date`, `ip`, `last_user_agent`, `total_logins`, `addon_digital_products`, `addon_tripay`, `esc_package`, `esc_expired`, `ro_pro_package`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param('sssssssssssssssssss', $hashed_password, $email, $phone, $email_code, $name, $package_id, $package_expiration_date, $package_settings, Language::$language, $active, \Altum\Date::$date, $ip, $last_user_agent, $total_logins, $addon_digital_products, $addon_tripay, $esc_package, $esc_expired, $ro_pro_package);
             $stmt->execute();
             $registered_user_id = $stmt->insert_id;
             $stmt->close();
@@ -253,7 +254,8 @@ class ApiUser extends Controller {
             'addon_digital_products' => $addon_digital_products,
             'addon_tripay' => $addon_tripay,
             'esc_package' => $esc_package,
-            'esc_expired' => $esc_expired
+            'esc_expired' => $esc_expired,
+            'ro_pro_package' => $ro_pro_package
         ], 201);
     }
 
