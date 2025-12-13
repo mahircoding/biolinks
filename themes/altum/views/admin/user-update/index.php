@@ -248,13 +248,13 @@
             </div>
             
             <?php if(($this->user->type == 1 || $this->user->whitelabel) && (empty($this->user->superagency) && empty($this->user->agency) && empty($this->user->subagency))){?> 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label>EShop Pro Status</label>
 				<select class="form-control" name="ro_status">
 				<option value="0"<?= $data->user->ro_pro_package==0 ? ' selected' : null ?>>Disabled</option>
 				<option value="1"<?= $data->user->ro_pro_package==1 ? ' selected' : null ?>>Enabled</option>
 				</select>
-			</div>
+			</div> -->
             <?php }?>
 
 			<div class="form-group">
