@@ -224,7 +224,40 @@
 			</div>
 			<?php }?>
 
-			            <div class="form-group">
+			<h2 class="h4 mt-5"><?= $this->language->admin_user_update->package->header ?></h2>
+            <p class="text-muted"><?= $this->language->admin_user_update->package->header_help ?></p>
+
+            <div class="form-group">
+                <label><?= $this->language->admin_user_update->package->package_id ?></label>
+
+                <select class="form-control" name="package_id">
+					<?php if($this->settings->package_free->is_enabled) {?>
+                    <option value="free" <?php if($data->user->package->package_id == 'free') echo 'selected' ?>><?= $this->settings->package_free->name ?></option>
+                    <?php }?>
+					<?php if($this->settings->package_trial->is_enabled) {?>
+					<option value="trial" <?php if($data->user->package->package_id == 'trial') echo 'selected' ?>><?= $this->settings->package_trial->name ?></option>
+                    <?php }?>
+					<option value="custom" <?php if($data->user->package->package_id == 'custom') echo 'selected' ?>><?= $this->settings->package_custom->name ?></option>
+
+                    <?php while($row = $data->packages_result->fetch_object()): ?>
+						<?php if($row->is_enabled) {?>
+                        <option value="<?= $row->package_id ?>" <?php if($data->user->package->package_id == $row->package_id) echo 'selected' ?>><?= $row->name ?></option>
+						<?php }?>
+					<?php endwhile ?>
+                </select>
+            </div>
+            
+            <?php if(($this->user->type == 1 || $this->user->whitelabel) && (empty($this->user->superagency) && empty($this->user->agency) && empty($this->user->subagency))){?> 
+            <div class="form-group">
+                <label>EShop Pro Status</label>
+				<select class="form-control" name="ro_status">
+				<option value="0"<?= $data->user->ro_pro_package==0 ? ' selected' : null ?>>Disabled</option>
+				<option value="1"<?= $data->user->ro_pro_package==1 ? ' selected' : null ?>>Enabled</option>
+				</select>
+			</div>
+            <?php }?>
+
+			<div class="form-group">
                 <label><?= $this->language->admin_user_update->package->package_trial_done ?></label>
 
                 <select class="form-control" name="package_trial_done">
