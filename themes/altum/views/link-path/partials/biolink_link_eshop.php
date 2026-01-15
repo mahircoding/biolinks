@@ -331,7 +331,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		top: 0;
 		width: 100%;
 		height: 100%;
-		overflow: hidden;
+		overflow: auto;
 		background-color: rgba(0,0,0,0.7);
 		animation: fadeIn 0.3s ease;
 		align-items: center;
@@ -352,7 +352,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		border-radius: 16px;
 		width: 100%;
 		max-width: 800px;
-		max-height: 90vh;
+		max-height: calc(100vh - 40px);
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -394,7 +394,8 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		padding: 30px;
 		gap: 30px;
 		overflow-y: auto;
-		max-height: calc(90vh - 40px);
+		flex: 1;
+		min-height: 0;
 	}
 	
 	.product-modal-images {
@@ -608,6 +609,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		
 		.product-modal-content {
 			width: 100%;
+			max-height: calc(100vh - 20px);
 		}
 		
 		.product-modal-body {
@@ -615,16 +617,16 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 			padding: 20px;
 		}
 		
-		.product-modal-image {
+		.product-modal-images {
 			max-width: 100%;
 		}
 		
 		.product-modal-info h2 {
-			font-size: 22px;
+			font-size: 20px;
 		}
 		
 		.modal-price {
-			font-size: 24px;
+			font-size: 22px;
 		}
 		
 		.product-btn {
