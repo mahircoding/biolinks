@@ -352,7 +352,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		border-radius: 16px;
 		width: 100%;
 		max-width: 800px;
-		max-height: 100%;
+		max-height: 90vh;
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -394,6 +394,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		padding: 30px;
 		gap: 30px;
 		overflow-y: auto;
+		max-height: calc(90vh - 40px);
 	}
 	
 	.product-modal-images {
