@@ -345,12 +345,12 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	.product-modal-content {
 		background-color: #fefefe;
-		margin: 0;
+		margin: 20px;
 		padding: 0;
 		border-radius: 16px;
 		width: 90%;
 		max-width: 800px;
-		max-height: 90vh;
+		max-height: calc(100vh - 40px);
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -600,8 +600,9 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	/* Responsive Design */
 	@media (max-width: 768px) {
 		.product-modal-content {
-			width: 95%;
-			margin: 10% auto;
+			width: calc(100% - 20px);
+			margin: 10px;
+			max-height: calc(100vh - 20px);
 		}
 		
 		.product-modal-body {
