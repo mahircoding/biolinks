@@ -269,7 +269,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 					}
 				};
 				
-				modal.style.display = 'block';
+				modal.style.display = 'flex';
 				document.body.style.overflow = 'hidden';
 			});
 		});
@@ -331,9 +331,11 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		top: 0;
 		width: 100%;
 		height: 100%;
-		overflow: auto;
+		overflow: hidden;
 		background-color: rgba(0,0,0,0.7);
 		animation: fadeIn 0.3s ease;
+		align-items: center;
+		justify-content: center;
 	}
 	
 	@keyframes fadeIn {
@@ -343,11 +345,14 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	.product-modal-content {
 		background-color: #fefefe;
-		margin: 5% auto;
+		margin: 0;
 		padding: 0;
 		border-radius: 16px;
 		width: 90%;
 		max-width: 800px;
+		max-height: 90vh;
+		display: flex;
+		flex-direction: column;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 		animation: slideDown 0.3s ease;
 		position: relative;
@@ -386,6 +391,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		flex-direction: row;
 		padding: 30px;
 		gap: 30px;
+		overflow-y: auto;
 	}
 	
 	.product-modal-images {
