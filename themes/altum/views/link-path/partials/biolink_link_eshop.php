@@ -336,6 +336,8 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		animation: fadeIn 0.3s ease;
 		align-items: center;
 		justify-content: center;
+		padding: 20px;
+		box-sizing: border-box;
 	}
 	
 	@keyframes fadeIn {
@@ -345,12 +347,12 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	.product-modal-content {
 		background-color: #fefefe;
-		margin: 20px;
+		margin: 0;
 		padding: 0;
 		border-radius: 16px;
-		width: 90%;
+		width: 100%;
 		max-width: 800px;
-		max-height: calc(100vh - 40px);
+		max-height: 100%;
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -599,10 +601,12 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	/* Responsive Design */
 	@media (max-width: 768px) {
+		.product-modal {
+			padding: 10px;
+		}
+		
 		.product-modal-content {
-			width: calc(100% - 20px);
-			margin: 10px;
-			max-height: calc(100vh - 20px);
+			width: 100%;
 		}
 		
 		.product-modal-body {
