@@ -109,7 +109,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </div>
     
     <!-- Product Detail Modal -->
-    <!-- PERBAIKAN: inset: 0 memastikan cover penuh layar. max-height pada inner box memastikan tidak terpotong -->
     <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
         <div class="bg-white rounded shadow overflow-hidden position-relative mx-2" style="max-width: 900px; max-height: 90vh; margin: auto; overflow-y: auto; width: calc(100% - 1rem);">
             
@@ -136,7 +135,8 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     
                     <div id="modalProductVariants" class="mb-4"></div>
                     
-                    <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; overflow-y: auto; line-height: 1.6; flex: 1;"></div>
+                    <!-- PERBAIKAN: Deskripsi dibatasi tingginya dan bisa di-scroll -->
+                    <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
                     
                     <div class="mt-auto">
                         <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
@@ -301,7 +301,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         };
                     }
                     
-                    // PERBAIKAN: Tampilkan modal dengan Flexbox Centering
+                    // Show Modal
                     modal.style.display = 'flex';
                     modal.style.flexDirection = 'row';
                     modal.style.flexWrap = 'wrap';
@@ -337,11 +337,29 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         @media (max-width: 767.98px) {
             .border-md-right { border-right: 0 !important; }
         }
-        /* Custom Scrollbar for Modal Content */
+        
+        /* Custom Scrollbar for Modal Content Box */
         #productDetailModal > div::-webkit-scrollbar { width: 6px; }
         #productDetailModal > div::-webkit-scrollbar-track { background: #f1f1f1; }
         #productDetailModal > div::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
         
+        /* SCROLLABLE DESCRIPTION CSS */
+        #modalProductDesc {
+            /* Hapus flex-grow agar tidak memaksa tinggi modal */
+            flex: unset; 
+            /* Batasi tinggi maksimal (misal 200px) */
+            max-height: 200px;
+            /* Aktifkan scroll vertikal jika teks melebihi batas */
+            overflow-y: auto;
+            /* Tambahkan padding kanan agar scrollbar tidak menutupi teks */
+            padding-right: 8px; 
+            /* Styling scrollbar khusus untuk deskripsi */
+        }
+        
+        #modalProductDesc::-webkit-scrollbar { width: 4px; }
+        #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
+        #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
+
         .bootstrap-select{flex: 1 1 auto !important;} 
         .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
     </style>
