@@ -292,16 +292,48 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	<style>
 	.bootstrap-select{flex: 1 1 auto !important;}.bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
 	
+	/* Product Grid Responsive */
+	.pricing-table .row {
+		margin-left: -8px;
+		margin-right: -8px;
+	}
+	
+	.cat-product {
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+	
+	.cat-product .item {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+	
+	.cat-product .item .image {
+		width: 100%;
+		height: auto;
+		max-height: 250px;
+		object-fit: cover;
+		border-radius: 8px;
+	}
+	
+	.cat-product .product-desc {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	
 	/* Product Button Styles */
 	.product-btn {
 		display: flex;
 		gap: 8px;
-		margin-top: 10px;
+		margin-top: auto;
+		padding-top: 10px;
 	}
 	
 	.product-btn .btn-detail {
 		flex: 1;
-		padding: 10px 15px;
+		padding: 12px 16px;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		color: white;
 		text-align: center;
@@ -311,6 +343,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		transition: all 0.3s ease;
 		border: none;
 		cursor: pointer;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	
 	.product-btn .btn-detail:hover {
@@ -333,11 +369,11 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		bottom: 0;
 		width: 100%;
 		height: 100%;
-		overflow: hidden;
+		overflow: auto;
 		background-color: rgba(0,0,0,0.7);
 		animation: fadeIn 0.3s ease;
-		align-items: center;
-		justify-content: center;
+		padding: 20px;
+		-webkit-overflow-scrolling: touch;
 	}
 	
 	@keyframes fadeIn {
@@ -347,12 +383,12 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	.product-modal-content {
 		background-color: #fefefe;
-		margin: auto;
+		margin: 20px auto;
 		padding: 0;
 		border-radius: 16px;
-		width: 90%;
-		max-width: 800px;
-		max-height: 90vh;
+		width: 100%;
+		max-width: 900px;
+		max-height: none;
 		display: flex;
 		flex-direction: column;
 		box-shadow: 0 10px 40px rgba(0,0,0,0.3);
@@ -362,7 +398,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	@keyframes slideDown {
 		from {
-			transform: translateY(-50px);
+			transform: translateY(-30px);
 			opacity: 0;
 		}
 		to {
@@ -374,58 +410,70 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	.product-modal-close {
 		color: #aaa;
 		position: absolute;
-		right: 20px;
-		top: 15px;
+		right: 15px;
+		top: 10px;
 		font-size: 32px;
 		font-weight: bold;
 		cursor: pointer;
-		z-index: 1;
+		z-index: 10;
 		transition: color 0.3s ease;
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: rgba(255,255,255,0.9);
 	}
 	
 	.product-modal-close:hover,
 	.product-modal-close:focus {
 		color: #000;
+		background: rgba(255,255,255,1);
 	}
 	
 	.product-modal-body {
 		display: flex;
 		flex-direction: row;
-		padding: 30px;
+		padding: 40px 30px 30px;
 		gap: 30px;
-		overflow-y: auto;
-		flex: 1;
-		min-height: 0;
+		overflow: visible;
 	}
 	
 	.product-modal-images {
 		flex: 1;
-		max-width: 350px;
+		max-width: 400px;
+		min-width: 0;
 	}
 	
 	.main-image-container {
 		width: 100%;
-		margin-bottom: 10px;
+		margin-bottom: 12px;
+		position: relative;
+		overflow: hidden;
+		border-radius: 12px;
 	}
 	
 	.main-product-image {
 		width: 100%;
 		height: auto;
 		border-radius: 12px;
-		object-fit: cover;
-		max-height: 350px;
+		object-fit: contain;
+		max-height: 400px;
+		display: block;
 	}
 	
 	.thumbnail-gallery {
 		display: flex;
-		gap: 8px;
+		gap: 10px;
 		overflow-x: auto;
-		padding: 5px 0;
+		padding: 8px 0;
+		-webkit-overflow-scrolling: touch;
 	}
 	
 	.thumbnail-image {
-		width: 60px;
-		height: 60px;
+		width: 70px;
+		height: 70px;
 		border-radius: 8px;
 		object-fit: cover;
 		cursor: pointer;
@@ -446,7 +494,7 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	/* Custom scrollbar for thumbnails */
 	.thumbnail-gallery::-webkit-scrollbar {
-		height: 4px;
+		height: 6px;
 	}
 	
 	.thumbnail-gallery::-webkit-scrollbar-track {
@@ -467,14 +515,17 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		flex: 1;
 		display: flex;
 		flex-direction: column;
+		min-width: 0;
 	}
 	
 	.product-modal-info h2 {
 		margin: 0 0 15px 0;
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 700;
 		color: #333;
 		text-align: left;
+		line-height: 1.3;
+		word-wrap: break-word;
 	}
 	
 	.product-modal-price {
@@ -483,16 +534,18 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	}
 	
 	.modal-price {
-		font-size: 24px;
+		font-size: 28px;
 		font-weight: 700;
 		color: #667eea;
 		margin-right: 10px;
+		display: inline-block;
 	}
 	
 	.modal-price-strike {
-		font-size: 16px;
+		font-size: 18px;
 		color: #999;
 		text-decoration: line-through;
+		display: inline-block;
 	}
 	
 	.product-modal-variants {
@@ -500,25 +553,25 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	}
 	
 	.variant-group {
-		margin-bottom: 15px;
+		margin-bottom: 18px;
 	}
 	
 	.variant-title {
-		font-size: 14px;
+		font-size: 15px;
 		font-weight: 600;
 		color: #333;
-		margin-bottom: 8px;
+		margin-bottom: 10px;
 		text-align: left;
 	}
 	
 	.variant-options {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: 10px;
 	}
 	
 	.variant-btn {
-		padding: 8px 16px;
+		padding: 10px 18px;
 		border: 2px solid #e0e0e0;
 		border-radius: 8px;
 		background: #fff;
@@ -528,6 +581,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		cursor: pointer;
 		transition: all 0.3s ease;
 		outline: none;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	
 	.variant-btn:hover {
@@ -545,14 +602,15 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	.product-modal-description {
 		flex: 1;
 		margin-bottom: 25px;
-		font-size: 16px;
-		line-height: 1.6;
+		font-size: 15px;
+		line-height: 1.7;
 		color: #666;
 		white-space: pre-wrap;
-		max-height: 200px;
+		max-height: 250px;
 		overflow-y: auto;
 		padding-right: 10px;
 		text-align: left;
+		word-wrap: break-word;
 	}
 	
 	/* Custom scrollbar for description */
@@ -576,12 +634,13 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	
 	.product-modal-actions {
 		margin-top: auto;
+		padding-top: 10px;
 	}
 	
 	.modal-btn-cart {
 		display: inline-block;
 		width: 100%;
-		padding: 15px 30px;
+		padding: 16px 30px;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		color: white;
 		text-align: center;
@@ -592,6 +651,10 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		transition: all 0.3s ease;
 		border: none;
 		cursor: pointer;
+		min-height: 54px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	
 	.modal-btn-cart:hover {
@@ -602,19 +665,74 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 	}
 	
 	/* Responsive Design */
-	@media (max-width: 768px) {
+	
+	/* Large tablets and small desktops */
+	@media (max-width: 992px) {
+		.product-modal {
+			padding: 15px;
+		}
+		
 		.product-modal-content {
-			width: 95%;
-			max-height: 95vh;
+			max-width: 750px;
+		}
+		
+		.product-modal-body {
+			padding: 35px 25px 25px;
+			gap: 25px;
+		}
+		
+		.product-modal-images {
+			max-width: 350px;
+		}
+		
+		.main-product-image {
+			max-height: 350px;
+		}
+	}
+	
+	/* Tablets */
+	@media (max-width: 768px) {
+		.cat-product {
+			flex: 0 0 50%;
+			max-width: 50%;
+		}
+		
+		.product-modal {
+			padding: 10px;
+		}
+		
+		.product-modal-content {
+			width: 100%;
+			max-width: 100%;
+			margin: 10px auto;
+			border-radius: 12px;
+		}
+		
+		.product-modal-close {
+			right: 10px;
+			top: 8px;
+			font-size: 28px;
+			width: 36px;
+			height: 36px;
 		}
 		
 		.product-modal-body {
 			flex-direction: column;
-			padding: 20px;
+			padding: 45px 20px 20px;
+			gap: 20px;
 		}
 		
 		.product-modal-images {
 			max-width: 100%;
+		}
+		
+		.main-product-image {
+			max-height: 300px;
+		}
+		
+		.thumbnail-image {
+			width: 60px;
+			height: 60px;
 		}
 		
 		.product-modal-info h2 {
@@ -622,16 +740,151 @@ $button_text = isset($settings_data->button_text) ? $settings_data->button_text 
 		}
 		
 		.modal-price {
-			font-size: 22px;
+			font-size: 24px;
+		}
+		
+		.modal-price-strike {
+			font-size: 16px;
+		}
+		
+		.product-modal-description {
+			font-size: 14px;
+			max-height: 180px;
+		}
+		
+		.modal-btn-cart {
+			font-size: 16px;
+			padding: 14px 24px;
 		}
 		
 		.product-btn {
 			flex-direction: column;
+			gap: 8px;
 		}
 		
 		.product-btn .btn-detail,
 		.product-btn .none {
 			width: 100%;
+		}
+	}
+	
+	/* Mobile phones */
+	@media (max-width: 576px) {
+		.cat-product {
+			flex: 0 0 100%;
+			max-width: 100%;
+		}
+		
+		.product-modal {
+			padding: 5px;
+		}
+		
+		.product-modal-content {
+			margin: 5px auto;
+			border-radius: 10px;
+		}
+		
+		.product-modal-close {
+			right: 8px;
+			top: 6px;
+			font-size: 26px;
+			width: 34px;
+			height: 34px;
+		}
+		
+		.product-modal-body {
+			padding: 42px 15px 15px;
+			gap: 15px;
+		}
+		
+		.main-product-image {
+			max-height: 250px;
+		}
+		
+		.thumbnail-gallery {
+			gap: 8px;
+			padding: 6px 0;
+		}
+		
+		.thumbnail-image {
+			width: 50px;
+			height: 50px;
+		}
+		
+		.product-modal-info h2 {
+			font-size: 18px;
+			margin-bottom: 12px;
+		}
+		
+		.modal-price {
+			font-size: 22px;
+		}
+		
+		.modal-price-strike {
+			font-size: 15px;
+		}
+		
+		.variant-title {
+			font-size: 14px;
+			margin-bottom: 8px;
+		}
+		
+		.variant-btn {
+			padding: 8px 14px;
+			font-size: 13px;
+			min-height: 40px;
+		}
+		
+		.product-modal-description {
+			font-size: 13px;
+			line-height: 1.6;
+			max-height: 150px;
+			margin-bottom: 20px;
+		}
+		
+		.modal-btn-cart {
+			font-size: 15px;
+			padding: 12px 20px;
+			min-height: 48px;
+		}
+		
+		.product-btn .btn-detail {
+			padding: 10px 12px;
+			font-size: 14px;
+		}
+	}
+	
+	/* Very small phones */
+	@media (max-width: 375px) {
+		.product-modal-body {
+			padding: 40px 12px 12px;
+		}
+		
+		.main-product-image {
+			max-height: 200px;
+		}
+		
+		.thumbnail-image {
+			width: 45px;
+			height: 45px;
+		}
+		
+		.product-modal-info h2 {
+			font-size: 16px;
+		}
+		
+		.modal-price {
+			font-size: 20px;
+		}
+		
+		.variant-btn {
+			padding: 7px 12px;
+			font-size: 12px;
+		}
+		
+		.product-modal-description {
+			font-size: 12px;
+			max-height: 120px;
 		}
 	}
 	</style>
