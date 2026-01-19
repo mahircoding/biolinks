@@ -108,53 +108,44 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         </div>
     </div>
     
-    <!-- Product Detail Modal: SIMPLIFIED BOTTOM FLOATING -->
-    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 999999; background-color: rgba(0,0,0,0.75); display: none !important;">
+    <!-- Product Detail Modal: CLASS-BASED VISIBILITY -->
+    <!-- Class 'modal-overlay' handles display:none/flex -->
+    <div id="productDetailModal" class="modal-overlay">
         
-        <!-- 
-           PERBAIKAN POSISI KODE: 
-           Menggunakan flex-direction column dan justify-content flex-end 
-           agar modal selalu mendarat di bawah (bottom).
-        -->
-        <div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%; width: 100%; padding: 20px 0;">
+        <!-- Modal Box Wrapper -->
+        <div class="modal-box">
             
-            <!-- Modal Box Container -->
-            <div class="bg-white rounded shadow position-relative overflow-hidden mx-auto" 
-                 style="max-width: 600px; width: calc(100% - 30px); max-height: 90vh;">
+            <span class="product-modal-close">&times;</span>
+            
+            <!-- Scrollable Content -->
+            <div class="modal-content-inner d-flex flex-column flex-md-row overflow-auto">
                 
-                <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
-                
-                <!-- Scrollable Content -->
-                <!-- Flex row untuk layout (Image Kiri, Info Kanan) -->
-                <div class="d-flex flex-column flex-md-row overflow-auto" style="max-height: 90vh;">
-                    
-                    <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
-                        <div class="p-3 d-flex flex-column align-items-center">
-                            <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 50vh;">
-                                <img id="mainProductImage" src="" alt="Product" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
-                            </div>
-                            <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2 w-100 pb-2"></div>
+                <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
+                    <div class="p-3 d-flex flex-column align-items-center">
+                        <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 50vh;">
+                            <img id="mainProductImage" src="" alt="Product" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
                         </div>
+                        <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2 w-100 pb-2"></div>
                     </div>
-                    
-                    <div class="col-12 col-md-6 p-4 d-flex flex-column bg-white">
-                        <h2 id="modalProductTitle" class="h4 font-weight-bold mb-3 text-dark"></h2>
-                        
-                        <div class="mb-3 pb-3 border-bottom">
-                            <span id="modalProductPrice" class="h3 font-weight-bold text-primary d-block mb-1"></span>
-                            <span id="modalProductPriceStrike" class="text-muted text-decoration-line-through d-none small"></span>
-                        </div>
-                        
-                        <div id="modalProductVariants" class="mb-4"></div>
-                        
-                        <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
-                        
-                        <div class="mt-auto">
-                            <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
-                        </div>
-                    </div>
-                    
                 </div>
+                
+                <div class="col-12 col-md-6 p-4 d-flex flex-column bg-white">
+                    <h2 id="modalProductTitle" class="h4 font-weight-bold mb-3 text-dark"></h2>
+                    
+                    <div class="mb-3 pb-3 border-bottom">
+                        <span id="modalProductPrice" class="h3 font-weight-bold text-primary d-block mb-1"></span>
+                        <span id="modalProductPriceStrike" class="text-muted text-decoration-line-through d-none small"></span>
+                    </div>
+                    
+                    <div id="modalProductVariants" class="mb-4"></div>
+                    
+                    <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                    
+                    <div class="mt-auto">
+                        <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -313,14 +304,14 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         };
                     }
                     
-                    // Show Modal
-                    modal.style.display = 'flex';
+                    // SHOW MODAL VIA CLASS (Fixes Visibility Issue)
+                    modal.classList.add('active');
                     document.body.style.overflow = 'hidden';
                 });
             });
             
             const closeModal = () => {
-                modal.style.display = 'none';
+                modal.classList.remove('active');
                 document.body.style.overflow = 'auto';
             };
             
@@ -336,6 +327,74 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </script>
     
     <style>
+        /* =========================================
+           MODAL VISIBILITY & POSITIONING CLASSES
+           ========================================= */
+        
+        /* Overlay Background: Hidden by default */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            z-index: 9999999; /* Max Z-Index */
+            background-color: rgba(0,0,0,0.75);
+            align-items: flex-end; /* Stick to Bottom */
+            justify-content: center; /* Center Horizontal */
+            padding-bottom: 20px;
+        }
+
+        /* Active State: Shown as Flex */
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        /* The White Modal Box */
+        .modal-box {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            /* Height Control: Max 90vh so it fits screen */
+            max-height: 90vh; 
+            overflow: hidden;
+            margin: 0 15px; /* Space on sides for mobile */
+        }
+
+        /* Close Button */
+        .product-modal-close {
+            color: #aaa;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            line-height: 1;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+        .product-modal-close:hover { color: #000; background: #fff; }
+
+        /* Inner Content Scroll Area */
+        .modal-content-inner {
+            max-height: 90vh;
+            height: auto;
+        }
+
+        /* Helper Classes (Bootstrap compat) */
         .rounded-lg { border-radius: 0.5rem !important; }
         .btn-block { display: block; width: 100%; }
         .py-3 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
@@ -345,12 +404,14 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
             .border-md-right { border-right: 0 !important; }
         }
         
-        /* Scrollbar */
+        /* Scrollbar Styling */
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
 
-        /* STYLE MOBILE (FONT 14PX & GAMBAR KECIL) */
+        /* =========================================
+           MOBILE STYLES (FONT 14PX & SMALL IMG)
+           ========================================= */
         @media (max-width: 767px) {
             /* Gambar lebih kecil */
             .bg-light .w-100.rounded.mb-3 {
