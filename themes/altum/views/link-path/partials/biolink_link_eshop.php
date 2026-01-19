@@ -108,13 +108,15 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         </div>
     </div>
     
-    <!-- Product Detail Modal -->
+    <!-- Product Detail Modal: BOTTOM FLOATING STYLE -->
     <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
-        <div class="bg-white rounded shadow overflow-hidden position-relative mx-2" style="max-width: 900px; max-height: 90vh; margin: auto; overflow-y: auto; width: calc(100% - 1rem);">
+        <!-- PERBAIKAN: Modal Box -->
+        <div class="bg-white rounded shadow position-relative" style="max-width: 600px; max-height: 85vh; margin: 0 auto 20px auto; width: calc(100% - 30px); overflow: hidden;">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
             
-            <div class="d-flex flex-column flex-md-row">
+            <!-- PERBAIKAN: Scrollable Container -->
+            <div class="d-flex flex-column flex-md-row overflow-auto" style="max-height: 85vh;">
                 
                 <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
                     <div class="p-3 d-flex flex-column align-items-center">
@@ -302,9 +304,8 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     
                     // Show Modal
                     modal.style.display = 'flex';
-                    modal.style.flexDirection = 'row';
-                    modal.style.flexWrap = 'wrap';
-                    modal.style.alignContent = 'center';
+                    // PERBAIKAN: Paksa posisi ke Bawah (Flex End)
+                    modal.style.alignItems = 'flex-end'; 
                     modal.style.justifyContent = 'center';
                     
                     document.body.style.overflow = 'hidden';
@@ -337,45 +338,39 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
             .border-md-right { border-right: 0 !important; }
         }
         
-        /* Custom Scrollbar for Modal Content Box */
-        #productDetailModal > div::-webkit-scrollbar { width: 6px; }
-        #productDetailModal > div::-webkit-scrollbar-track { background: #f1f1f1; }
-        #productDetailModal > div::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        /* Scrollbar untuk content di dalam modal */
+        #productDetailModal .overflow-auto::-webkit-scrollbar { width: 6px; }
+        #productDetailModal .overflow-auto::-webkit-scrollbar-track { background: #f1f1f1; }
+        #productDetailModal .overflow-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
         
-        /* SCROLLABLE DESCRIPTION CSS */
+        /* Deskripsi Scrollable */
         #modalProductDesc {
             flex: unset; 
             max-height: 200px;
             overflow-y: auto;
             padding-right: 8px; 
         }
-        
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
 
         /* =========================================
-           PERBAIKAN MOBILE (IMAGE KECIL & FONT 14PX)
+           STYLE MOBILE (FONT 14PX & GAMBAR KECIL)
            ========================================= */
         @media (max-width: 767px) {
-            /* 1. Make Image Smaller */
-            /* Target the container directly behind the image */
+            /* Gambar lebih kecil */
             .bg-light .w-100.rounded.mb-3 {
-                min-height: 180px !important; /* Dari 250px -> 180px */
-                max-height: 200px !important; /* Dari 50vh -> 200px */
+                min-height: 180px !important;
+                max-height: 200px !important;
             }
-
-            /* 2. Set All Fonts to 14px */
+            
+            /* Semua Font 14px */
             #modalProductTitle { font-size: 14px !important; }
             #modalProductPrice { font-size: 14px !important; }
             #modalProductPriceStrike { font-size: 14px !important; }
             #modalProductDesc { font-size: 14px !important; }
-            
-            /* Variant Title and Buttons */
             #modalProductVariants .font-weight-bold { font-size: 14px !important; }
             #modalProductVariants .btn { font-size: 14px !important; padding: 8px 12px !important; }
-            
-            /* Cart Button */
             #modalAddToCart { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
         }
 
