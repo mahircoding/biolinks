@@ -135,7 +135,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     
                     <div id="modalProductVariants" class="mb-4"></div>
                     
-                    <!-- PERBAIKAN: Deskripsi dibatasi tingginya dan bisa di-scroll -->
                     <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
                     
                     <div class="mt-auto">
@@ -345,20 +344,40 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         
         /* SCROLLABLE DESCRIPTION CSS */
         #modalProductDesc {
-            /* Hapus flex-grow agar tidak memaksa tinggi modal */
             flex: unset; 
-            /* Batasi tinggi maksimal (misal 200px) */
             max-height: 200px;
-            /* Aktifkan scroll vertikal jika teks melebihi batas */
             overflow-y: auto;
-            /* Tambahkan padding kanan agar scrollbar tidak menutupi teks */
             padding-right: 8px; 
-            /* Styling scrollbar khusus untuk deskripsi */
         }
         
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
+
+        /* =========================================
+           PERBAIKAN MOBILE (IMAGE KECIL & FONT 14PX)
+           ========================================= */
+        @media (max-width: 767px) {
+            /* 1. Make Image Smaller */
+            /* Target the container directly behind the image */
+            .bg-light .w-100.rounded.mb-3 {
+                min-height: 180px !important; /* Dari 250px -> 180px */
+                max-height: 200px !important; /* Dari 50vh -> 200px */
+            }
+
+            /* 2. Set All Fonts to 14px */
+            #modalProductTitle { font-size: 14px !important; }
+            #modalProductPrice { font-size: 14px !important; }
+            #modalProductPriceStrike { font-size: 14px !important; }
+            #modalProductDesc { font-size: 14px !important; }
+            
+            /* Variant Title and Buttons */
+            #modalProductVariants .font-weight-bold { font-size: 14px !important; }
+            #modalProductVariants .btn { font-size: 14px !important; padding: 8px 12px !important; }
+            
+            /* Cart Button */
+            #modalAddToCart { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
+        }
 
         .bootstrap-select{flex: 1 1 auto !important;} 
         .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
