@@ -108,21 +108,22 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         </div>
     </div>
     
-    <!-- Product Detail Modal -->
-    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 999999; background-color: rgba(0,0,0,0.75); display: none !important;">
+    <!-- Product Detail Modal: STABLE BOTTOM FLOATING -->
+    <!-- Naikkan Z-Index ke MAX agar selalu di atas -->
+    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 9999999; background-color: rgba(0,0,0,0.75); display: none !important;">
         
-        <!-- PERBAIKAN LOGIC HEIGHT: Pakai MIN agar modal TIDAK membesar saat discroll -->
-        <!-- height: min(kalkulasi_layar, batas_maksimum) -->
-        <div class="bg-white rounded shadow position-relative d-flex flex-column" 
-             style="max-width: 600px; margin: 0 auto 20px auto; width: calc(100% - 30px); overflow: hidden; 
-                    /* Logika Baru: */
-                    height: min(calc(var(--vh, 1vh) * 100 - 65px), 500px); 
-                    /* Fallback lama (max-height) tetap ada untuk keamanan */
-                    max-height: calc(100vh - 195px);">
+        <!-- Modal Content Wrapper -->
+        <div class="bg-white rounded shadow position-relative" 
+             style="max-width: 600px; margin: 0 auto 0 auto; width: calc(100% - 20px); overflow: hidden; 
+                    /* FIX: Use Stable max-height instead of calc */
+                    max-height: 85vh; 
+                    height: auto; /* Let content define height up to max */
+                    position: absolute; bottom: 0; right: 0; left: 0;">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
             
-            <div class="d-flex flex-column flex-md-row overflow-auto" style="flex: 1; position: relative;">
+            <!-- Scrollable Inner Content -->
+            <div class="d-flex flex-column flex-md-row overflow-auto" style="max-height: 85vh;">
                 
                 <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
                     <div class="p-3 d-flex flex-column align-items-center">
@@ -157,18 +158,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     <script>
     window.eshop = window.eshop || {};
     window.eshop[<?= $data->link->link_id ?>] = <?= json_encode($products_data) ?>;
-    </script>
-
-    <script>
-    // Fix --vh for mobile address bar
-    (function() {
-        function setVH() {
-            let vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', vh + 'px');
-        }
-        setVH();
-        window.addEventListener('resize', setVH);
-    })();
     </script>
 
     <script>
@@ -355,11 +344,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
             .border-md-right { border-right: 0 !important; }
         }
         
+        /* Scrollbar */
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
 
-        /* STYLE MOBILE */
+        /* STYLE MOBILE (FONT 14PX & GAMBAR KECIL) */
         @media (max-width: 767px) {
             .bg-light .w-100.rounded.mb-3 {
                 min-height: 180px !important;
