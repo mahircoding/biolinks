@@ -108,15 +108,19 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         </div>
     </div>
     
-    <!-- Product Detail Modal: BOTTOM FLOATING STYLE -->
+    <!-- Product Detail Modal: BOTTOM FLOATING -->
     <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
-        <!-- PERBAIKAN: Modal Box -->
-        <div class="bg-white rounded shadow position-relative" style="max-width: 600px; max-height: 85vh; margin: 0 auto 20px auto; width: calc(100% - 30px); overflow: hidden;">
+        <!-- Modal Content Box (Fixed at Bottom) -->
+        <div class="bg-white rounded shadow position-relative" style="max-width: 600px; margin: 0 auto 20px auto; width: calc(100% - 30px); overflow: hidden;">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
             
-            <!-- PERBAIKAN: Scrollable Container -->
-            <div class="d-flex flex-column flex-md-row overflow-auto" style="max-height: 85vh;">
+            <!-- SCROLLABLE CONTAINER: Apply User's CSS Here -->
+            <div class="d-flex flex-column flex-md-row"
+                 style="max-height: calc(100vh - 195px);
+                        max-height: calc(var(--vh, 1vh) * 100 - 65px);
+                        overflow-y: auto;
+                        position: relative;">
                 
                 <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
                     <div class="p-3 d-flex flex-column align-items-center">
@@ -151,6 +155,18 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     <script>
     window.eshop = window.eshop || {};
     window.eshop[<?= $data->link->link_id ?>] = <?= json_encode($products_data) ?>;
+    </script>
+
+    <script>
+    // Fix --vh for mobile address bar
+    (function() {
+        function setVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', vh + 'px');
+        }
+        setVH();
+        window.addEventListener('resize', setVH);
+    })();
     </script>
 
     <script>
@@ -304,7 +320,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     
                     // Show Modal
                     modal.style.display = 'flex';
-                    // PERBAIKAN: Paksa posisi ke Bawah (Flex End)
+                    // Force Bottom Floating Position
                     modal.style.alignItems = 'flex-end'; 
                     modal.style.justifyContent = 'center';
                     
@@ -339,24 +355,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         }
         
         /* Scrollbar untuk content di dalam modal */
-        #productDetailModal .overflow-auto::-webkit-scrollbar { width: 6px; }
-        #productDetailModal .overflow-auto::-webkit-scrollbar-track { background: #f1f1f1; }
-        #productDetailModal .overflow-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-        
-        /* Deskripsi Scrollable */
-        #modalProductDesc {
-            flex: unset; 
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 8px; 
-        }
+        /* Note: Scrollbar style akan mengikuti user max-height settings */
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
 
-        /* =========================================
-           STYLE MOBILE (FONT 14PX & GAMBAR KECIL)
-           ========================================= */
+        /* STYLE MOBILE (FONT 14PX & GAMBAR KECIL) */
         @media (max-width: 767px) {
             /* Gambar lebih kecil */
             .bg-light .w-100.rounded.mb-3 {
