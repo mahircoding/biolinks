@@ -109,17 +109,17 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </div>
     
     <!-- Product Detail Modal -->
-    <!-- Menggunakan inline style display: none !important untuk memastikan tersembunyi -->
-    <div id="productDetailModal" class="position-fixed" style="top:0; left:0; width:100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
-        <div class="bg-white w-100 mx-3 rounded shadow overflow-hidden position-relative" style="max-width: 900px; max-height: 85vh;">
+    <!-- PERBAIKAN: inset: 0 memastikan cover penuh layar. max-height pada inner box memastikan tidak terpotong -->
+    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
+        <div class="bg-white rounded shadow overflow-hidden position-relative mx-2" style="max-width: 900px; max-height: 90vh; margin: auto; overflow-y: auto; width: calc(100% - 1rem);">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
             
-            <div class="d-flex flex-column flex-md-row h-100 overflow-auto">
+            <div class="d-flex flex-column flex-md-row">
                 
                 <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
-                    <div class="p-3 d-flex flex-column align-items-center h-100">
-                        <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 60vh;">
+                    <div class="p-3 d-flex flex-column align-items-center">
+                        <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 50vh;">
                             <img id="mainProductImage" src="" alt="Product" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
                         </div>
                         <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2 w-100 pb-2"></div>
@@ -136,7 +136,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     
                     <div id="modalProductVariants" class="mb-4"></div>
                     
-                    <div id="modalProductDesc" class="text-secondary small mb-4 flex-grow-1" style="white-space: pre-wrap; overflow-y: auto; line-height: 1.6;"></div>
+                    <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; overflow-y: auto; line-height: 1.6; flex: 1;"></div>
                     
                     <div class="mt-auto">
                         <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
@@ -301,20 +301,19 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         };
                     }
                     
-                    // PERBAIKAN POSISI: Paksa centering menggunakan Inline Style
+                    // PERBAIKAN: Tampilkan modal dengan Flexbox Centering
                     modal.style.display = 'flex';
-                    modal.style.flexDirection = 'column';
-                    modal.style.justifyContent = 'center'; // Center Vertically
-                    modal.style.alignItems = 'center';     // Center Horizontally
-                    modal.style.minHeight = '100vh';        // Paksa tinggi layar penuh
-                    modal.style.height = '100vh';
+                    modal.style.flexDirection = 'row';
+                    modal.style.flexWrap = 'wrap';
+                    modal.style.alignContent = 'center';
+                    modal.style.justifyContent = 'center';
                     
                     document.body.style.overflow = 'hidden';
                 });
             });
             
             const closeModal = () => {
-                modal.style.display = 'none'; // Reset display
+                modal.style.display = 'none';
                 document.body.style.overflow = 'auto';
             };
             
@@ -338,9 +337,11 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         @media (max-width: 767.98px) {
             .border-md-right { border-right: 0 !important; }
         }
-        .overflow-auto::-webkit-scrollbar { width: 6px; }
-        .overflow-auto::-webkit-scrollbar-track { background: #f1f1f1; }
-        .overflow-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        /* Custom Scrollbar for Modal Content */
+        #productDetailModal > div::-webkit-scrollbar { width: 6px; }
+        #productDetailModal > div::-webkit-scrollbar-track { background: #f1f1f1; }
+        #productDetailModal > div::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        
         .bootstrap-select{flex: 1 1 auto !important;} 
         .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
     </style>
