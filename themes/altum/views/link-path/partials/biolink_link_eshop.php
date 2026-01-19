@@ -108,49 +108,53 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         </div>
     </div>
     
-    <!-- Product Detail Modal: STABLE BOTTOM FLOATING -->
-    <!-- Naikkan Z-Index ke MAX agar selalu di atas -->
-    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 9999999; background-color: rgba(0,0,0,0.75); display: none !important;">
+    <!-- Product Detail Modal: SIMPLIFIED BOTTOM FLOATING -->
+    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 999999; background-color: rgba(0,0,0,0.75); display: none !important;">
         
-        <!-- Modal Content Wrapper -->
-        <div class="bg-white rounded shadow position-relative" 
-             style="max-width: 600px; margin: 0 auto 0 auto; width: calc(100% - 20px); overflow: hidden; 
-                    /* FIX: Use Stable max-height instead of calc */
-                    max-height: 85vh; 
-                    height: auto; /* Let content define height up to max */
-                    position: absolute; bottom: 0; right: 0; left: 0;">
+        <!-- 
+           PERBAIKAN POSISI KODE: 
+           Menggunakan flex-direction column dan justify-content flex-end 
+           agar modal selalu mendarat di bawah (bottom).
+        -->
+        <div style="display: flex; flex-direction: column; justify-content: flex-end; height: 100%; width: 100%; padding: 20px 0;">
             
-            <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
-            
-            <!-- Scrollable Inner Content -->
-            <div class="d-flex flex-column flex-md-row overflow-auto" style="max-height: 85vh;">
+            <!-- Modal Box Container -->
+            <div class="bg-white rounded shadow position-relative overflow-hidden mx-auto" 
+                 style="max-width: 600px; width: calc(100% - 30px); max-height: 90vh;">
                 
-                <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
-                    <div class="p-3 d-flex flex-column align-items-center">
-                        <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 50vh;">
-                            <img id="mainProductImage" src="" alt="Product" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
+                
+                <!-- Scrollable Content -->
+                <!-- Flex row untuk layout (Image Kiri, Info Kanan) -->
+                <div class="d-flex flex-column flex-md-row overflow-auto" style="max-height: 90vh;">
+                    
+                    <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
+                        <div class="p-3 d-flex flex-column align-items-center">
+                            <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 50vh;">
+                                <img id="mainProductImage" src="" alt="Product" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                            </div>
+                            <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2 w-100 pb-2"></div>
                         </div>
-                        <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2 w-100 pb-2"></div>
                     </div>
+                    
+                    <div class="col-12 col-md-6 p-4 d-flex flex-column bg-white">
+                        <h2 id="modalProductTitle" class="h4 font-weight-bold mb-3 text-dark"></h2>
+                        
+                        <div class="mb-3 pb-3 border-bottom">
+                            <span id="modalProductPrice" class="h3 font-weight-bold text-primary d-block mb-1"></span>
+                            <span id="modalProductPriceStrike" class="text-muted text-decoration-line-through d-none small"></span>
+                        </div>
+                        
+                        <div id="modalProductVariants" class="mb-4"></div>
+                        
+                        <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                        
+                        <div class="mt-auto">
+                            <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
+                        </div>
+                    </div>
+                    
                 </div>
-                
-                <div class="col-12 col-md-6 p-4 d-flex flex-column bg-white">
-                    <h2 id="modalProductTitle" class="h4 font-weight-bold mb-3 text-dark"></h2>
-                    
-                    <div class="mb-3 pb-3 border-bottom">
-                        <span id="modalProductPrice" class="h3 font-weight-bold text-primary d-block mb-1"></span>
-                        <span id="modalProductPriceStrike" class="text-muted text-decoration-line-through d-none small"></span>
-                    </div>
-                    
-                    <div id="modalProductVariants" class="mb-4"></div>
-                    
-                    <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
-                    
-                    <div class="mt-auto">
-                        <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
-                    </div>
-                </div>
-                
             </div>
         </div>
     </div>
@@ -311,9 +315,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     
                     // Show Modal
                     modal.style.display = 'flex';
-                    modal.style.alignItems = 'flex-end'; 
-                    modal.style.justifyContent = 'center';
-                    
                     document.body.style.overflow = 'hidden';
                 });
             });
@@ -351,11 +352,13 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
 
         /* STYLE MOBILE (FONT 14PX & GAMBAR KECIL) */
         @media (max-width: 767px) {
+            /* Gambar lebih kecil */
             .bg-light .w-100.rounded.mb-3 {
                 min-height: 180px !important;
                 max-height: 200px !important;
             }
             
+            /* Semua Font 14px */
             #modalProductTitle { font-size: 14px !important; }
             #modalProductPrice { font-size: 14px !important; }
             #modalProductPriceStrike { font-size: 14px !important; }
