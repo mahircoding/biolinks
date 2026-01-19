@@ -1,7 +1,6 @@
 <?php defined('ALTUMCODE') || die() ?>
 <?php 
  $settings_data = is_object($data->link->settings) ? $data->link->settings : json_encode($data->link->settings); 
-// Note: Ensure correct decoding based on your data structure
 if(is_string($settings_data)) $settings_data = json_decode($settings_data);
 
  $products_data = isset($settings_data->data) ? $settings_data->data : $settings_data;
@@ -110,7 +109,8 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </div>
     
     <!-- Product Detail Modal -->
-    <div id="productDetailModal" class="position-fixed top-0 left-0 w-100 h-100 d-flex justify-content-center align-items-center" style="z-index: 100000; background-color: rgba(0,0,0,0.75); display: none;">
+    <!-- PERBAIKAN: Hapus d-flex, justify-content, align-items dari class. Paksa display:none !important -->
+    <div id="productDetailModal" class="position-fixed top-0 left-0 w-100 h-100" style="z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
         <div class="bg-white w-100 mx-3 rounded shadow overflow-hidden position-relative" style="max-width: 900px; max-height: 85vh;">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
@@ -148,15 +148,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </div>
     
     <script>
-    // FIX 1: Initialize eshop if not exists to prevent crash
     window.eshop = window.eshop || {};
     window.eshop[<?= $data->link->link_id ?>] = <?= json_encode($products_data) ?>;
     </script>
 
     <script>
-    // FIX 2: Separate script logic and ensure DOM is ready
     (function() {
-        // Wait for DOM just to be safe
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initModal);
         } else {
@@ -168,18 +165,18 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
             const closeBtn = document.querySelector('.product-modal-close');
             
             if(!modal) {
-                console.error('Modal element #productDetailModal not found.');
+                console.error('Modal not found');
                 return;
             }
 
             const detailBtns = document.querySelectorAll('.btn-detail');
-            console.log('Found detail buttons:', detailBtns.length); // Debugging log
+            console.log('Found buttons:', detailBtns.length);
             
             detailBtns.forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    e.preventDefault(); // FIX 3: Prevent default link behavior
+                    e.preventDefault();
                     
-                    // Get data safely
+                    // Data extraction
                     const title = this.getAttribute('data-product-title');
                     const desc = this.getAttribute('data-product-desc');
                     const fullDesc = this.getAttribute('data-product-full-desc');
@@ -193,7 +190,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     const index = this.getAttribute('data-product-index');
                     const linkId = this.getAttribute('data-product-link-id');
                     
-                    // Set Content
+                    // Populate Content
                     document.getElementById('modalProductTitle').textContent = title || '';
                     document.getElementById('modalProductDesc').textContent = fullDesc || desc || '';
                     document.getElementById('modalProductPrice').textContent = price || '';
@@ -206,16 +203,14 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         strikeEl.classList.add('d-none');
                     }
                     
-                    // Handle Images
+                    // Images
                     const images = [image, image1, image2, image3, image4].filter(img => img && img.trim() !== '');
                     const mainImg = document.getElementById('mainProductImage');
                     const thumbnailGallery = document.getElementById('thumbnailGallery');
-                    
                     thumbnailGallery.innerHTML = '';
                     
                     if(images.length > 0) {
                         mainImg.src = images[0];
-                        
                         images.forEach((imgUrl, idx) => {
                             const thumb = document.createElement('img');
                             thumb.src = imgUrl;
@@ -239,7 +234,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         });
                     }
                     
-                    // Handle Variants
+                    // Variants
                     const variantsData = this.getAttribute('data-product-variants');
                     let variants = [];
                     try { variants = JSON.parse(variantsData || '[]'); } catch(e) {}
@@ -251,7 +246,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         variants.forEach((variantGroup, gIndex) => {
                             const groupDiv = document.createElement('div');
                             groupDiv.className = 'mb-3';
-                            
                             const groupTitle = document.createElement('div');
                             groupTitle.className = 'font-weight-bold small mb-2 text-dark';
                             groupTitle.textContent = variantGroup.title || '';
@@ -303,21 +297,21 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                             const originalBtn = document.querySelector(`a[data-cart="add"][data-link-id="${linkId}"]`);
                             if(originalBtn) {
                                 originalBtn.click();
-                                modal.style.display = 'none';
-                                document.body.style.overflow = 'auto';
+                                closeModal();
                             }
                         };
                     }
                     
-                    // Show Modal
+                    // PERBAIKAN: Aktifkan Flex secara manual saat klik
+                    modal.classList.add('d-flex', 'justify-content-center', 'align-items-center');
                     modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
                 });
             });
             
-            // Close Logic
             const closeModal = () => {
                 modal.style.display = 'none';
+                modal.classList.remove('d-flex', 'justify-content-center', 'align-items-center');
                 document.body.style.overflow = 'auto';
             };
             
