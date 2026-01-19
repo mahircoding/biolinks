@@ -109,18 +109,21 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </div>
     
     <!-- Product Detail Modal: BOTTOM FLOATING -->
-    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
-        <!-- Modal Content Box (Fixed at Bottom) -->
-        <div class="bg-white rounded shadow position-relative" style="max-width: 600px; margin: 0 auto 20px auto; width: calc(100% - 30px); overflow: hidden;">
+    <!-- PERBAIKAN 1: Naikkan z-index ke 999999 -->
+    <div id="productDetailModal" class="position-fixed" style="inset: 0; width: 100%; z-index: 999999; background-color: rgba(0,0,0,0.75); display: none !important;">
+        
+        <!-- PERBAIKAN 2: Apply height logic pada Container Agar Tidak Collapse -->
+        <!-- Tambahkan 'max(..., 300px)' untuk memastikan modal selalu terlihat meskipun kalkulasi aneh -->
+        <div class="bg-white rounded shadow position-relative d-flex flex-column" 
+             style="max-width: 600px; margin: 0 auto 20px auto; width: calc(100% - 30px); overflow: hidden; 
+                    height: max(calc(100vh - 195px), 300px);
+                    height: max(calc(var(--vh, 1vh) * 100 - 65px), 300px);">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
             
-            <!-- SCROLLABLE CONTAINER: Apply User's CSS Here -->
-            <div class="d-flex flex-column flex-md-row"
-                 style="max-height: calc(100vh - 195px);
-                        max-height: calc(var(--vh, 1vh) * 100 - 65px);
-                        overflow-y: auto;
-                        position: relative;">
+            <!-- SCROLLABLE CONTAINER -->
+            <!-- Hapus max-height di sini karena parent sudah diatur -->
+            <div class="d-flex flex-column flex-md-row overflow-auto" style="flex: 1; position: relative;">
                 
                 <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
                     <div class="p-3 d-flex flex-column align-items-center">
@@ -355,7 +358,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         }
         
         /* Scrollbar untuk content di dalam modal */
-        /* Note: Scrollbar style akan mengikuti user max-height settings */
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
