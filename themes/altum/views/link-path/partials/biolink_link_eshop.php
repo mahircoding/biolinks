@@ -109,8 +109,8 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     </div>
     
     <!-- Product Detail Modal -->
-    <!-- PERBAIKAN: Hapus d-flex, justify-content, align-items dari class. Paksa display:none !important -->
-    <div id="productDetailModal" class="position-fixed top-0 left-0 w-100 h-100" style="z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
+    <!-- Menggunakan inline style display: none !important untuk memastikan tersembunyi -->
+    <div id="productDetailModal" class="position-fixed" style="top:0; left:0; width:100%; z-index: 100000; background-color: rgba(0,0,0,0.75); display: none !important;">
         <div class="bg-white w-100 mx-3 rounded shadow overflow-hidden position-relative" style="max-width: 900px; max-height: 85vh;">
             
             <span class="product-modal-close position-absolute text-dark bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="top: 10px; right: 10px; z-index: 1000; cursor: pointer; font-size: 24px; width: 36px; height: 36px; opacity: 0.8;">&times;</span>
@@ -170,7 +170,6 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
             }
 
             const detailBtns = document.querySelectorAll('.btn-detail');
-            console.log('Found buttons:', detailBtns.length);
             
             detailBtns.forEach(btn => {
                 btn.addEventListener('click', function(e) {
@@ -302,16 +301,20 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         };
                     }
                     
-                    // PERBAIKAN: Aktifkan Flex secara manual saat klik
-                    modal.classList.add('d-flex', 'justify-content-center', 'align-items-center');
+                    // PERBAIKAN POSISI: Paksa centering menggunakan Inline Style
                     modal.style.display = 'flex';
+                    modal.style.flexDirection = 'column';
+                    modal.style.justifyContent = 'center'; // Center Vertically
+                    modal.style.alignItems = 'center';     // Center Horizontally
+                    modal.style.minHeight = '100vh';        // Paksa tinggi layar penuh
+                    modal.style.height = '100vh';
+                    
                     document.body.style.overflow = 'hidden';
                 });
             });
             
             const closeModal = () => {
-                modal.style.display = 'none';
-                modal.classList.remove('d-flex', 'justify-content-center', 'align-items-center');
+                modal.style.display = 'none'; // Reset display
                 document.body.style.overflow = 'auto';
             };
             
