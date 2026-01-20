@@ -108,44 +108,49 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         </div>
     </div>
     
-    <!-- Product Detail Modal: CLASS-BASED VISIBILITY -->
-    <!-- Class 'modal-overlay' handles display:none/flex -->
-    <div id="productDetailModal" class="modal-overlay">
-        
-        <!-- Modal Box Wrapper -->
-        <div class="modal-box">
-            
-            <span class="product-modal-close">&times;</span>
-            
-            <!-- Scrollable Content -->
-            <div class="modal-content-inner d-flex flex-column flex-md-row overflow-auto">
-                
-                <div class="col-12 col-md-6 p-0 bg-light border-bottom border-md-bottom-0 border-md-right">
-                    <div class="p-3 d-flex flex-column align-items-center">
-                        <div class="w-100 bg-white rounded mb-3 p-2 text-center d-flex align-items-center justify-content-center" style="min-height: 250px; max-height: 50vh;">
-                            <img id="mainProductImage" src="" alt="Product" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+    <!-- Product Detail Modal: Bootstrap Modal (Same as #addtocart) -->
+    <div class="modal fade" id="productDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title" id="modalProductTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="row no-gutters">
+                        <!-- Image Section -->
+                        <div class="col-12 col-md-5 bg-light">
+                            <div class="p-3">
+                                <div class="text-center mb-3" style="min-height: 200px;">
+                                    <img id="mainProductImage" src="" alt="Product" class="img-fluid rounded" style="max-height: 280px; object-fit: contain;" />
+                                </div>
+                                <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2"></div>
+                            </div>
                         </div>
-                        <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center gap-2 w-100 pb-2"></div>
+                        
+                        <!-- Info Section -->
+                        <div class="col-12 col-md-7">
+                            <div class="p-3">
+                                <!-- Price -->
+                                <div class="mb-3 pb-2 border-bottom">
+                                    <span id="modalProductPrice" class="h4 font-weight-bold text-primary d-block mb-1"></span>
+                                    <span id="modalProductPriceStrike" class="text-muted text-decoration-line-through d-none small"></span>
+                                </div>
+                                
+                                <!-- Variants -->
+                                <div id="modalProductVariants" class="mb-3"></div>
+                                
+                                <!-- Description -->
+                                <div id="modalProductDesc" class="text-secondary small mb-3" style="white-space: pre-wrap; line-height: 1.6; max-height: 150px; overflow-y: auto;"></div>
+                                
+                                <!-- Add to Cart Button -->
+                                <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-2" href="javascript:;"><?= $button_text ?></a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="col-12 col-md-6 p-4 d-flex flex-column bg-white">
-                    <h2 id="modalProductTitle" class="h4 font-weight-bold mb-3 text-dark"></h2>
-                    
-                    <div class="mb-3 pb-3 border-bottom">
-                        <span id="modalProductPrice" class="h3 font-weight-bold text-primary d-block mb-1"></span>
-                        <span id="modalProductPriceStrike" class="text-muted text-decoration-line-through d-none small"></span>
-                    </div>
-                    
-                    <div id="modalProductVariants" class="mb-4"></div>
-                    
-                    <div id="modalProductDesc" class="text-secondary small mb-4" style="white-space: pre-wrap; line-height: 1.6;"></div>
-                    
-                    <div class="mt-auto">
-                        <a id="modalAddToCart" class="btn btn-primary btn-block font-weight-bold py-3 rounded-lg" href="javascript:;"><?= $button_text ?></a>
-                    </div>
-                </div>
-                
             </div>
         </div>
     </div>
@@ -158,20 +163,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
     <script>
     (function() {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initModal);
+            document.addEventListener('DOMContentLoaded', initProductDetailModal);
         } else {
-            initModal();
+            initProductDetailModal();
         }
 
-        function initModal() {
-            const modal = document.getElementById('productDetailModal');
-            const closeBtn = document.querySelector('.product-modal-close');
-            
-            if(!modal) {
-                console.error('Modal not found');
-                return;
-            }
-
+        function initProductDetailModal() {
             const detailBtns = document.querySelectorAll('.btn-detail');
             
             detailBtns.forEach(btn => {
@@ -216,20 +213,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                         images.forEach((imgUrl, idx) => {
                             const thumb = document.createElement('img');
                             thumb.src = imgUrl;
-                            thumb.className = 'cursor-pointer rounded p-1 border' + (idx === 0 ? ' border-primary' : ' border-white');
-                            thumb.style.width = '60px';
-                            thumb.style.height = '60px';
-                            thumb.style.objectFit = 'cover';
-                            thumb.style.backgroundColor = '#fff';
-                            thumb.style.transition = 'all 0.2s';
+                            thumb.className = 'rounded border cursor-pointer' + (idx === 0 ? ' border-primary' : '');
+                            thumb.style.cssText = 'width:50px;height:50px;object-fit:cover;cursor:pointer;';
                             
                             thumb.onclick = function() {
                                 mainImg.src = imgUrl;
-                                Array.from(thumbnailGallery.children).forEach(c => {
-                                    c.classList.remove('border-primary');
-                                    c.classList.add('border-white');
-                                });
-                                this.classList.remove('border-white');
+                                Array.from(thumbnailGallery.children).forEach(c => c.classList.remove('border-primary'));
                                 this.classList.add('border-primary');
                             };
                             thumbnailGallery.appendChild(thumb);
@@ -247,14 +236,16 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                     if(variants && variants.length > 0) {
                         variants.forEach((variantGroup, gIndex) => {
                             const groupDiv = document.createElement('div');
-                            groupDiv.className = 'mb-3';
+                            groupDiv.className = 'mb-2';
+                            
                             const groupTitle = document.createElement('div');
-                            groupTitle.className = 'font-weight-bold small mb-2 text-dark';
+                            groupTitle.className = 'font-weight-bold small mb-1 text-dark';
                             groupTitle.textContent = variantGroup.title || '';
                             groupDiv.appendChild(groupTitle);
                             
                             const optionsDiv = document.createElement('div');
-                            optionsDiv.className = 'd-flex flex-wrap gap-2';
+                            optionsDiv.className = 'd-flex flex-wrap';
+                            optionsDiv.style.gap = '5px';
                             
                             if(variantGroup.variant && variantGroup.variant.length > 0) {
                                 variantGroup.variant.forEach((opt, oIndex) => {
@@ -299,137 +290,94 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                             const originalBtn = document.querySelector(`a[data-cart="add"][data-link-id="${linkId}"]`);
                             if(originalBtn) {
                                 originalBtn.click();
-                                closeModal();
+                                // Close modal using Bootstrap
+                                $('#productDetailModal').modal('hide');
                             }
                         };
                     }
                     
-                    // SHOW MODAL VIA CLASS (Fixes Visibility Issue)
-                    modal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                    // Show modal using Bootstrap
+                    $('#productDetailModal').modal('show');
                 });
-            });
-            
-            const closeModal = () => {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            };
-            
-            if(closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
-            
-            window.addEventListener('click', (e) => { 
-                if(e.target == modal) closeModal(); 
             });
         }
     })();
     </script>
     
     <style>
-        /* =========================================
-           MODAL VISIBILITY & POSITIONING CLASSES
-           ========================================= */
+        /* Bootstrap Select Fix */
+        .bootstrap-select{flex: 1 1 auto !important;} 
+        .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
         
-        /* Overlay Background: Hidden by default */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            z-index: 9999999; /* Max Z-Index */
-            background-color: rgba(0,0,0,0.75);
-            align-items: flex-end; /* Stick to Bottom */
-            justify-content: center; /* Center Horizontal */
-            padding-bottom: 20px;
-        }
-
-        /* Active State: Shown as Flex */
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        /* The White Modal Box */
-        .modal-box {
-            background-color: #fff;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            /* Height Control: Max 90vh so it fits screen */
-            max-height: 90vh; 
+        /* Product Detail Modal Styles */
+        #productDetailModal .modal-content {
+            border: none;
+            border-radius: 12px;
             overflow: hidden;
-            margin: 0 15px; /* Space on sides for mobile */
-        }
-
-        /* Close Button */
-        .product-modal-close {
-            color: #aaa;
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            font-size: 32px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1000;
-            line-height: 1;
-            background: rgba(255,255,255,0.9);
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s;
-        }
-        .product-modal-close:hover { color: #000; background: #fff; }
-
-        /* Inner Content Scroll Area */
-        .modal-content-inner {
-            max-height: 90vh;
-            height: auto;
-        }
-
-        /* Helper Classes (Bootstrap compat) */
-        .rounded-lg { border-radius: 0.5rem !important; }
-        .btn-block { display: block; width: 100%; }
-        .py-3 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
-        .border-md-right { border-right: 1px solid #dee2e6 !important; }
-        .border-md-bottom-0 { border-bottom: 0 !important; }
-        @media (max-width: 767.98px) {
-            .border-md-right { border-right: 0 !important; }
         }
         
-        /* Scrollbar Styling */
+        #productDetailModal .modal-header {
+            border-bottom: 1px solid #eee;
+        }
+        
+        #productDetailModal .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        /* Thumbnail Gallery */
+        #thumbnailGallery img {
+            transition: all 0.2s;
+        }
+        #thumbnailGallery img:hover {
+            opacity: 0.8;
+        }
+        #thumbnailGallery img.border-primary {
+            border-width: 2px !important;
+        }
+        
+        /* Scrollbar for description */
         #modalProductDesc::-webkit-scrollbar { width: 4px; }
         #modalProductDesc::-webkit-scrollbar-track { background: #f9f9f9; }
         #modalProductDesc::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
-
-        /* =========================================
-           MOBILE STYLES (FONT 14PX & SMALL IMG)
-           ========================================= */
-        @media (max-width: 767px) {
-            /* Gambar lebih kecil */
-            .bg-light .w-100.rounded.mb-3 {
-                min-height: 180px !important;
+        
+        /* Mobile Responsive */
+        @media (max-width: 767.98px) {
+            #productDetailModal .modal-dialog {
+                margin: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            #productDetailModal .modal-title {
+                font-size: 14px;
+            }
+            
+            #productDetailModal #modalProductPrice {
+                font-size: 18px !important;
+            }
+            
+            #productDetailModal #modalProductDesc {
+                font-size: 13px;
+                max-height: 120px;
+            }
+            
+            #productDetailModal #mainProductImage {
                 max-height: 200px !important;
             }
             
-            /* Semua Font 14px */
-            #modalProductTitle { font-size: 14px !important; }
-            #modalProductPrice { font-size: 14px !important; }
-            #modalProductPriceStrike { font-size: 14px !important; }
-            #modalProductDesc { font-size: 14px !important; }
-            #modalProductVariants .font-weight-bold { font-size: 14px !important; }
-            #modalProductVariants .btn { font-size: 14px !important; padding: 8px 12px !important; }
-            #modalAddToCart { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
+            #thumbnailGallery img {
+                width: 45px !important;
+                height: 45px !important;
+            }
+            
+            #modalProductVariants .btn {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            
+            #modalAddToCart {
+                font-size: 14px;
+            }
         }
-
-        .bootstrap-select{flex: 1 1 auto !important;} 
-        .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
     </style>
 </div>
