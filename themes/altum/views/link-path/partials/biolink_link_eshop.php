@@ -169,6 +169,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         }
 
         function initProductDetailModal() {
+            // PENTING: Pindahkan modal ke body untuk fix z-index stacking context
+            const modal = document.getElementById('productDetailModal');
+            if(modal && modal.parentElement !== document.body) {
+                document.body.appendChild(modal);
+            }
+            
             const detailBtns = document.querySelectorAll('.btn-detail');
             
             detailBtns.forEach(btn => {
