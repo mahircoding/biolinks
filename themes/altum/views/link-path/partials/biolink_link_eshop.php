@@ -309,6 +309,15 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         .bootstrap-select{flex: 1 1 auto !important;} 
         .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
         
+        /* Product Detail Modal - HIGH Z-INDEX */
+        #productDetailModal {
+            z-index: 99999999 !important;
+        }
+        #productDetailModal + .modal-backdrop,
+        .modal-backdrop.show {
+            z-index: 99999998 !important;
+        }
+        
         /* Product Detail Modal Styles */
         #productDetailModal .modal-content {
             border: none;
