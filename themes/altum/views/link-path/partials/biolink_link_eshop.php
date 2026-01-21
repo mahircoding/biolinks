@@ -60,7 +60,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                                data-product-index="<?= $num_prd ?>"
                                data-product-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>"
                                href="javascript:;">Detail</a>
-                            <a class="btn btn-sm btn-outline-secondary none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
+                            <a class="btn btn-sm btn-success mt-2" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
                         </div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
                                data-product-index="<?= $num_prd ?>"
                                data-product-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>"
                                href="javascript:;">Detail</a>
-                            <a class="btn btn-sm btn-outline-secondary none" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
+                            <a class="btn btn-sm btn-success mt-2" data-index="<?= $num_prd ?>" data-cart="add" data-link-id="<?= $data->link->link_id.':'.$iy.":".$iz ?>" href="javascript:;"><?= $button_text ?></a>
                         </div>
                     </div>
                 </div>
@@ -314,6 +314,12 @@ if(is_string($settings_data)) $settings_data = json_decode($settings_data);
         /* Bootstrap Select Fix */
         .bootstrap-select{flex: 1 1 auto !important;} 
         .bootstrap-select .btn{line-height:2.25 !important;border-top-left-radius:0;border-bottom-left-radius:0;}
+        
+        /* Harga Coret (Strikethrough) */
+        .text-decoration-line-through,
+        .price-strike {
+            text-decoration: line-through !important;
+        }
         
         /* Product Detail Modal - HIGH Z-INDEX */
         #productDetailModal {
