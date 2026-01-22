@@ -115,7 +115,7 @@ body.modal-open {
             <tr>
                 <td><?= (int)$order->order_id ?></td>
                 <td><?= $order->product_name ?></td>
-                <td><?= $order->buyer_name ?><br><small><?= $order->buyer_email ?></small></td>
+                <td><?= $order->buyer_name ?><br><small><?= $order->buyer_email ?></small><br><small><?= $order->buyer_phone ?></small></td>
                 <td>
                     <span class="badge badge-<?= $order->status === 'paid' ? 'success' : ($order->status === 'cancelled' ? 'danger' : ($order->status === 'refunded' ? 'warning' : 'secondary')) ?>">
                         <?= strtoupper($order->status) ?>

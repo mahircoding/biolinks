@@ -182,8 +182,32 @@ class ApiUser extends Controller {
         $ip = get_ip();
 
         // Get package settings
+        $package_settings = '';
         $package_expiration_date = date("Y-m-d H:i:s", strtotime('+' . $this->settings->package_trial->days . ' days'));
-        $package_settings = json_encode($this->settings->package_trial->settings);
+
+        /* Get the package settings */
+        if($package_id == 'free') {
+            $package_settings = json_encode($this->settings->package_free->settings);
+            $package_expiration_date = date("Y-m-d H:i:s", strtotime('+100 years')); // Free plan practically never expires
+        } elseif($package_id == 'trial') {
+            $package_settings = json_encode($this->settings->package_trial->settings);
+            $package_expiration_date = date("Y-m-d H:i:s", strtotime('+' . $this->settings->package_trial->days . ' days'));
+        } else {
+            /* Try to get the package from the database */
+            $package = Database::get('*', 'packages', ['package_id' => $package_id]);
+
+            if($package) {
+                $package_settings = $package->settings;
+                
+                // Default to 30 days for paid packages if not specified
+                $package_expiration_date = date("Y-m-d H:i:s", strtotime('+30 days'));
+            } else {
+                // Fallback to free if package invalid
+                $package_id = 'free';
+                $package_settings = json_encode($this->settings->package_free->settings);
+                $package_expiration_date = date("Y-m-d H:i:s", strtotime('+100 years')); 
+            }
+        }
 
         // Override package expiration date if provided
         if(isset($data['package_expiration_date'])) {
