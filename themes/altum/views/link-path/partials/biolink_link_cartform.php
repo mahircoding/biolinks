@@ -13,7 +13,7 @@
 </div>
 
 <?php ob_start() ?>
-<div class="modal fade" id="cartform_<?= $data->link->link_id ?>" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade cartform-modal" id="cartform_<?= $data->link->link_id ?>" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
 

@@ -410,7 +410,7 @@ $pvs=$kts=$kcs=null;
 	</div>
 	<style>
 	/* FIX: High z-index untuk semua modal */
-	#addtocart, #product_variant, #locked_content {
+	#addtocart, #product_variant, #locked_content, .cartform-modal {
 		z-index: 99999999 !important;
 	}
 	#addtocart + .modal-backdrop,
