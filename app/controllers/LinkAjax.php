@@ -200,6 +200,8 @@ class LinkAjax extends Controller {
                         $this->create_biolink_mail();
                     } else if($_POST['subtype'] == 'text') {
                         $this->create_biolink_text();
+                    } else if($_POST['subtype'] == 'text_pv2') {
+                        $this->create_biolink_text_pv2();
                     } else if($_POST['subtype'] == 'runningtext') {
                         $this->create_biolink_runningtext();
                     } else if($_POST['subtype'] == 'html') {
@@ -711,6 +713,34 @@ class LinkAjax extends Controller {
             'description' => $_POST['description'],
             'title_text_color' => 'white',
             'description_text_color' => 'white',
+        ]);
+
+        $stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('ssssssssss', $project_id, $_POST['link_id'], $this->user->user_id, $type, $subtype, $url, $location_url, $settings, $order, \Altum\Date::$date);
+        $stmt->execute();
+        $stmt->close();
+
+        /* Clear the cache */
+        \Altum\Cache::$adapter->deleteItemsByTag('biolinks_links_user_' . $this->user->user_id);
+
+        Response::json('', 'success', ['url' => url('link/' . $_POST['link_id'] . '?tab=links')]);
+    }
+
+    private function create_biolink_text_pv2() {
+        $_POST['link_id'] = (int) $_POST['link_id'];
+        $_POST['title'] = trim(Database::clean_string($_POST['title']));
+
+        if(!$project_id = Database::simple_get('project_id', 'links', ['user_id' => $this->user->user_id, 'link_id' => $_POST['link_id'], 'type' => 'biolink', 'subtype' => 'base'])) {
+            die();
+        }
+
+        $url = $location_url = '';
+        $type = 'biolink';
+        $subtype = 'text_pv2';
+		$order = 99;
+        $settings = json_encode([
+            'title' => $_POST['title'],
+            'description' => $_POST['description'],
         ]);
 
         $stmt = Database::$database->prepare("INSERT INTO `links` (`project_id`, `biolink_id`, `user_id`, `type`, `subtype`, `url`, `location_url`, `settings`, `order`, `date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -1638,6 +1668,8 @@ class LinkAjax extends Controller {
                             $this->update_biolink_mail();
                         } else if($_POST['subtype'] == 'text') {
                             $this->update_biolink_text();
+                        } else if($_POST['subtype'] == 'text_pv2') {
+                            $this->update_biolink_text_pv2();
                         } else if($_POST['subtype'] == 'runningtext') {
                             $this->update_biolink_runningtext();
                         } else if($_POST['subtype'] == 'multitext') {
@@ -2269,6 +2301,30 @@ class LinkAjax extends Controller {
             'description' => $_POST['description'],
             'title_text_color' => $_POST['title_text_color'],
             'description_text_color' => $_POST['description_text_color'],
+        ]);
+
+        $stmt = Database::$database->prepare("UPDATE `links` SET `settings` = ? WHERE `link_id` = ?");
+        $stmt->bind_param('ss', $settings, $_POST['link_id']);
+        $stmt->execute();
+        $stmt->close();
+
+        /* Clear the cache */
+        \Altum\Cache::$adapter->deleteItemsByTag('biolinks_links_user_' . $this->user->user_id);
+
+        Response::json($this->language->link->success_message->settings_updated, 'success');
+    }
+
+    private function update_biolink_text_pv2() {
+        $_POST['link_id'] = (int) $_POST['link_id'];
+        $_POST['title'] = trim(Database::clean_string($_POST['title']));
+
+        if(!$link = Database::get('*', 'links', ['link_id' => $_POST['link_id'], 'user_id' => $this->user->user_id])) {
+            die();
+        }
+
+        $settings = json_encode([
+            'title' => $_POST['title'],
+            'description' => $_POST['description'],
         ]);
 
         $stmt = Database::$database->prepare("UPDATE `links` SET `settings` = ? WHERE `link_id` = ?");

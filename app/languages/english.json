@@ -1151,6 +1151,12 @@
 				"icon"							: "fa fa-fw fa-heading",
 				"color"							: "#000"
 			},
+
+			"text_pv2": {
+				"name"                          : "HTML PV2",
+				"icon"							: "fa fa-fw fa-heading",
+				"color"							: "#000"
+			},
 			
 			"html": {
 				"name"                          : "MultiText",
@@ -2298,6 +2304,18 @@
 			"description"				: "Description",
 			"title_text_color"			: "Title Color",
 			"description_text_color"	: "Description Color",
+
+			"submit"					: "Add Block"
+		}
+	},
+
+	"create_biolink_text_pv2_modal": {
+		"header"						: "Create a HTML PV2 Block",
+		"subheader"						: "Add a title and a description.",
+
+		"input": {
+			"title"						: "Title",
+			"description"				: "Description",
 
 			"submit"					: "Add Block"
 		}
