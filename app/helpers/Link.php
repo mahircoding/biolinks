@@ -209,6 +209,16 @@ class Link {
                 $view_path = 'link-path/partials/biolink_link_text';
 
                 break;
+				
+			case 'text_pv2':
+
+                $link->settings = json_decode($link->settings);
+                
+                $link->settings->description = cleanHTMLBody($link->settings->description);
+
+                $view_path = 'link-path/partials/biolink_link_text_pv2';
+
+                break;
 			
 			case 'html':
 
