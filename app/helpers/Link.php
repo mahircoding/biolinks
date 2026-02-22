@@ -64,6 +64,17 @@ class Link {
 		
 		$link->design->page_transition = isset($link->settings->page_transition_type) ? $link->settings->page_transition_type : 0;
 		
+        /* Remove background if HTML PV2 (text_pv2) block is used */
+        if ($links) {
+            foreach ($links as $row) {
+                if ($row->subtype == 'text_pv2') {
+                    $link->design->background_class = '';
+                    $link->design->background_style = '';
+                    break;
+                }
+            }
+        }
+		
         /* Determine the color of the header text */
         $link->design->text_style = 'color: ' . $link->settings->text_color;
 
