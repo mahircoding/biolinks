@@ -104,7 +104,7 @@ $pvs=$kts=$kcs=null;
 								<?php endforeach ?>
 							<?php endif ?>
 							
-							<?php if($data->user->package_settings->socials): ?>
+							<?php if($data->user->package_settings->socials && !$data->link->design->full_page): ?>
 							<div id="socials" class="d-flex flex-wrap justify-content-center mt-5">
 
 							<?php $biolink_socials = require APP_PATH . 'includes/biolink_socials.php'; ?>
