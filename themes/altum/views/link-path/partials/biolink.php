@@ -37,9 +37,9 @@ $pvs=$kts=$kcs=null;
     <div id="pt-main" data-animation="<?= $data->link->design->page_transition ?>" data-bg-class="<?= $data->link->design->background_class ?>" data-bg-style="<?= $data->link->design->background_style ?>" class="pt-perspective">
 		<div class="pt-page pt-page-1" style=""></div>
 		<div class="pt-page pt-page-2 pt-page-current pt-current-active" style="">
-			<div class="container">
-				<div class="row d-flex justify-content-center text-center">
-					<div class="<?= $data->link->design->full_page ? 'col-12 p-0 m-0' : 'col-md-8' ?> link-content<?= isset($_GET['preview']) ? ' container-disabled-simple' : ''?>">
+			<?php if(!$data->link->design->full_page): ?><div class="container">
+				<div class="row d-flex justify-content-center text-center"><?php endif ?>
+					<div class="<?= $data->link->design->full_page ? 'col-12 p-0 m-0 w-100' : 'col-md-8' ?> link-content<?= isset($_GET['preview']) ? ' container-disabled-simple' : ''?>">
 
 						<?php require THEME_PATH . 'views/partials/ads_header_biolink.php' ?>
 
@@ -141,8 +141,8 @@ $pvs=$kts=$kcs=null;
 						</footer>
 						<?php endif ?>
 					</div>
-				</div>
-			</div>
+				<?php if(!$data->link->design->full_page): ?></div>
+			</div><?php endif ?>
 		</div>
 	</div>
 	<a class="bio-addtocart hide" href="javascript:;" data-toggle="modal" data-target="#addtocart">
@@ -224,17 +224,11 @@ $pvs=$kts=$kcs=null;
 	.product-empty{display:flex;justify-content:center;align-items:center;min-height:180px}
 	.product-empty .empty-center{display:flex;align-items:center}
     <?php if($data->link->design->full_page): ?>
-    #links, main, .link-content, .container, .row, .pt-page, .pt-perspective, .link-body {
+    body.link-body, #pt-main.pt-perspective, .pt-page, #links {
         margin: 0 !important;
         padding: 0 !important;
         max-width: none !important;
         width: 100% !important;
-    }
-    header {
-        display: none !important;
-    }
-    .link-footer {
-        display: none !important;
     }
     <?php endif ?>
 	</style>
