@@ -43,6 +43,7 @@ $pvs=$kts=$kcs=null;
 
 						<?php require THEME_PATH . 'views/partials/ads_header_biolink.php' ?>
 
+						<?php if(!$data->link->design->full_page): ?>
 						<header class="d-flex flex-column align-items-center" style="<?= $data->link->design->text_style ?>">
 							<img id="image" src="<?= SITE_URL . UPLOADS_URL_PATH . 'avatars/' . $data->link->settings->image ?>" alt="<?= \Altum\Language::get()->link->biolink->image_alt ?>" class="link-image" <?= !empty($data->link->settings->image) && file_exists(UPLOADS_PATH . 'avatars/' . $data->link->settings->image) ? null : 'style="display: none;"' ?> />
 
@@ -56,6 +57,7 @@ $pvs=$kts=$kcs=null;
 
 							<p id="description"><?= $data->link->settings->description ?></p>
 						</header>
+						<?php endif ?>
 
 						<main id="links" class="<?= $data->link->design->full_page ? 'm-0 p-0' : 'mt-4' ?>">
 
@@ -127,6 +129,7 @@ $pvs=$kts=$kcs=null;
 
 						<?php require THEME_PATH . 'views/partials/ads_footer_biolink.php' ?>
 						
+						<?php if(!$data->link->design->full_page): ?>
 						<footer class="link-footer">
 							<?php if($data->link->settings->display_branding): ?>
 								<?php if(isset($data->link->settings->branding, $data->link->settings->branding->name, $data->link->settings->branding->url) && !empty($data->link->settings->branding->name)): ?>
@@ -136,6 +139,7 @@ $pvs=$kts=$kcs=null;
 								<?php endif ?>
 							<?php endif ?>
 						</footer>
+						<?php endif ?>
 					</div>
 				</div>
 			</div>
