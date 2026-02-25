@@ -39,7 +39,7 @@ $pvs=$kts=$kcs=null;
 		<div class="pt-page pt-page-2 pt-page-current pt-current-active" style="">
 			<div class="container">
 				<div class="row d-flex justify-content-center text-center">
-					<div class="col-md-8 link-content<?= isset($_GET['preview']) ? ' container-disabled-simple' : ''?>">
+					<div class="<?= $data->link->design->full_page ? 'col-12 p-0 m-0' : 'col-md-8' ?> link-content<?= isset($_GET['preview']) ? ' container-disabled-simple' : ''?>">
 
 						<?php require THEME_PATH . 'views/partials/ads_header_biolink.php' ?>
 
@@ -57,7 +57,7 @@ $pvs=$kts=$kcs=null;
 							<p id="description"><?= $data->link->settings->description ?></p>
 						</header>
 
-						<main id="links" class="mt-4">
+						<main id="links" class="<?= $data->link->design->full_page ? 'm-0 p-0' : 'mt-4' ?>">
 
 							<?php if(isset($data->link->settings->password_protector)&&$data->link->settings->password_protector):?>
 								<?php else: ?>
@@ -219,6 +219,20 @@ $pvs=$kts=$kcs=null;
 	.product-price span{font-size:14px;color:#aaa;text-decoration:line-through}
 	.product-empty{display:flex;justify-content:center;align-items:center;min-height:180px}
 	.product-empty .empty-center{display:flex;align-items:center}
+    <?php if($data->link->design->full_page): ?>
+    #links, main, .link-content, .container, .row, .pt-page, .pt-perspective, .link-body {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+    }
+    header {
+        display: none !important;
+    }
+    .link-footer {
+        display: none !important;
+    }
+    <?php endif ?>
 	</style>
 	<div class="modal fade" id="addtocart" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-product" role="document">

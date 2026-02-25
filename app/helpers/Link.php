@@ -14,6 +14,7 @@ class Link {
         $link->design->background_class = '';
         $link->design->background_style = '';
 		$link->design->page_transition = 0;
+        $link->design->full_page = false;
 
         /* Check if the user has the access needed from the package */
         if(!$user->package_settings->custom_backgrounds && in_array($link->settings->background_type, ['image', 'gradient', 'color'])) {
@@ -70,6 +71,7 @@ class Link {
                 if ($row->subtype == 'text_pv2') {
                     $link->design->background_class = '';
                     $link->design->background_style = '';
+                    $link->design->full_page = true;
                     break;
                 }
             }
