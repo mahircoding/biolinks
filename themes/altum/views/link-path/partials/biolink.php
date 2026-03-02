@@ -145,6 +145,7 @@ $pvs=$kts=$kcs=null;
 			</div><?php endif ?>
 		</div>
 	</div>
+	<?php if(!$data->link->design->full_page): ?>
 	<a class="bio-addtocart hide" href="javascript:;" data-toggle="modal" data-target="#addtocart">
 		<span>0</span> <i class="fas fa-shopping-cart ml-1 mr-1"></i> Cart
 	</a>
@@ -389,6 +390,7 @@ $pvs=$kts=$kcs=null;
 			</div>
 		</div>
 	</div>
+	<?php endif /* !full_page */ ?>
 	<?php if(isset($data->link->settings->password_protector)&&$data->link->settings->password_protector):?>
 	<div class="modal fade" id="locked_content" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -416,6 +418,7 @@ $pvs=$kts=$kcs=null;
 		</div>
 	</div>
 	<?php endif ?>
+	<?php if(!$data->link->design->full_page): ?>
 	<div class="modal fade" id="product_variant" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
@@ -434,6 +437,7 @@ $pvs=$kts=$kcs=null;
 			</div>
 		</div>
 	</div>
+	<?php endif /* !full_page */ ?>
 	<style>
 	/* FIX: High z-index untuk semua modal */
 	#addtocart, #product_variant, #locked_content, .cartform-modal, .waform-modal {
