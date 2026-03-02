@@ -28,6 +28,9 @@
             <link href="<?= SITE_URL . UPLOADS_URL_PATH . 'favicon/' . $this->settings->favicon ?>" rel="shortcut icon" />
         <?php endif ?>
 
+        <?php $is_full_page = isset($this->link->design->full_page) && $this->link->design->full_page; ?>
+
+        <?php if(!$is_full_page): ?>
         <?php if(!$this->link->settings->font): ?>
             <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
         <?php endif ?>
@@ -40,16 +43,17 @@
 		<link rel="stylesheet" href="<?= SITE_URL . ASSETS_URL_PATH . 'css/floating-button.css?v=' . PRODUCT_CODE ?>" rel="stylesheet" media="screen">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css " rel="stylesheet" media="screen">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" />
-		<script src="<?= SITE_URL . ASSETS_URL_PATH ?>js/libraries/jquery.min.js?v=<?= PRODUCT_CODE ?>"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript"></script>
-		
-		<script>function listen(t,e,n){if(e.addEventListener)e.addEventListener(t,n,!1);else{if(e.attachEvent)return e.attachEvent("on"+t,n);window.alert("Oops")}}</script>
-		
         <?php if($this->link->settings->font): ?>
 		<?php $biolink_fonts = require APP_PATH . 'includes/biolink_fonts.php'; ?>
 		<link href="https://fonts.googleapis.com/css?family=<?= $biolink_fonts[$this->link->settings->font]['font-family'] ?>&display=swap" rel="stylesheet">
 		<style>body{font-family: '<?= $biolink_fonts[$this->link->settings->font]['name'] ?>',sans-serif !important;}</style>
         <?php endif ?>
+        <?php endif /* !$is_full_page */ ?>
+
+		<script src="<?= SITE_URL . ASSETS_URL_PATH ?>js/libraries/jquery.min.js?v=<?= PRODUCT_CODE ?>"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript"></script>
+		
+		<script>function listen(t,e,n){if(e.addEventListener)e.addEventListener(t,n,!1);else{if(e.attachEvent)return e.attachEvent("on"+t,n);window.alert("Oops")}}</script>
 
         <?= \Altum\Event::get_content('head') ?>
 
@@ -67,6 +71,7 @@
     <input type="hidden" name="number_decimal_point" value="<?= $this->language->global->number->decimal_point ?>" />
     <input type="hidden" name="number_thousands_separator" value="<?= $this->language->global->number->thousands_separator ?>" />
 	
+    <?php if(!$is_full_page): ?>
     <?php foreach(['libraries/popper.min.js', 'libraries/bootstrap.min.js', 'libraries/jquery.validate.min.js', 'main.js', 'functions.js', 'libraries/fontawesome.min.js'] as $file): ?>
         <script src="<?= SITE_URL . ASSETS_URL_PATH ?>js/<?= $file ?>?v=<?= PRODUCT_CODE ?>"></script>
     <?php endforeach ?>
@@ -74,7 +79,9 @@
 	<script src="<?= SITE_URL . ASSETS_URL_PATH ?>js/libraries/page-transition.js?v=<?= PRODUCT_CODE ?>"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
+    <?php endif /* !$is_full_page */ ?>
 	
+	<?php if(!$is_full_page): ?>
 	<script>
 	$(window).on('load',function(e){
 		$('.modal').on('show.bs.modal', function (e) {
@@ -84,6 +91,7 @@
 		});
 	})
 	</script>
+	<?php endif ?>
 	
 	<?= \Altum\Event::get_content('javascript') ?>
 </html>

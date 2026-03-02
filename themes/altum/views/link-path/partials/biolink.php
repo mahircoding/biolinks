@@ -2,7 +2,7 @@
 $pvs=$kts=$kcs=null;
 ?>
 
-<body class="pt-h100 link-body link-body-relative <?= $data->link->design->background_class ?>" style="<?= $data->link->design->background_style ?>;height:100%">
+<body<?php if($data->link->design->full_page): ?> style="margin:0;padding:0"<?php else: ?> class="pt-h100 link-body link-body-relative <?= $data->link->design->background_class ?>" style="<?= $data->link->design->background_style ?>;height:100%"<?php endif ?>>
 		<?php if($this->blocked) {?>
 		<div class="link-blocked">
 			<div class="link-blocked-notes">
@@ -224,11 +224,25 @@ $pvs=$kts=$kcs=null;
 	.product-empty{display:flex;justify-content:center;align-items:center;min-height:180px}
 	.product-empty .empty-center{display:flex;align-items:center}
     <?php if($data->link->design->full_page): ?>
-    body.link-body, #pt-main.pt-perspective, .pt-page, #links {
+    html.link-html, body.link-body,
+    #pt-main, .pt-perspective, .pt-page, .pt-page-current,
+    #links, .link-content, .col-12 {
+        all: unset !important;
+        display: block !important;
         margin: 0 !important;
         padding: 0 !important;
         max-width: none !important;
         width: 100% !important;
+        height: auto !important;
+        background: none !important;
+        border: none !important;
+        font-size: unset !important;
+        font-family: unset !important;
+        box-sizing: border-box !important;
+        position: static !important;
+    }
+    body.link-body {
+        overflow: auto !important;
     }
     <?php endif ?>
 	</style>
